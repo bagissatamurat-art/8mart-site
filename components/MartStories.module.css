@@ -43,6 +43,7 @@
 .cardDesktop { width: 400px; height: min(711px, calc(100% - 48px)); border-radius: var(--r-20); }
 .cardMobile { width: 100%; height: 100%; border-radius: 0; }
 
+.layer { position: absolute; inset: 0; display: block; }
 .slideImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .preload { display: none; }
 .tap { position: absolute; inset: 0; cursor: pointer; }
