@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Spinner } from './ui/Spinner';
 import s from './MartButton.module.css';
+import { asset } from '@/lib/basePath';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'kaspi';
 export type ButtonSize = 36 | 40 | 44 | 56;
@@ -35,7 +36,7 @@ export function MartButton({
   const content = (
     <>
       {loading && <span className={s.spinnerWrap}><Spinner /></span>}
-      {kaspi && <img src="/assets/kaspi-pay.svg" alt="Kaspi Pay" className={s.kaspiImg} style={{ height: size }} />}
+      {kaspi && <img src={asset('/assets/kaspi-pay.svg')} alt="Kaspi Pay" className={s.kaspiImg} style={{ height: size }} />}
       {(!kaspi || label) && label != null && <span>{label}</span>}
       {!kaspi && amount && <><span className={s.sep} aria-hidden /><span className={s.amount}>{amount}</span></>}
     </>

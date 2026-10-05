@@ -82,6 +82,9 @@ export function getProduct(id: string): Promise<ProductDetail> {
   return reply({ ...p, images, description, specs });
 }
 
+/** Все id товаров — для статической сборки страниц /product/[id] (в проде — sitemap бэкенда). */
+export const getAllProductIds = (): Promise<string[]> => reply(M.PRODUCTS.map(p => p.id), 0);
+
 /** GET /products?ids=… — избранное в кабинете. */
 export const getProductsByIds = (ids: string[]): Promise<Product[]> =>
   reply(ids.map(id => M.PRODUCTS.find(p => p.id === id)).filter((p): p is Product => !!p));

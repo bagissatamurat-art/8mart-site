@@ -8,6 +8,7 @@ import { MartProductCard } from '../MartProductCard';
 import { Cross } from '../ui/Cross';
 import s from '../MartAccount.module.css';
 import { EMPTY } from '@/lib/copy';
+import { asset } from '@/lib/basePath';
 
 // ── Адреса ──
 
@@ -52,7 +53,7 @@ export function AccountPayments({ cards, onDeleteCard }: { cards: Card[]; onDele
   return (
     <>
       <div className={`${s.card} ${s.row}`}>
-        <img src="/assets/kaspi-logo.svg" alt="Kaspi" className={s.payIcon} />
+        <img src={asset('/assets/kaspi-logo.svg')} alt="Kaspi" className={s.payIcon} />
         <span className={s.col}>
           <b className={s.payTitle}>Kaspi Pay</b>
           <span className={s.muted13}>Оплата в приложении Kaspi — привязывать не нужно</span>

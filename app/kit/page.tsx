@@ -13,6 +13,7 @@ import Account from './sections/Account';
 import Site from './sections/Site';
 import Checkout from './sections/Checkout';
 import s from './kit.module.css';
+import { asset } from '@/lib/basePath';
 
 export const metadata: Metadata = { title: 'UI Kit · 8mart', robots: { index: false } };
 
@@ -29,7 +30,7 @@ export default function KitPage() {
   return (
     <main className={s.page}>
       <header className={s.header}>
-        <img src="/assets/logo.svg" alt="8mart" className={s.logo} />
+        <img src={asset('/assets/logo.svg')} alt="8mart" className={s.logo} />
         <h1 className={s.h1}>UI Kit</h1>
         <p className={s.lead}>Единый источник правды для экранов 8mart. Шрифт Onest, шаг отступов 4, высоты контролов 36 / 40 / 44 / 56 (textarea 84), строки списков 48 / 60.</p>
         <nav className={s.toc} aria-label="Разделы витрины">{TOC.map(([id, t]) => <a key={id} href={`#${id}`}>{t}</a>)}</nav>

@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductScreen } from '@/components/screens/ProductScreen';
-import { ApiError, getCategories, getGroup, getProduct } from '@/lib/api';
+import { ApiError, getAllProductIds, getCategories, getGroup, getProduct } from '@/lib/api';
 
 type Params = { params: Promise<{ id: string }> };
+
+// Страницы товаров собираются заранее (нужно для статического хостинга); новые id рендерятся по запросу.
+export async function generateStaticParams() {
+  return (await getAllProductIds()).map(id => ({ id }));
+}
 
 async function load(id: string) {
   try { return await getProduct(id); } catch (e) { if (e instanceof ApiError && e.status === 404) notFound(); throw e; }

@@ -4,6 +4,7 @@
 import type { Card } from '@/lib/types';
 import { CHECKOUT } from '@/lib/copy';
 import s from './checkout.module.css';
+import { asset } from '@/lib/basePath';
 
 export interface MartPaymentProps { value: string; cards?: Card[]; mobile?: boolean; onChange: (v: string) => void }
 
@@ -26,7 +27,7 @@ export function MartPayment({ value, cards = [], mobile, onChange }: MartPayment
             {mobile ? (
               <>
                 <span className={s.payLeft}>
-                  <span className={s.payIcon}>{m.id === 'kaspi' ? <img src="/assets/kaspi-logo.svg" alt="" className={s.kaspiLogo} /> : <CardIcon />}</span>
+                  <span className={s.payIcon}>{m.id === 'kaspi' ? <img src={asset('/assets/kaspi-logo.svg')} alt="" className={s.kaspiLogo} /> : <CardIcon />}</span>
                   <span className={s.payText}><span className={s.payTitle}>{m.title}</span><span className={s.paySub12}>{m.sub}</span></span>
                 </span>
                 <Radio on={m.sel} />
@@ -34,7 +35,7 @@ export function MartPayment({ value, cards = [], mobile, onChange }: MartPayment
             ) : (
               <>
                 <span className={s.payTop}>
-                  <span className={s.payIconTop}>{m.id === 'kaspi' ? <img src="/assets/kaspi-logo.svg" alt="" className={s.kaspiLogo} /> : <CardIcon />}</span>
+                  <span className={s.payIconTop}>{m.id === 'kaspi' ? <img src={asset('/assets/kaspi-logo.svg')} alt="" className={s.kaspiLogo} /> : <CardIcon />}</span>
                   <Radio on={m.sel} />
                 </span>
                 <span className={s.payText}><span className={s.payTitle}>{m.title}</span><span className={s.paySub}>{m.sub}</span></span>

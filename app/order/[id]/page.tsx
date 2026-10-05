@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import { OrderScreen } from '@/components/screens/OrderScreen';
-import { getCategories } from '@/lib/api';
+import { getCategories, getOrders } from '@/lib/api';
 
 type Params = { params: Promise<{ id: string }> };
+
+// Демо-заказы собираются заранее; остальные id рендерятся по запросу.
+export async function generateStaticParams() {
+  return (await getOrders()).map(o => ({ id: o.id }));
+}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return { title: `Заказ №${(await params).id} — 8mart`, robots: { index: false } };

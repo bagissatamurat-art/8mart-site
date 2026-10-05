@@ -13,6 +13,7 @@ import { MartButton } from './MartButton';
 import { SearchField } from './MartSearch';
 import { Chevron, Cross } from './ui/Cross';
 import s from './MartHeader.module.css';
+import { asset } from '@/lib/basePath';
 
 /** Разделы кабинета: /account/<section> (ids — как в маршрутах /account/[section]). */
 export type AccountSection = 'orders' | 'favorites' | 'addresses' | 'payments' | 'promos' | 'bonus' | 'profile';
@@ -85,7 +86,7 @@ export function MartHeader(props: MartHeaderProps) {
     return (
       <header className={s.mobile}>
         <div className={s.mRow}>
-          <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src="/assets/logo.svg" alt="8mart" className={s.mLogo} /></Link>
+          <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src={asset('/assets/logo.svg')} alt="8mart" className={s.mLogo} /></Link>
           <button type="button" className={s.mMethod} onClick={onMethod} aria-haspopup="dialog">
             {dot}
             <span className={s.mMethodText}>{method ? (address || methodLabel) : 'Как получить заказ?'}</span>
@@ -106,7 +107,7 @@ export function MartHeader(props: MartHeaderProps) {
     <>
       {open && <div className={`${s.searchOverlay} ${contained ? s.abs : s.fixed}`} onClick={closeSearch} aria-hidden />}
       <header className={s.desktop}>
-        <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src="/assets/logo.svg" alt="8mart" className={s.logo} /></Link>
+        <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src={asset('/assets/logo.svg')} alt="8mart" className={s.logo} /></Link>
 
         <button type="button" className={s.method} onClick={onMethod} aria-haspopup="dialog">
           {dot}

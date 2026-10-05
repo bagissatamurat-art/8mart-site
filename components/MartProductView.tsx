@@ -17,6 +17,7 @@ import { Colors, Cta, Description, Packs, Sizes, Specs, Ways } from './product/S
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import s from './MartProductView.module.css';
 import { STATUS } from '@/lib/copy';
+import { asset } from '@/lib/basePath';
 
 export interface MartProductViewProps {
   product: ProductDetail;
@@ -95,7 +96,7 @@ function View({
   const step = (d: number) => setIdx(i => (Math.min(i, imgs.length - 1) + d + imgs.length) % imgs.length);
 
   const share = () => {
-    const url = new URL(productUrl(pr.id), location.origin).href;
+    const url = new URL(asset(productUrl(pr.id)), location.origin).href;
     if (mobile && typeof navigator.share === 'function') navigator.share({ title: pr.name, url }).catch(() => {});
     else navigator.clipboard?.writeText(url).catch(() => {});
     clearTimeout(shareT.current);

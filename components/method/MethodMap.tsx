@@ -7,6 +7,7 @@ import type { City, Method, PickupPoint } from '@/lib/types';
 import type { LatLng } from './types';
 import s from '../MartMethodModal.module.css';
 import { GEO } from '@/lib/copy';
+import { asset } from '@/lib/basePath';
 
 export interface MethodMapHandle {
   /** Перелёт к точке; quiet — подпись над пином без повторного геокодирования. */
@@ -54,7 +55,7 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
     if (compact) q.set('compact', '1');
     if (start?.label) q.set('quiet', start.label);
     if (selected) q.set('selected', selected);
-    return '/map.html?' + q;
+    return asset('/map.html') + '?' + q;
   });
 
   const post = (m: Record<string, unknown>) => {

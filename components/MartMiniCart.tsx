@@ -10,6 +10,7 @@ import type { Method } from '@/lib/types';
 import { MartStepper } from './MartStepper';
 import { MartButton } from './MartButton';
 import s from './MartMiniCart.module.css';
+import { asset } from '@/lib/basePath';
 
 export interface MartMiniCartProps {
   /** { [lineKey]: qty } */
@@ -37,7 +38,7 @@ export function MartMiniCart({ cart, method = 'delivery', together, cartHref = '
     <aside className={`${s.box} ${sticky ? s.sticky : ''}`} aria-label="Корзина">
       {count === 0 ? (
         <div className={s.empty}>
-          <span className={s.emptyPic}><img src="/assets/empty-cart.png" alt="" width={60} height={60} /></span>
+          <span className={s.emptyPic}><img src={asset('/assets/empty-cart.png')} alt="" width={60} height={60} /></span>
           <b className={s.emptyTitle}>Корзина пуста</b>
           <span className={s.emptyText}>Добавьте товары — покажем сумму и доставку здесь</span>
         </div>

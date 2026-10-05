@@ -4,6 +4,7 @@
 // проставлены bonus, pack, delivery, group, weightKg, conditions). Цены, бонусы, вес — МОК.
 import { BONUS_RULES, DELIVERY, PROMO } from './config';
 import { groupDigits } from './domain/format';
+import { BASE_PATH as A } from './basePath';
 import { bonusFor, cartItem } from './domain/catalog';
 import { orderTotals } from './domain/order';
 import type {
@@ -37,45 +38,45 @@ export const PICKUP_POINTS: PickupPoint[] = [
 ];
 
 export const CATEGORIES: Category[] = [
-  { slug: 'stroymaterialy', name: 'Стройматериалы', img: '/assets/cat-build.png', sub: [
+  { slug: 'stroymaterialy', name: 'Стройматериалы', img: `${A}/assets/cat-build.png`, sub: [
     { slug: 'sukhie-smesi', name: 'Сухие смеси' }, { slug: 'kirpich-i-bloki', name: 'Кирпич и блоки' }, { slug: 'gipsokarton', name: 'Гипсокартон' },
     { slug: 'kraski', name: 'Краски' }, { slug: 'uteplitel', name: 'Утеплитель' }, { slug: 'plitka', name: 'Плитка' }, { slug: 'germetiki', name: 'Герметики и пена' } ] },
-  { slug: 'instrumenty', name: 'Инструменты', img: '/assets/cat-tools.png', sub: [ { slug: 'ruchnoy', name: 'Ручной инструмент' }, { slug: 'elektro', name: 'Электроинструмент' }, { slug: 'krepezh', name: 'Крепёж' } ] },
-  { slug: 'dlya-doma', name: 'Для дома', img: '/assets/cat-home.png', sub: [ { slug: 'hoztovary', name: 'Хозтовары' }, { slug: 'svet', name: 'Освещение' }, { slug: 'santehnika', name: 'Сантехника' } ] },
-  { slug: 'podarki', name: 'Подарки', img: '/assets/cat-goods.png', sub: [ { slug: 'upakovka', name: 'Упаковка' }, { slug: 'otkrytki', name: 'Открытки' }, { slug: 'shary', name: 'Шары' } ] },
-  { slug: 'tsvety', name: 'Цветы', img: '/assets/cat-flowers.png', sub: [ { slug: 'gortenzii', name: 'Гортензии' }, { slug: 'rozy', name: 'Розы' }, { slug: 'hrizantemy', name: 'Хризантемы' } ] },
+  { slug: 'instrumenty', name: 'Инструменты', img: `${A}/assets/cat-tools.png`, sub: [ { slug: 'ruchnoy', name: 'Ручной инструмент' }, { slug: 'elektro', name: 'Электроинструмент' }, { slug: 'krepezh', name: 'Крепёж' } ] },
+  { slug: 'dlya-doma', name: 'Для дома', img: `${A}/assets/cat-home.png`, sub: [ { slug: 'hoztovary', name: 'Хозтовары' }, { slug: 'svet', name: 'Освещение' }, { slug: 'santehnika', name: 'Сантехника' } ] },
+  { slug: 'podarki', name: 'Подарки', img: `${A}/assets/cat-goods.png`, sub: [ { slug: 'upakovka', name: 'Упаковка' }, { slug: 'otkrytki', name: 'Открытки' }, { slug: 'shary', name: 'Шары' } ] },
+  { slug: 'tsvety', name: 'Цветы', img: `${A}/assets/cat-flowers.png`, sub: [ { slug: 'gortenzii', name: 'Гортензии' }, { slug: 'rozy', name: 'Розы' }, { slug: 'hrizantemy', name: 'Хризантемы' } ] },
 ];
 
 export const PRODUCTS: Product[] = [
-  {id: "b1", name: "Цемент М400, 50 кг", weight: "50 кг", price: 2890, oldPrice: 3290, badge: "Товар дня", cat: "sukhie-smesi", img: "/assets/b-cement.png", bonus: 87, pack: "50 кг", delivery: "cargo", group: "m400", weightKg: 50},
-  {id: "b8", name: "Цемент М500 Д0, 50 кг", weight: "50 кг", price: 3190, cat: "sukhie-smesi", img: "/assets/b-cement.png", bonus: 64, pack: "50 кг", delivery: "cargo", weightKg: 50},
-  {id: "b9", name: "Цемент М400, 25 кг", weight: "25 кг", price: 1590, oldPrice: 1790, cat: "sukhie-smesi", img: "/assets/b-cement.png", pack: "25 кг", delivery: "express", group: "m400", weightKg: 25},
-  {id: "b10", name: "Цементно-песчаная смесь М150, 25 кг", weight: "25 кг", price: 1290, cat: "sukhie-smesi", img: "/assets/b-glue.png", pack: "25 кг", delivery: "express", weightKg: 25},
-  {id: "b11", name: "Штукатурка гипсовая, 30 кг", weight: "30 кг", price: 2890, cat: "sukhie-smesi", img: "/assets/b-glue.png", bonus: 58, pack: "30 кг", delivery: "cargo", weightKg: 30},
-  {id: "b12", name: "Краска фасадная белая, 10 л", weight: "10 л", price: 14900, cat: "kraski", img: "/assets/b-paint.png", bonus: 450, pack: "10 л", delivery: "express", colors: ["Белый","Светло-серый"], colorNote: "Колеровка бесплатно, 15 минут", weightKg: 14},
-  {id: "b2", name: "Кирпич керамический рядовой М150", weight: "1 шт", price: 145, cat: "kirpich-i-bloki", img: "/assets/b-brick.png", pack: "1 шт", delivery: "cargo", weightKg: 2.5},
-  {id: "b3", name: "Гипсокартон стеновой 12,5 мм, 2500×1200", weight: "1 лист", price: 3490, oldPrice: 3890, cat: "gipsokarton", img: "/assets/b-drywall.png", bonus: 70, pack: "1 лист", delivery: "cargo", weightKg: 25},
-  {id: "b4", name: "Краска интерьерная белая, 10 л", weight: "10 л", price: 12900, oldPrice: 14500, badge: "Хит", cat: "kraski", img: "/assets/b-paint.png", bonus: 390, pack: "10 л", delivery: "express", colors: ["Белый","Слоновая кость","Светло-серый","Бежевый"], colorNote: "Колеровка бесплатно, 15 минут", weightKg: 14},
-  {id: "b5", name: "Утеплитель минеральная вата, 50 мм, рулон", weight: "12 м²", price: 8400, cat: "uteplitel", img: "/assets/b-wool.png", bonus: 250, pack: "12 м²", delivery: "cargo", conditions: {tag: "Габаритный товар", delivery: {note: "Рулоны объёмные — до 10 шт помещаются в легковую машину, больше — грузовой"}}, weightKg: 10},
-  {id: "b6", name: "Клей для плитки, 25 кг", weight: "25 кг", price: 2190, oldPrice: 2490, cat: "sukhie-smesi", img: "/assets/b-glue.png", bonus: 45, pack: "25 кг", delivery: "express", weightKg: 25},
-  {id: "b7", name: "Плитка керамогранит серый 60×60", weight: "1,44 м²", price: 9990, cat: "plitka", img: "/assets/b-tile.png", pack: "1,44 м²", delivery: "cargo", weightKg: 32},
-  {id: "t1", name: "Молоток слесарный 500 г", weight: "1 шт", price: 3490, cat: "ruchnoy", img: "/assets/p-t1.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "t2", name: "Набор отвёрток, 6 шт", weight: "6 шт", price: 4990, oldPrice: 5890, cat: "ruchnoy", img: "/assets/p-t2.png", pack: "6 шт", delivery: "express", weightKg: 1},
-  {id: "t3", name: "Рулетка 5 м", weight: "1 шт", price: 1890, cat: "ruchnoy", img: "/assets/p-t3.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "t4", name: "Дрель-шуруповёрт аккумуляторная 18 В", weight: "1 шт", price: 32900, oldPrice: 36900, cat: "elektro", img: "/assets/p-t4.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "t5", name: "Перфоратор 800 Вт", weight: "1 шт", price: 44900, cat: "elektro", img: "/assets/p-t5.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "t6", name: "Саморезы по дереву 3,5×35, 200 шт", weight: "200 шт", price: 1290, cat: "krepezh", img: "/assets/p-t6.png", pack: "200 шт", delivery: "express", weightKg: 1},
-  {id: "t7", name: "Дюбель-гвоздь 6×40, 100 шт", weight: "100 шт", price: 1590, cat: "krepezh", img: "/assets/p-t7.png", pack: "100 шт", delivery: "express", weightKg: 1},
-  {id: "h1", name: "Мешки для строительного мусора, 10 шт", weight: "10 шт", price: 1490, cat: "hoztovary", img: "/assets/p-h1.png", pack: "10 шт", delivery: "express", weightKg: 1},
-  {id: "h2", name: "Ведро строительное 12 л", weight: "12 л", price: 990, cat: "hoztovary", img: "/assets/p-h2.png", pack: "12 л", delivery: "express", weightKg: 1},
-  {id: "h3", name: "Лампа светодиодная E27, 12 Вт", weight: "1 шт", price: 690, cat: "svet", img: "/assets/p-h3.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "h4", name: "Удлинитель 5 м, 4 розетки", weight: "1 шт", price: 3990, cat: "svet", img: "/assets/p-h4.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "h5", name: "Смеситель для раковины", weight: "1 шт", price: 12900, oldPrice: 14900, cat: "santehnika", img: "/assets/p-h5.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "g1", name: "Подарочная коробка крафт", weight: "1 шт", price: 1990, cat: "upakovka", img: "/assets/p-g1.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "g2", name: "Лента атласная, 5 м", weight: "5 м", price: 590, cat: "upakovka", img: "/assets/p-g2.png", pack: "5 м", delivery: "express", weightKg: 1},
-  {id: "g3", name: "Открытка «С днём рождения»", weight: "1 шт", price: 490, cat: "otkrytki", img: "/assets/p-g3.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "g4", name: "Шар фольгированный «Сердце»", weight: "1 шт", price: 1490, cat: "shary", img: "/assets/p-g4.png", pack: "1 шт", delivery: "express", weightKg: 1},
-  {id: "g5", name: "Набор латексных шаров, 10 шт", weight: "10 шт", price: 2490, cat: "shary", img: "/assets/p-g5.png", pack: "10 шт", delivery: "express", weightKg: 1},
+  {id: "b1", name: "Цемент М400, 50 кг", weight: "50 кг", price: 2890, oldPrice: 3290, badge: "Товар дня", cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, bonus: 87, pack: "50 кг", delivery: "cargo", group: "m400", weightKg: 50},
+  {id: "b8", name: "Цемент М500 Д0, 50 кг", weight: "50 кг", price: 3190, cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, bonus: 64, pack: "50 кг", delivery: "cargo", weightKg: 50},
+  {id: "b9", name: "Цемент М400, 25 кг", weight: "25 кг", price: 1590, oldPrice: 1790, cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, pack: "25 кг", delivery: "express", group: "m400", weightKg: 25},
+  {id: "b10", name: "Цементно-песчаная смесь М150, 25 кг", weight: "25 кг", price: 1290, cat: "sukhie-smesi", img: `${A}/assets/b-glue.png`, pack: "25 кг", delivery: "express", weightKg: 25},
+  {id: "b11", name: "Штукатурка гипсовая, 30 кг", weight: "30 кг", price: 2890, cat: "sukhie-smesi", img: `${A}/assets/b-glue.png`, bonus: 58, pack: "30 кг", delivery: "cargo", weightKg: 30},
+  {id: "b12", name: "Краска фасадная белая, 10 л", weight: "10 л", price: 14900, cat: "kraski", img: `${A}/assets/b-paint.png`, bonus: 450, pack: "10 л", delivery: "express", colors: ["Белый","Светло-серый"], colorNote: "Колеровка бесплатно, 15 минут", weightKg: 14},
+  {id: "b2", name: "Кирпич керамический рядовой М150", weight: "1 шт", price: 145, cat: "kirpich-i-bloki", img: `${A}/assets/b-brick.png`, pack: "1 шт", delivery: "cargo", weightKg: 2.5},
+  {id: "b3", name: "Гипсокартон стеновой 12,5 мм, 2500×1200", weight: "1 лист", price: 3490, oldPrice: 3890, cat: "gipsokarton", img: `${A}/assets/b-drywall.png`, bonus: 70, pack: "1 лист", delivery: "cargo", weightKg: 25},
+  {id: "b4", name: "Краска интерьерная белая, 10 л", weight: "10 л", price: 12900, oldPrice: 14500, badge: "Хит", cat: "kraski", img: `${A}/assets/b-paint.png`, bonus: 390, pack: "10 л", delivery: "express", colors: ["Белый","Слоновая кость","Светло-серый","Бежевый"], colorNote: "Колеровка бесплатно, 15 минут", weightKg: 14},
+  {id: "b5", name: "Утеплитель минеральная вата, 50 мм, рулон", weight: "12 м²", price: 8400, cat: "uteplitel", img: `${A}/assets/b-wool.png`, bonus: 250, pack: "12 м²", delivery: "cargo", conditions: {tag: "Габаритный товар", delivery: {note: "Рулоны объёмные — до 10 шт помещаются в легковую машину, больше — грузовой"}}, weightKg: 10},
+  {id: "b6", name: "Клей для плитки, 25 кг", weight: "25 кг", price: 2190, oldPrice: 2490, cat: "sukhie-smesi", img: `${A}/assets/b-glue.png`, bonus: 45, pack: "25 кг", delivery: "express", weightKg: 25},
+  {id: "b7", name: "Плитка керамогранит серый 60×60", weight: "1,44 м²", price: 9990, cat: "plitka", img: `${A}/assets/b-tile.png`, pack: "1,44 м²", delivery: "cargo", weightKg: 32},
+  {id: "t1", name: "Молоток слесарный 500 г", weight: "1 шт", price: 3490, cat: "ruchnoy", img: `${A}/assets/p-t1.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "t2", name: "Набор отвёрток, 6 шт", weight: "6 шт", price: 4990, oldPrice: 5890, cat: "ruchnoy", img: `${A}/assets/p-t2.png`, pack: "6 шт", delivery: "express", weightKg: 1},
+  {id: "t3", name: "Рулетка 5 м", weight: "1 шт", price: 1890, cat: "ruchnoy", img: `${A}/assets/p-t3.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "t4", name: "Дрель-шуруповёрт аккумуляторная 18 В", weight: "1 шт", price: 32900, oldPrice: 36900, cat: "elektro", img: `${A}/assets/p-t4.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "t5", name: "Перфоратор 800 Вт", weight: "1 шт", price: 44900, cat: "elektro", img: `${A}/assets/p-t5.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "t6", name: "Саморезы по дереву 3,5×35, 200 шт", weight: "200 шт", price: 1290, cat: "krepezh", img: `${A}/assets/p-t6.png`, pack: "200 шт", delivery: "express", weightKg: 1},
+  {id: "t7", name: "Дюбель-гвоздь 6×40, 100 шт", weight: "100 шт", price: 1590, cat: "krepezh", img: `${A}/assets/p-t7.png`, pack: "100 шт", delivery: "express", weightKg: 1},
+  {id: "h1", name: "Мешки для строительного мусора, 10 шт", weight: "10 шт", price: 1490, cat: "hoztovary", img: `${A}/assets/p-h1.png`, pack: "10 шт", delivery: "express", weightKg: 1},
+  {id: "h2", name: "Ведро строительное 12 л", weight: "12 л", price: 990, cat: "hoztovary", img: `${A}/assets/p-h2.png`, pack: "12 л", delivery: "express", weightKg: 1},
+  {id: "h3", name: "Лампа светодиодная E27, 12 Вт", weight: "1 шт", price: 690, cat: "svet", img: `${A}/assets/p-h3.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "h4", name: "Удлинитель 5 м, 4 розетки", weight: "1 шт", price: 3990, cat: "svet", img: `${A}/assets/p-h4.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "h5", name: "Смеситель для раковины", weight: "1 шт", price: 12900, oldPrice: 14900, cat: "santehnika", img: `${A}/assets/p-h5.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "g1", name: "Подарочная коробка крафт", weight: "1 шт", price: 1990, cat: "upakovka", img: `${A}/assets/p-g1.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "g2", name: "Лента атласная, 5 м", weight: "5 м", price: 590, cat: "upakovka", img: `${A}/assets/p-g2.png`, pack: "5 м", delivery: "express", weightKg: 1},
+  {id: "g3", name: "Открытка «С днём рождения»", weight: "1 шт", price: 490, cat: "otkrytki", img: `${A}/assets/p-g3.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "g4", name: "Шар фольгированный «Сердце»", weight: "1 шт", price: 1490, cat: "shary", img: `${A}/assets/p-g4.png`, pack: "1 шт", delivery: "express", weightKg: 1},
+  {id: "g5", name: "Набор латексных шаров, 10 шт", weight: "10 шт", price: 2490, cat: "shary", img: `${A}/assets/p-g5.png`, pack: "10 шт", delivery: "express", weightKg: 1},
   {id: "f1", name: "Розы Мандала", weight: "S · M · L", price: 9900, cat: "rozy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_921d21b7-a498-4184-970f-350907f58d8d_1783525261145.png", colors: ["Розовый","Красный","Белый"], variants: [{id: "f1-s", size: "S", price: 9900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2b70d6aa-a229-427c-8843-4c13d4ab011d_1783525246444.png"},{id: "f2", size: "M", price: 14400, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2b70d6aa-a229-427c-8843-4c13d4ab011d_1783525246444.png"},{id: "f1", size: "L", price: 19800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_921d21b7-a498-4184-970f-350907f58d8d_1783525261145.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
   {id: "f3", name: "Кустовые розы в букете", weight: "S · M · L", price: 11900, cat: "rozy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png", colors: ["Розовый","Белый"], variants: [{id: "f3-s", size: "S", price: 11900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png"},{id: "f3-m", size: "M", price: 17300, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png"},{id: "f3", size: "L", price: 23800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
   {id: "f4", name: "Гортензия с хризантемами", weight: "S · M · L", price: 12900, cat: "gortenzii", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png", colors: ["Микс","Голубой"], variants: [{id: "f4-s", size: "S", price: 12900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png"},{id: "f4", size: "M", price: 18700, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png"},{id: "f4-l", size: "L", price: 25800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
@@ -101,20 +102,20 @@ export const FLOWER_SPECS: [string, string][] = [['S', '35 см, 9–11 цвет
 
 // ── Сторисы и баннер (GET /stories, GET /banners). МОК, текст накладывается вёрсткой ──
 export const STORIES: Story[] = [
-  { id: 's-sale', title: 'Скидки', cover: '/assets/st-sale.jpg', slides: [
-    { img: '/assets/st-sale.jpg', title: 'Цемент М400 — 2 890 тг', text: 'Вместо 3 290 тг. Товар дня в «Выгодной полке»', cta: { label: 'Смотреть скидки', href: '/catalog?cat=stroymaterialy' } } ] },
-  { id: 's-flowers', title: 'Цветы', cover: '/assets/st-flowers.jpg', slides: [
-    { img: '/assets/st-flowers.jpg', title: 'Букет за 60–90 минут', text: 'Выберите размер и цвет — соберём и привезём сегодня', cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
-  { id: 's-promo', title: 'Промокод', cover: '/assets/st-gifts.jpg', slides: [
-    { img: '/assets/st-gifts.jpg', title: `−${PROMO.pct}% по коду ${PROMO.code}`, text: `На заказ от ${groupDigits(PROMO.minSum)} тг. Введите код в корзине`, cta: { label: 'Скопировать код', copy: PROMO.code } } ] },
-  { id: 's-tools', title: 'Инструменты', cover: '/assets/st-tools.jpg', slides: [
-    { img: '/assets/st-tools.jpg', title: 'Всё для ремонта', text: 'Дрели, шуруповёрты, ручной инструмент и расходники', cta: { label: 'В каталог', href: '/catalog?cat=instrumenty' } } ] },
-  { id: 's-delivery', title: 'Доставка', cover: '/assets/st-delivery.jpg', slides: [
-    { img: '/assets/st-delivery.jpg', title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Курьер за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе ${groupDigits(DELIVERY.fee)} тг` },
-    { img: '/assets/st-delivery.jpg', title: 'Тяжёлое — Газелью', text: 'Цемент и кирпич привезём на следующий день, поднимем на этаж', cta: { label: 'Подробнее', href: '/catalog?cat=stroymaterialy' } } ] },
+  { id: 's-sale', title: 'Скидки', cover: `${A}/assets/st-sale.jpg`, slides: [
+    { img: `${A}/assets/st-sale.jpg`, title: 'Цемент М400 — 2 890 тг', text: 'Вместо 3 290 тг. Товар дня в «Выгодной полке»', cta: { label: 'Смотреть скидки', href: '/catalog?cat=stroymaterialy' } } ] },
+  { id: 's-flowers', title: 'Цветы', cover: `${A}/assets/st-flowers.jpg`, slides: [
+    { img: `${A}/assets/st-flowers.jpg`, title: 'Букет за 60–90 минут', text: 'Выберите размер и цвет — соберём и привезём сегодня', cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
+  { id: 's-promo', title: 'Промокод', cover: `${A}/assets/st-gifts.jpg`, slides: [
+    { img: `${A}/assets/st-gifts.jpg`, title: `−${PROMO.pct}% по коду ${PROMO.code}`, text: `На заказ от ${groupDigits(PROMO.minSum)} тг. Введите код в корзине`, cta: { label: 'Скопировать код', copy: PROMO.code } } ] },
+  { id: 's-tools', title: 'Инструменты', cover: `${A}/assets/st-tools.jpg`, slides: [
+    { img: `${A}/assets/st-tools.jpg`, title: 'Всё для ремонта', text: 'Дрели, шуруповёрты, ручной инструмент и расходники', cta: { label: 'В каталог', href: '/catalog?cat=instrumenty' } } ] },
+  { id: 's-delivery', title: 'Доставка', cover: `${A}/assets/st-delivery.jpg`, slides: [
+    { img: `${A}/assets/st-delivery.jpg`, title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Курьер за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе ${groupDigits(DELIVERY.fee)} тг` },
+    { img: `${A}/assets/st-delivery.jpg`, title: 'Тяжёлое — Газелью', text: 'Цемент и кирпич привезём на следующий день, поднимем на этаж', cta: { label: 'Подробнее', href: '/catalog?cat=stroymaterialy' } } ] },
 ];
 export const BANNERS: Banner[] = [
-  { img: '/assets/banner.jpg', title: 'Ремонт без лишних поездок', text: 'Стройматериалы, инструменты и цветы — привезём сегодня', textShort: 'Привезём сегодня', cta: 'В каталог', href: '/catalog' },
+  { img: `${A}/assets/banner.jpg`, title: 'Ремонт без лишних поездок', text: 'Стройматериалы, инструменты и цветы — привезём сегодня', textShort: 'Привезём сегодня', cta: 'В каталог', href: '/catalog' },
 ];
 
 // ── Личный кабинет (GET /me/*, /orders) ──
