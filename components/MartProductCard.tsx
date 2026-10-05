@@ -11,6 +11,7 @@ import { BonusTag } from './ui/BonusCoin';
 import { HeartIcon } from './ui/HeartIcon';
 import s from './MartProductCard.module.css';
 import { Img } from '@/components/ui/Img';
+import { useChangeTick } from '@/lib/hooks/useChangeTick';
 
 export interface MartProductCardProps {
   product: Product;
@@ -29,6 +30,9 @@ export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavo
   const hasPrice = p.price != null;
   const pct = discountPct(p);
   const open = () => onOpen?.(p);
+  // Отклик только на действие: сердце — при добавлении в избранное, степпер — когда товар впервые положили.
+  const heart = useChangeTick(fav, n => n);
+  const stepIn = useChangeTick(qty > 0, n => n);
   return (
     <article className={`${s.card} ${soldOut ? s.sold : ''}`} onClick={open}>
       <div className={s.photo}>
@@ -37,7 +41,7 @@ export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavo
         {p.badge && !soldOut && <Badge tone="onPhoto" className={s.badge}>{p.badge}</Badge>}
         <button type="button" className={s.fav} aria-label={fav ? 'Убрать из избранного' : 'В избранное'} aria-pressed={fav}
           onClick={e => { e.stopPropagation(); if (favorite === undefined) setFavorite(p.id, !fav); onFavorite?.(p.id, !fav); }}>
-          <HeartIcon on={fav} />
+          <span key={heart} className={heart ? s.heartPop : s.heartBox}><HeartIcon on={fav} /></span>
         </button>
         {soldOut && <Badge tone="dark" className={s.soldBadge}>Раскупили</Badge>}
       </div>
@@ -59,7 +63,7 @@ export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavo
       {soldOut ? <div className={s.stub}>Нет в наличии</div>
         : !hasPrice ? <div className={s.stub}>Цена не задана</div>
         : p.variants ? <button type="button" className={s.add} onClick={e => { e.stopPropagation(); open(); }}>Выбрать размер</button>
-        : qty > 0 ? <MartStepper qty={qty} size={36} full onChange={q => onQty?.(p.id, Math.max(0, q))} />
+        : qty > 0 ? <span className={stepIn ? s.stepIn : s.stepBox}><MartStepper qty={qty} size={36} full onChange={q => onQty?.(p.id, Math.max(0, q))} /></span>
         : <button type="button" className={s.add} onClick={e => { e.stopPropagation(); onQty?.(p.id, 1); }}>В корзину</button>}
     </article>
   );

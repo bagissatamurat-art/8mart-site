@@ -25,3 +25,7 @@
   position: absolute; top: 2px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--r-pill);
   background: var(--primary); color: #fff; font-size: var(--fs-tab); font-weight: 700; display: flex; align-items: center; justify-content: center;
 }
+
+/* Анимации (prefers-reduced-motion — без них) */
+@keyframes pop { 0% { transform: scale(.4); } 70% { transform: scale(1.15); } 100% { transform: none; } }
+@media (prefers-reduced-motion: no-preference) { .pop { animation: pop var(--dur-pop) var(--ease-pop); } }

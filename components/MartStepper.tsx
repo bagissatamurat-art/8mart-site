@@ -2,6 +2,7 @@
 // MartStepper — COMPONENTS.md → MartStepper; референс site/MartStepper.dc.html.
 // «+» блокируется на max (opacity .4). qty → 0 удаляет позицию (решает владелец onChange).
 import s from './MartStepper.module.css';
+import { useChangeTick } from '@/lib/hooks/useChangeTick';
 
 export interface MartStepperProps {
   qty: number;
@@ -15,6 +16,7 @@ export interface MartStepperProps {
 
 export function MartStepper({ qty, max = 99, size = 44, tone = 'primary', full, disabled, onChange }: MartStepperProps) {
   const atMax = qty >= max;
+  const bump = useChangeTick(qty);
   return (
     <div className={`${s.root} ${s[tone]} ${disabled ? s.disabled : ''}`} style={{ height: size, width: full ? '100%' : undefined, fontSize: size >= 44 ? 16 : 14 }}
       onClick={e => e.stopPropagation()} role="group" aria-label="Количество">
@@ -22,7 +24,7 @@ export function MartStepper({ qty, max = 99, size = 44, tone = 'primary', full, 
         onClick={() => onChange?.(qty - 1)}>
         <span className={s.h} />
       </button>
-      <span className={s.qty} aria-live="polite">{qty}</span>
+      <span className={s.qty} aria-live="polite"><span key={bump} className={bump ? `${s.qtyNum} ${s.bump}` : s.qtyNum}>{qty}</span></span>
       <button type="button" className={s.btn} style={{ width: size, height: size, opacity: atMax ? .4 : 1 }} disabled={disabled || atMax} aria-label="Больше"
         onClick={() => onChange?.(Math.min(max, qty + 1))}>
         <span className={s.h} /><span className={s.v} />

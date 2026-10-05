@@ -55,3 +55,11 @@
 /* Кадры локально: имена анимаций в CSS-модулях хешируются. Пульс скелетона — .5 ↔ 1, 1.4 с (07). */
 @keyframes mart-spin { to { transform: rotate(360deg); } }
 @keyframes mart-pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+
+/* Анимации появления (prefers-reduced-motion — без них) */
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, -12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes toastInM { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .toast:not(.toastInline) { animation: toastIn var(--dur-enter) var(--ease-out); }
+  @media (max-width: 1023.98px) { .toast:not(.toastInline) { animation-name: toastInM; } }
+}

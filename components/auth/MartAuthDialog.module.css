@@ -23,3 +23,13 @@
   display: flex; align-items: center; justify-content: center;
 }
 .sheet .close { right: var(--s-3); top: var(--s-3); width: var(--h-44); height: var(--h-44); }
+
+/* Анимации появления (prefers-reduced-motion — без них) */
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes sheet { from { transform: translateY(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .overlay { animation: fade var(--dur-enter) var(--ease-out); }
+  .dialog { animation: rise var(--dur-enter) var(--ease-out); }
+  .sheet { animation: sheet var(--dur-enter) var(--ease-out); }
+}

@@ -16,3 +16,8 @@
   padding: 10px 10px 10px 16px; border-radius: var(--r-16); font-size: var(--fs-small); white-space: normal; box-shadow: none;
 }
 .m .action { padding: 0 12px; font-size: var(--fs-13); }
+
+/* Анимации (prefers-reduced-motion — без них) */
+@keyframes up { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes upM { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: up var(--dur-enter) var(--ease-out); } .m { animation-name: upM; } }

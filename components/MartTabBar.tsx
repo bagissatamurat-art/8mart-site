@@ -1,6 +1,7 @@
 // MartTabBar (mobile) — COMPONENTS.md → MartTabBar; референс site/MartTabBar.dc.html. Иконки — геометрией.
 import Link from 'next/link';
 import s from './MartTabBar.module.css';
+import { useChangeTick } from '@/lib/hooks/useChangeTick';
 
 export type Tab = 'home' | 'catalog' | 'cart' | 'profile';
 
@@ -16,6 +17,8 @@ const DEFAULT_HREFS: Record<Tab, string> = { home: '/', catalog: '/catalog', car
 
 export function MartTabBar({ active = 'home', cartCount = 0, hrefs, fixed }: MartTabBarProps) {
   const h = { ...DEFAULT_HREFS, ...hrefs };
+  // «Подскок» счётчика — только когда товар добавили (а не при загрузке страницы).
+  const pop = useChangeTick(cartCount, (n, p) => p > 0 && n > p);
   const tab = (k: Tab, label: string, icon: React.ReactNode, extra?: React.ReactNode) => (
     <Link href={h[k]} className={`${s.tab} ${active === k ? s.active : ''}`} aria-current={active === k ? 'page' : undefined}>
       {icon}{label}{extra}
@@ -26,7 +29,7 @@ export function MartTabBar({ active = 'home', cartCount = 0, hrefs, fixed }: Mar
       {tab('home', 'Главная', <span className={s.iHome}><span /></span>)}
       {tab('catalog', 'Каталог', <span className={s.iCatalog}><span /><span /><span /><span /></span>)}
       {tab('cart', 'Корзина', <span className={s.iCart}><span /><span /></span>,
-        cartCount > 0 && <span className={s.count} aria-label={`${cartCount} в корзине`}>{cartCount}</span>)}
+        cartCount > 0 && <span key={pop} className={pop ? `${s.count} ${s.pop}` : s.count} aria-label={`${cartCount} в корзине`}>{cartCount}</span>)}
       {tab('profile', 'Профиль', <span className={s.iProfile}><span /><span /></span>)}
     </nav>
   );

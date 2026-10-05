@@ -11,3 +11,8 @@
 .h { width: 12px; height: 2px; background: currentColor; border-radius: 1px; display: block; }
 .v { width: 2px; height: 12px; background: currentColor; border-radius: 1px; display: block; position: absolute; }
 .qty { flex: 1; text-align: center; min-width: 24px; font-variant-numeric: tabular-nums; }
+
+/* Анимации (prefers-reduced-motion — без них) */
+.qtyNum { display: inline-block; }
+@keyframes bump { 0% { transform: scale(.7); opacity: .4; } 100% { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) { .bump { animation: bump var(--dur-pop) var(--ease-pop); } }

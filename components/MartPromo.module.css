@@ -10,3 +10,7 @@
 .right { display: flex; align-items: center; gap: 8px; }
 .disc { font-size: var(--fs-small); font-weight: 600; color: var(--success); }
 .remove { width: var(--h-36); height: var(--h-36); border-radius: 50%; border: 0; background: var(--surface-card); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+
+/* Анимации (prefers-reduced-motion — без них) */
+@keyframes appear { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) { .applied { animation: appear var(--dur-enter) var(--ease-pop); } }

@@ -91,6 +91,10 @@
 
   /* Motion */
   --dur: 150ms; --ease: ease;            /* hover / focus / цвет */
+  /* Появление оверлеев, листов, тостов, отклик на действия (в макете не задано — DESIGN_NOTES → «Анимации») */
+  --dur-enter: 220ms; --dur-pop: 260ms;
+  --ease-out: cubic-bezier(.2, .8, .2, 1);   /* выезд и появление */
+  --ease-pop: cubic-bezier(.34, 1.56, .64, 1); /* лёгкий «отскок» для отклика */
   --story-duration: 6000ms;              /* = STORY_DURATION в data.js */
 
   /* Раскладка */
