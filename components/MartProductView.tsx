@@ -3,7 +3,7 @@
 // DESIGN_RULES.md → «Карточка товара (быстрый просмотр)»; референс site/MartProductView.dc.html и «08 Товар.dc.html».
 // Desktop — модалка 1040 (галерея слева sticky, миниатюры, стрелки, ←→); mobile — sheet 94% (свайп-галерея с точками,
 // CTA закреплён снизу). page=true — та же разметка без оверлея и крестика (/product/[id]).
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { bonusText, cartKey, deliveryConditions, discountPct, money } from '@/lib/domain';
@@ -44,22 +44,26 @@ export interface MartProductViewProps {
   /** Витрина: оверлей position:absolute внутри родителя, без портала, блокировки скролла и ловушки фокуса. */
   contained?: boolean;
   cartHref?: string;
+  /** Высота окна, которое модалка подменяет (скелетон): высота плавно перейдёт к своей, без скачка. */
+  fromHeight?: number;
 }
 
 export function MartProductView(props: MartProductViewProps) {
   const isMobile = useIsMobile();
   const mode = props.mode ?? 'auto';
   const mobile = mode === 'mobile' || (mode === 'auto' && isMobile);
+  // Последняя высота окна: при смене товара (фасовка) новое окно плавно переходит от неё к своей.
+  const lastH = useRef(props.fromHeight);
   // Смена товара (фасовка) сбрасывает выбор размера/цвета, фото и раскрытые блоки — как reset() в референсе.
-  return <View key={props.product.id} {...props} mobile={mobile} />;
+  return <View key={props.product.id} {...props} mobile={mobile} fromHeight={lastH.current} onHeight={h => { lastH.current = h; }} />;
 }
 
 const productUrl = (id: string) => `/product/${encodeURIComponent(id)}`;
 
 function View({
   product: pr, group, categories, method = null, qtyFor, onQty, onClose, onPickGroup, page = false, contained = false, appear = 'enter',
-  cartHref = '/cart', mobile,
-}: MartProductViewProps & { mobile: boolean }) {
+  cartHref = '/cart', mobile, fromHeight, onHeight,
+}: MartProductViewProps & { mobile: boolean; onHeight?: (h: number) => void }) {
   const [vid, setVid] = useState<string | null>(null);
   const [colorSel, setColorSel] = useState<string | null>(null);
   const [idx, setIdx] = useState(0);
@@ -106,6 +110,20 @@ function View({
     shareT.current = setTimeout(() => setShared(false), 1800);
   };
   useEffect(() => () => clearTimeout(shareT.current), []);
+
+  // ── Высота окна: от прошлой (скелетон, другая фасовка) к своей — плавно; дальше запоминаем текущую ──
+  const reportHeight = useEffectEvent((h: number) => onHeight?.(h));
+  const startHeight = useEffectEvent(() => fromHeight);
+  useLayoutEffect(() => {
+    const el = dialogRef.current;
+    if (!trap || !mounted || !el) return;
+    const from = startHeight(), to = el.getBoundingClientRect().height;
+    if (from && Math.abs(from - to) > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      el.animate([{ height: `${from}px` }, { height: `${to}px` }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    const ro = new ResizeObserver(() => reportHeight(el.getBoundingClientRect().height));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [trap, mounted]);
 
   // ── Модалка: Esc, фокус внутрь и обратно, ловушка Tab, блокировка скролла — общий слой ──
   useModal({ active: trap && mounted, ref: dialogRef, onClose });

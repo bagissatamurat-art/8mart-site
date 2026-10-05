@@ -2,7 +2,7 @@
 .dialog {
   width: 100%; max-width: 1040px; /* как у MartProductView */ background: var(--surface-card); border-radius: var(--r-24);
   padding: 28px; display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 32px; align-items: start;
-  height: min(760px, calc(100dvh - 80px)); overflow: hidden; /* ~высота модалки товара: без скачка при подмене */
+  height: min(820px, calc(100dvh - 80px)); overflow: hidden; /* как max-height модалки товара; остальное добирает плавный переход высоты */
 }
 .info { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
 .row { display: flex; gap: 8px; }

@@ -34,7 +34,7 @@ export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavo
   const heart = useChangeTick(fav, n => n);
   const stepIn = useChangeTick(qty > 0, n => n);
   return (
-    <article className={`${s.card} ${soldOut ? s.sold : ''}`} onClick={open}>
+    <article className={`${s.card} ${soldOut ? s.sold : ''}`} onClick={open} data-quickview={onOpen ? p.id : undefined}>
       <div className={s.photo}>
         {p.img ? <Img src={p.img} alt={p.name} fill sizes="(max-width: 1023px) 50vw, 220px" className={s.img} /> : <span className={s.ph}>фото товара</span>}
         {pct > 0 && !soldOut && <Badge tone="sale" className={s.disc}>−{pct}%</Badge>}

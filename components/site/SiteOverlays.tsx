@@ -1,18 +1,18 @@
 'use client';
 // Глобальные оверлеи: гидрация сторов, модалка способа получения, быстрый просмотр.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { QuickViewSkeleton } from './QuickViewSkeleton';
 
 // Модалки грузятся по требованию — их код не входит в бандл страниц.
 const MartMethodModal = dynamic(() => import('@/components/MartMethodModal').then(m => m.MartMethodModal), { ssr: false });
-const MartProductView = dynamic(() => import('@/components/MartProductView').then(m => m.MartProductView), { ssr: false, loading: () => <QuickViewSkeleton /> });
-import { getCities, getGroup, getProduct } from '@/lib/api';
+import { getCities } from '@/lib/api';
+import { loadQuickView, loadQuickViewComponent, peekQuickView, peekQuickViewComponent, preloadQuickView, type QuickViewData } from './quickViewData';
 import { useCart } from '@/lib/store/cart';
 import { useAuth } from '@/lib/store/auth';
 import { methodValue, useMethod } from '@/lib/store/method';
 import { flushPending, setCartQty, useUi } from '@/lib/store/ui';
-import type { Category, City, Product, ProductDetail } from '@/lib/types';
+import type { Category, City } from '@/lib/types';
 import type { MethodValue } from '@/components/method/types';
 
 /** Подпись способа для шапки: доставка — «Город, улица, дом», самовывоз — адрес точки. */
@@ -50,28 +50,66 @@ function MethodModalHost() {
   );
 }
 
+/** Скелетон — только если загрузка дольше этого (мс): быстрый ответ открывается сразу, без мигания. */
+const SKELETON_DELAY = 150;
+/** Наведение на карточку дольше этого (мс) — начинаем грузить товар и код модалки. */
+const HOVER_INTENT = 80;
+
+type Ready = { id: string; data: QuickViewData; View: NonNullable<ReturnType<typeof peekQuickViewComponent>>; appear: 'enter' | 'swap' };
+
 function QuickViewHost({ categories }: { categories: Category[] }) {
   const id = useUi(s => s.quickViewId);
   const close = useUi(s => s.closeQuickView);
   const open = useUi(s => s.openQuickView);
   const method = useMethod(s => s.method);
   const lines = useCart(s => s.lines);
-  const [data, setData] = useState<{ product: ProductDetail; group: Product[] } | null>(null);
+  const [ready, setReady] = useState<Ready | null>(null);
+  const [skeleton, setSkeleton] = useState(false);
+  const skelRef = useRef<HTMLDivElement>(null);
+  /** Высота, с которой окно товара плавно перейдёт к своей (высота скелетона). */
+  const fromH = useRef<number | undefined>(undefined);
+
+  // Предзагрузка по намерению: наведение (desktop), касание, фокус на карточке с data-quickview.
   useEffect(() => {
-    if (!id) { setData(null); return; }
-    // Смена товара внутри просмотра (фасовка): прошлый остаётся на экране, пока грузится новый — без вспышки скелетона.
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const target = (e: Event) => (e.target as Element | null)?.closest?.('[data-quickview]')?.getAttribute('data-quickview');
+    const onOver = (e: Event) => { clearTimeout(t); const q = target(e); if (q) t = setTimeout(() => preloadQuickView(q), HOVER_INTENT); };
+    const now = (e: Event) => { const q = target(e); if (q) preloadQuickView(q); };
+    document.addEventListener('pointerover', onOver);
+    document.addEventListener('pointerdown', now);
+    document.addEventListener('focusin', now);
+    return () => { clearTimeout(t); document.removeEventListener('pointerover', onOver); document.removeEventListener('pointerdown', now); document.removeEventListener('focusin', now); };
+  }, []);
+
+  useEffect(() => {
+    if (!id) { setReady(null); setSkeleton(false); fromH.current = undefined; return; }
+    const data = peekQuickView(id), View = peekQuickViewComponent();
+    // Окно уже стоит (прошлый товар или скелетон) — проявляется только содержимое, иначе полный вход.
+    if (data && View) { setReady(prev => ({ id, data, View, appear: prev ? 'swap' : 'enter' })); return; }
+    // Смена товара внутри просмотра (фасовка): прошлый остаётся на экране, пока грузится новый — скелетон не нужен.
     let live = true;
-    getProduct(id).then(async product => {
-      const group = product.group ? await getGroup(product.group) : [];
-      if (live) setData({ product, group });
+    const t = setTimeout(() => { if (live) setSkeleton(true); }, SKELETON_DELAY);
+    Promise.all([loadQuickView(id), loadQuickViewComponent()]).then(async ([data, View]) => {
+      // Скелетон ещё выезжает — дать ему доехать, иначе окно товара встанет на место рывком.
+      const anims = (skelRef.current?.parentElement?.getAnimations({ subtree: true }) ?? [])
+        .filter(a => a.effect?.getComputedTiming().endTime !== Infinity); // пульс скелетона бесконечный — его не ждём
+      await Promise.all(anims.map(a => a.finished.catch(() => {})));
+      if (!live) return;
+      const skel = skelRef.current?.getBoundingClientRect().height;
+      if (skel) fromH.current = skel;
+      setReady(prev => ({ id, data, View, appear: prev || skel ? 'swap' : 'enter' }));
+      setSkeleton(false);
     }).catch(close);
-    return () => { live = false; };
+    return () => { live = false; clearTimeout(t); };
   }, [id, close]);
+
   if (!id) return null;
-  if (!data) return <QuickViewSkeleton onClose={close} />;
+  if (!ready) return skeleton ? <QuickViewSkeleton ref={skelRef} onClose={close} /> : null;
+  const { View, data } = ready;
   return (
-    <MartProductView product={data.product} group={data.group} categories={categories} method={method}
-      qtyFor={k => lines[k] || 0} onQty={setCartQty} onClose={close} onPickGroup={open} mode="auto" appear="swap" />
+    <View product={data.product} group={data.group} categories={categories} method={method}
+      qtyFor={k => lines[k] || 0} onQty={setCartQty} onClose={close} onPickGroup={open} mode="auto"
+      appear={ready.appear} fromHeight={fromH.current} />
   );
 }
 
