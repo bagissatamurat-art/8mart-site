@@ -1,5 +1,5 @@
 /* Значения — из site/06 Личный кабинет.dc.html (модалки 6a / 6c). */
-.overlay { position: fixed; inset: 0; z-index: 100; background: var(--overlay); display: flex; align-items: center; justify-content: center; padding: var(--s-6); font-family: var(--font); color: var(--ink-1); }
+.overlay { position: fixed; inset: 0; z-index: var(--z-modal); background: var(--overlay); display: flex; align-items: center; justify-content: center; padding: var(--s-6); font-family: var(--font); color: var(--ink-1); }
 .overlayM { align-items: flex-end; padding: 0; }
 /* Витрина: оверлей внутри рамки, не на весь экран */
 .inline { position: absolute; }

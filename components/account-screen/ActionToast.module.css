@@ -1,7 +1,7 @@
 /* 06: desktop — padding 12 12 12 20, pill, gap 16, текст 15; кнопка 36, padding 0 14, 14/600.
    mobile — padding 10 10 10 16, r16, gap 12, текст 14; кнопка 36, padding 0 12, 13/600. */
 .toast {
-  position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); z-index: 80;
+  position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); z-index: var(--z-toast);
   display: flex; align-items: center; gap: 16px; padding: 12px 12px 12px 20px; border-radius: var(--r-pill);
   background: var(--ink-1); color: #fff; font-family: var(--font); font-size: var(--fs-15); box-shadow: var(--shadow-toast); white-space: nowrap;
 }

@@ -22,7 +22,7 @@
   .side, .aside { display: none; }
 }
 
-.mobileHeader { position: sticky; top: 0; z-index: 30; }
+.mobileHeader { position: sticky; top: 0; z-index: var(--z-header); }
 
 /* Сайдбар категорий: белый, r24, padding 12, строки 48 */
 .sidebar { background: var(--surface-card); border-radius: var(--r-24); padding: 12px; display: flex; flex-direction: column; gap: 2px; }
@@ -53,5 +53,5 @@
 .chips::-webkit-scrollbar { display: none; }
 
 /* Экран поиска mobile поверх страницы */
-.searchScreen { position: fixed; inset: 0; z-index: 70; background: var(--surface-page); overflow-y: auto; }
+.searchScreen { position: fixed; inset: 0; z-index: var(--z-screen); background: var(--surface-page); overflow-y: auto; }
 .searchScreenInner { max-width: var(--mobile-max); margin: 0 auto; min-height: 100%; background: var(--surface-page); }

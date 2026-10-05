@@ -21,6 +21,8 @@ import { asset } from '@/lib/basePath';
 
 export interface MartProductViewProps {
   product: ProductDetail;
+  /** enter — полная анимация входа; swap — модалка подменяет скелетон (затемнение уже есть): проявляется только содержимое. */
+  appear?: 'enter' | 'swap';
   /** Товары той же group (фасовки). Берутся только с совпадающим group; меньше двух — блок скрыт. */
   group?: Product[];
   /** Для подписи «Категория · Подкатегория» над названием. */
@@ -55,7 +57,7 @@ const productUrl = (id: string) => `/product/${encodeURIComponent(id)}`;
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
 
 function View({
-  product: pr, group, categories, method = null, qtyFor, onQty, onClose, onPickGroup, page = false, contained = false,
+  product: pr, group, categories, method = null, qtyFor, onQty, onClose, onPickGroup, page = false, contained = false, appear = 'enter',
   cartHref = '/cart', mobile,
 }: MartProductViewProps & { mobile: boolean }) {
   const [vid, setVid] = useState<string | null>(null);
@@ -200,7 +202,7 @@ function View({
     </div>
   );
 
-  const rootCls = [s.root, mobile ? s.mobile : s.desktop, page ? s.page : s.modal, contained ? s.contained : ''].filter(Boolean).join(' ');
+  const rootCls = [s.root, mobile ? s.mobile : s.desktop, page ? s.page : s.modal, contained ? s.contained : '', appear === 'swap' ? s.swap : ''].filter(Boolean).join(' ');
   const tree = (
     <div className={rootCls} onClick={modal ? () => onClose?.() : undefined} data-mart-modal={trap || undefined}>
       <div ref={dialogRef} className={s.dialog} onClick={e => e.stopPropagation()}

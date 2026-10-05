@@ -2,7 +2,7 @@
   display: grid; grid-template-columns: repeat(4, 1fr); height: var(--h-tabbar); padding: 8px 8px 20px;
   background: var(--surface-card); border-top: 1px solid var(--divider); font-family: var(--font); width: 100%;
 }
-.fixed { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); max-width: var(--mobile-max); z-index: 50; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+.fixed { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); max-width: var(--mobile-max); z-index: var(--z-tabbar); padding-bottom: max(20px, env(safe-area-inset-bottom)); }
 .tab {
   position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   text-decoration: none; color: var(--ink-3); font-size: var(--fs-tab); font-weight: 600; border-radius: var(--r-12);

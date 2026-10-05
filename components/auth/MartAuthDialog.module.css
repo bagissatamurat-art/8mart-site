@@ -1,6 +1,6 @@
 /* Оболочка MartAuth в кабинете — из 06 Личный кабинет.dc.html (phoneModalD / phoneModalM). */
 .overlay {
-  position: fixed; inset: 0; z-index: 100; background: var(--overlay);
+  position: fixed; inset: 0; z-index: var(--z-modal); background: var(--overlay);
   display: flex; align-items: center; justify-content: center; padding: var(--s-6);
 }
 /* Витрина: оверлей внутри рамки, а не на весь экран */

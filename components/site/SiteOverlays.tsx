@@ -59,6 +59,7 @@ function QuickViewHost({ categories }: { categories: Category[] }) {
   const [data, setData] = useState<{ product: ProductDetail; group: Product[] } | null>(null);
   useEffect(() => {
     if (!id) { setData(null); return; }
+    // Смена товара внутри просмотра (фасовка): прошлый остаётся на экране, пока грузится новый — без вспышки скелетона.
     let live = true;
     getProduct(id).then(async product => {
       const group = product.group ? await getGroup(product.group) : [];
@@ -67,10 +68,10 @@ function QuickViewHost({ categories }: { categories: Category[] }) {
     return () => { live = false; };
   }, [id, close]);
   if (!id) return null;
-  if (!data || data.product.id !== id) return <QuickViewSkeleton onClose={close} />;
+  if (!data) return <QuickViewSkeleton onClose={close} />;
   return (
     <MartProductView product={data.product} group={data.group} categories={categories} method={method}
-      qtyFor={k => lines[k] || 0} onQty={setCartQty} onClose={close} onPickGroup={open} mode="auto" />
+      qtyFor={k => lines[k] || 0} onQty={setCartQty} onClose={close} onPickGroup={open} mode="auto" appear="swap" />
   );
 }
 

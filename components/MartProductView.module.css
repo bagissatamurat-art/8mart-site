@@ -1,7 +1,7 @@
 /* MartProductView — значения из site/MartProductView.dc.html. Литералы без токена помечены «из референса, нет в tokens.css». */
 
 /* ── Оверлей / корень ── */
-.root { inset: 0; display: flex; justify-content: center; box-sizing: border-box; font-family: var(--font); color: var(--ink-1); z-index: 30; }
+.root { inset: 0; display: flex; justify-content: center; box-sizing: border-box; font-family: var(--font); color: var(--ink-1); z-index: var(--z-modal); }
 .modal { position: fixed; background: var(--overlay); overflow: hidden; }
 .modal.contained { position: absolute; }
 .modal.desktop { align-items: flex-start; padding: 40px 24px; }
@@ -225,9 +225,11 @@
 @keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
 @keyframes sheet { from { transform: translateY(100%); } to { transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
-  .modal:not(.contained) { animation: fade var(--dur-enter) var(--ease-out); }
-  .modal.desktop:not(.contained) .dialog { animation: rise var(--dur-enter) var(--ease-out); }
-  .modal.mobile:not(.contained) .dialog { animation: sheet var(--dur-enter) var(--ease-out); }
+  .modal:not(.contained):not(.swap) { animation: fade var(--dur-enter) var(--ease-out); }
+  .modal.desktop:not(.contained):not(.swap) .dialog { animation: rise var(--dur-enter) var(--ease-out); }
+  .modal.mobile:not(.contained):not(.swap) .dialog { animation: sheet var(--dur-enter) var(--ease-out); }
+  /* swap: окно уже стоит (скелетон или прошлый товар) — проявляется только содержимое */
+  .swap .dialog > * { animation: fade 180ms var(--ease-out); }
 }
 
 /* Анимации (prefers-reduced-motion — без них) */

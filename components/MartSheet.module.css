@@ -1,6 +1,6 @@
 /* MartSheet — нижний лист. Значения из шторок site/07 Каталог.dc.html. */
 .overlay { inset: 0; background: var(--overlay); display: flex; align-items: flex-end; animation: sheet-fade var(--dur) var(--ease); }
-.fixed { position: fixed; z-index: 100; }
+.fixed { position: fixed; z-index: var(--z-modal); }
 .contained { position: absolute; z-index: 20; }
 
 .panel {

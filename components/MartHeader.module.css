@@ -10,7 +10,7 @@
 
 /* ── Desktop 80 ── */
 .desktop {
-  position: relative; z-index: 31; display: flex; align-items: center; gap: 16px;
+  position: relative; z-index: var(--z-header); display: flex; align-items: center; gap: 16px;
   height: var(--h-header-desktop); padding: 0 var(--page-pad-desktop);
   background: var(--surface-card); border-radius: 0 0 var(--r-24) var(--r-24); font-family: var(--font); color: var(--ink-1);
 }
@@ -50,7 +50,7 @@
 
 /* Затемнение под шапкой, пока открыты подсказки */
 .searchOverlay {
-  top: var(--h-header-desktop); left: 0; right: 0; bottom: 0; z-index: 30;
+  top: var(--h-header-desktop); left: 0; right: 0; bottom: 0; z-index: calc(var(--z-header) - 1);
   background: rgba(23, 21, 26, .35); /* из референса (05 Поиск), нет в tokens.css: --overlay — .45 */
 }
 
@@ -73,9 +73,9 @@
 /* ── Боковое меню 420 ── */
 .fixed { position: fixed; }
 .abs { position: absolute; }
-.overlay { inset: 0; background: var(--overlay); z-index: 40; }
+.overlay { inset: 0; background: var(--overlay); z-index: var(--z-menu); }
 .aside {
-  top: 0; right: 0; bottom: 0; width: 420px; max-width: 100%; z-index: 41; overflow: hidden;
+  top: 0; right: 0; bottom: 0; width: 420px; max-width: 100%; z-index: calc(var(--z-menu) + 1); overflow: hidden;
   display: flex; flex-direction: column; background: var(--surface-card); border-radius: var(--r-24) 0 0 var(--r-24);
   box-shadow: -12px 0 40px rgba(23, 21, 26, .12); /* из референса, нет в tokens.css */
   font-family: var(--font); color: var(--ink-1);

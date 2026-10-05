@@ -34,7 +34,7 @@
 .skeleton { display: block; background: var(--surface-disabled); animation: mart-pulse 1.4s ease-in-out infinite; }
 
 .toast {
-  position: fixed; left: 50%; top: 96px; transform: translateX(-50%); width: 460px; max-width: calc(100% - 32px); z-index: 80;
+  position: fixed; left: 50%; top: 96px; transform: translateX(-50%); width: 460px; max-width: calc(100% - 32px); z-index: var(--z-toast);
   display: flex; align-items: center; gap: 12px; padding: 12px 8px 12px 18px; border-radius: var(--r-16);
   background: var(--ink-1); color: #fff; font-size: var(--fs-15); line-height: 1.35; box-shadow: var(--shadow-toast);
 }
