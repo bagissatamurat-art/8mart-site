@@ -26,6 +26,7 @@ import type { Category, Product } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import c from './CartScreen.module.css';
 import { asset } from '@/lib/basePath';
+import { Img } from '@/components/ui/Img';
 
 export function CartScreen({ categories }: { categories: Category[] }) {
   const mobile = useIsMobile();
@@ -82,7 +83,7 @@ export function CartScreen({ categories }: { categories: Category[] }) {
         {!ready ? <div className={c.mBody}><Skeleton h={200} r={20} /><Skeleton h={120} r={20} /></div>
           : empty ? (
             <div className={c.emptyM}>
-              <span className={c.emptyPicM}><img src={asset('/assets/empty-cart.png')} alt="" /></span>
+              <span className={c.emptyPicM}><Img src={asset('/assets/empty-cart.png')} w={80} h={80} /></span>
               <b className={c.emptyTitleM}>{CART.empty.title}</b>
               <span className={c.emptyText}>{CART.empty.textMobile}</span>
               <MartButton label="В каталог" size={56} href="/catalog" />
@@ -112,7 +113,7 @@ export function CartScreen({ categories }: { categories: Category[] }) {
         {!ready ? <div className={c.grid}><Skeleton h={320} r={24} /><Skeleton h={420} r={24} /></div>
           : empty ? (
             <div className={c.empty}>
-              <span className={c.emptyPic}><img src={asset('/assets/empty-cart.png')} alt="" /></span>
+              <span className={c.emptyPic}><Img src={asset('/assets/empty-cart.png')} w={100} h={100} /></span>
               <h1 className={c.emptyTitle}>{CART.empty.title}</h1>
               <span className={c.emptyText}>{CART.empty.text}</span>
               <MartButton label="В каталог" size={56} href="/catalog" />

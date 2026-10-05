@@ -6,6 +6,7 @@ import type { Category } from '@/lib/types';
 import { catalogHref, type CatalogLevel } from './catalogUrl';
 import s from '@/components/site/site.module.css';
 import c from './catalog.module.css';
+import { Img } from '@/components/ui/Img';
 
 export function CatalogSidebar({ categories, level, cat, sub }: { categories: Category[]; level: CatalogLevel; cat: string | null; sub: string | null }) {
   const isRoot = level === 'root';
@@ -18,7 +19,7 @@ export function CatalogSidebar({ categories, level, cat, sub }: { categories: Ca
           <div key={x.slug} className={c.sideItem}>
             <Link href={catalogHref({ cat: x.slug })} className={`${s.sideRow} ${on ? s.sideRowActive : ''}`}
               aria-current={on && level === 'cat' ? 'page' : undefined}>
-              {x.img ? <img src={x.img} alt="" className={s.sideImg} /> : <span className={`${s.sideImg} ${c.stripes}`} />}{x.name}
+              {x.img ? <Img src={x.img} w={36} h={36} className={s.sideImg} /> : <span className={`${s.sideImg} ${c.stripes}`} />}{x.name}
             </Link>
             {on && x.sub.length > 0 && (
               <div className={c.sideSubs}>

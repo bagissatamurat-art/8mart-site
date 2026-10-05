@@ -31,6 +31,7 @@ import type { Category, Product, SortId } from '@/lib/types';
 import { EMPTY, SEARCH } from '@/lib/copy';
 import site from '@/components/site/site.module.css';
 import s from './SearchScreen.module.css';
+import { Img } from '@/components/ui/Img';
 
 /** Сортировки поиска: по умолчанию «По релевантности» (5c) — порядок выдачи, в API это sort по умолчанию (id 'popular'). */
 const SEARCH_SORTS: [SortId, string][] = [['popular', SEARCH.relevance], ...SORTS.filter(x => x[0] !== 'popular')];
@@ -202,7 +203,7 @@ export function SearchScreen({ q, categories }: { q: string; categories: Categor
                 </button>
                 {tree.map(c => (
                   <div key={c.slug} role="group" aria-label={c.name} className={s.tree}>
-                    <div className={s.groupHead}><img src={c.img} alt="" className={s.groupImg} />{c.name}</div>
+                    <div className={s.groupHead}><Img src={c.img} w={24} h={24} className={s.groupImg} />{c.name}</div>
                     {c.subs.map(x => (
                       <button key={x.slug} type="button" className={`${s.row} ${s.subRow} ${sub === x.slug ? s.rowOn : ''}`} aria-pressed={sub === x.slug}
                         onClick={() => pickSub(sub === x.slug ? null : x.slug)}>

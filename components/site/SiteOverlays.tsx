@@ -1,8 +1,12 @@
 'use client';
 // Глобальные оверлеи: гидрация сторов, модалка способа получения, быстрый просмотр.
 import { useEffect, useState } from 'react';
-import { MartMethodModal } from '@/components/MartMethodModal';
-import { MartProductView } from '@/components/MartProductView';
+import dynamic from 'next/dynamic';
+import { QuickViewSkeleton } from './QuickViewSkeleton';
+
+// Модалки грузятся по требованию — их код не входит в бандл страниц.
+const MartMethodModal = dynamic(() => import('@/components/MartMethodModal').then(m => m.MartMethodModal), { ssr: false });
+const MartProductView = dynamic(() => import('@/components/MartProductView').then(m => m.MartProductView), { ssr: false, loading: () => <QuickViewSkeleton /> });
 import { getCities, getGroup, getProduct } from '@/lib/api';
 import { useCart } from '@/lib/store/cart';
 import { useAuth } from '@/lib/store/auth';
@@ -62,7 +66,8 @@ function QuickViewHost({ categories }: { categories: Category[] }) {
     }).catch(close);
     return () => { live = false; };
   }, [id, close]);
-  if (!id || !data || data.product.id !== id) return null;
+  if (!id) return null;
+  if (!data || data.product.id !== id) return <QuickViewSkeleton onClose={close} />;
   return (
     <MartProductView product={data.product} group={data.group} categories={categories} method={method}
       qtyFor={k => lines[k] || 0} onQty={setCartQty} onClose={close} onPickGroup={open} mode="auto" />

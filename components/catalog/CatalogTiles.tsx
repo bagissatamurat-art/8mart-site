@@ -7,6 +7,7 @@ import type { Category } from '@/lib/types';
 import { Chevron } from '@/components/ui/Cross';
 import { catalogHref } from './catalogUrl';
 import c from './catalog.module.css';
+import { Img } from '@/components/ui/Img';
 
 /** Счётчики и обложки по slug (корневой или подкатегории) — собирает app/catalog/page.tsx через getProducts(). */
 export type CatalogStats = Record<string, { count: number; img?: string }>;
@@ -20,7 +21,7 @@ export function RootTiles({ categories, stats }: { categories: Category[]; stats
         const meta = x.sub.length ? CATALOG.tileMeta(`${x.sub.length} ${plural(x.sub.length, one, few, many)}`, itemsTitle(n)) : CATALOG.catEmpty.title;
         return (
           <Link key={x.slug} href={catalogHref({ cat: x.slug })} className={c.rootTile}>
-            {x.img ? <img src={x.img} alt="" className={c.rootImg} /> : <span className={`${c.rootImg} ${c.stripes}`} />}
+            {x.img ? <Img src={x.img} w={160} h={160} className={c.rootImg} /> : <span className={`${c.rootImg} ${c.stripes}`} />}
             <span className={c.rootText}><b className={c.rootName}>{x.name}</b><span className={c.meta}>{meta}</span></span>
             <span className={c.rootArrow} aria-hidden><Chevron size={8} color="var(--ink-3)" direction="right" /></span>
           </Link>
@@ -41,7 +42,7 @@ export function SubTiles({ category, stats }: { category: Category; stats: Catal
         const st = stats[x.slug];
         return (
           <Link key={x.slug} href={catalogHref({ cat: category.slug, sub: x.slug })} className={c.subTile}>
-            {st?.img ? <img src={st.img} alt="" className={c.subImg} /> : <span className={`${c.subImg} ${c.stripes}`} />}
+            {st?.img ? <Img src={st.img} w={120} h={120} className={c.subImg} /> : <span className={`${c.subImg} ${c.stripes}`} />}
             <span className={c.subText}><b className={c.subName}>{x.name}</b><span className={c.meta}>{st?.count ? itemsTitle(st.count) : CATALOG.subEmpty}</span></span>
           </Link>
         );

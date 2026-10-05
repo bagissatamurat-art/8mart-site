@@ -8,6 +8,7 @@ import { Badge } from './ui/Badge';
 import { BonusTag } from './ui/BonusCoin';
 import { Cross } from './ui/Cross';
 import s from './MartCartLine.module.css';
+import { Img } from '@/components/ui/Img';
 
 export interface MartCartLineProps {
   product: CartProduct;
@@ -23,7 +24,7 @@ export function MartCartLine({ product: p, qty, max = 99, soldOut, compact, onCh
   return (
     <div className={`${s.line} ${compact ? s.compact : ''} ${soldOut ? s.sold : ''}`}>
       <div className={s.photo}>
-        {p.img && <img src={p.img} alt="" className={s.img} />}
+        {p.img && <Img src={p.img} w={compact ? 64 : 80} h={compact ? 64 : 80} className={s.img} />}
         {soldOut && <Badge tone="dark" className={s.soldBadge}>Раскупили</Badge>}
       </div>
       <div className={s.text}>

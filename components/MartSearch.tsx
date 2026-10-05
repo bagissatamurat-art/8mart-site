@@ -12,6 +12,7 @@ import { Chevron, Cross } from './ui/Cross';
 import { Spinner } from './ui/Spinner';
 import s from './MartSearch.module.css';
 import { EMPTY } from '@/lib/copy';
+import { Img } from '@/components/ui/Img';
 
 /** Ответ GET /search/suggest?q */
 export interface SearchSuggest {
@@ -59,7 +60,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
       onSubmit={e => { e.preventDefault(); const q = value.trim(); if (q) onSubmit?.(q); }}>
       {icon && <span className={s.loupe} aria-hidden><span /><span /></span>}
       <input ref={ref} type="search" enterKeyHint="search" className={s.input} value={value} placeholder={placeholder} autoFocus={autoFocus}
-        aria-label="Поиск по 8mart" aria-controls={controls} aria-expanded={expanded} autoComplete="off"
+        aria-label="Поиск по 8mart" role={controls ? "combobox" : undefined} aria-controls={controls} aria-expanded={controls ? !!expanded : undefined} aria-autocomplete={controls ? "list" : undefined} autoComplete="off"
         onChange={e => onChange(e.target.value)} onFocus={onFocus} onBlur={onBlur}
         onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); onEscape?.(); } }} />
       {clearable && value.length > 0 && (
@@ -187,7 +188,7 @@ function ProductRow({ product: p, query, onPick }: { product: Product; query: st
     : <>{p.name.slice(0, i)}<b className={s.hit}>{p.name.slice(i, i + query.length)}</b>{p.name.slice(i + query.length)}</>;
   return (
     <button type="button" className={s.productRow} onClick={() => onPick?.(p)}>
-      {p.img ? <img src={p.img} alt="" className={s.thumb} /> : <span className={s.thumb} />}
+      {p.img ? <Img src={p.img} w={44} h={44} className={s.thumb} /> : <span className={s.thumb} />}
       <span className={s.productText}>
         <span className={s.productName}>{name}</span>
         <span className={s.weight}>{p.weight}</span>

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import type { Category } from '@/lib/types';
 import s from './site.module.css';
+import { Img } from '@/components/ui/Img';
 
 export function CategorySidebar({ categories, active }: { categories: Category[]; active?: string }) {
   return (
@@ -9,7 +10,7 @@ export function CategorySidebar({ categories, active }: { categories: Category[]
       {categories.map(c => (
         <Link key={c.slug} href={`/catalog?cat=${c.slug}`} className={`${s.sideRow} ${c.slug === active ? s.sideRowActive : ''}`}
           aria-current={c.slug === active ? 'page' : undefined}>
-          <img src={c.img} alt="" className={s.sideImg} />{c.name}
+          <Img src={c.img} w={36} h={36} className={s.sideImg} />{c.name}
         </Link>
       ))}
     </nav>

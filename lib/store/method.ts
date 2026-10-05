@@ -3,6 +3,7 @@
 // Выбирается до первого добавления в корзину; модалку можно закрыть всегда.
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { browserStorage } from './storage';
 import type { MethodValue } from '@/components/method/types';
 
 export const METHOD_KEY = '8mart.method';
@@ -22,7 +23,7 @@ export const useMethod = create<MethodState>()(persist(
     set: (v, label) => set({ ...EMPTY, ...v, label }),
     reset: () => set({ ...EMPTY, label: '' }),
   }),
-  { name: METHOD_KEY, storage: createJSONStorage(() => localStorage), skipHydration: true, version: 1,
+  { name: METHOD_KEY, storage: createJSONStorage(browserStorage), skipHydration: true, version: 1,
     partialize: ({ set: _s, reset: _r, ...v }) => v },
 ));
 

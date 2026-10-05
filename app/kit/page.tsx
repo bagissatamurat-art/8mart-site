@@ -15,7 +15,7 @@ import Checkout from './sections/Checkout';
 import s from './kit.module.css';
 import { asset } from '@/lib/basePath';
 
-export const metadata: Metadata = { title: 'UI Kit · 8mart', robots: { index: false } };
+export const metadata: Metadata = { title: 'UI Kit', robots: { index: false } };
 
 const TOC: [string, string][] = [
   ['colors', 'Цвета'], ['type', 'Типографика'], ['radii', 'Радиусы'], ['button', 'Кнопка'], ['input', 'Инпут'], ['promo', 'Промокод'],

@@ -1,0 +1,10 @@
+.overlay { position: fixed; inset: 0; z-index: 30; background: var(--overlay); display: flex; justify-content: center; align-items: flex-start; padding: 40px 24px; }
+.dialog {
+  width: 100%; max-width: 1040px; /* как у MartProductView */ background: var(--surface-card); border-radius: var(--r-24);
+  padding: 28px; display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 32px; align-items: start;
+}
+.info { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
+.row { display: flex; gap: 8px; }
+.mobile { align-items: flex-end; padding: 0; }
+.mobile .dialog { height: 94%; border-radius: var(--r-24) var(--r-24) 0 0; padding: 0; grid-template-columns: 1fr; gap: 0; overflow: hidden; align-content: start; }
+.mobile .info { padding: 16px; }

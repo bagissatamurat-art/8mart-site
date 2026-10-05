@@ -159,7 +159,7 @@ function View({
           </div>
         )}
         <div className={s.titleRow}>
-          <h2 className={s.title}>{pr.name}</h2>
+          {page ? <h1 className={s.title}>{pr.name}</h1> : <h2 className={s.title}>{pr.name}</h2>}
           {mobile && (
             <button type="button" className={s.favInline} onClick={toggleFav} aria-label={favBtnLabel} aria-pressed={fav}>
               <HeartIcon on={fav} size={22} />

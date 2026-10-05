@@ -11,6 +11,7 @@ import { MartStepper } from './MartStepper';
 import { MartButton } from './MartButton';
 import s from './MartMiniCart.module.css';
 import { asset } from '@/lib/basePath';
+import { Img } from '@/components/ui/Img';
 
 export interface MartMiniCartProps {
   /** { [lineKey]: qty } */
@@ -38,7 +39,7 @@ export function MartMiniCart({ cart, method = 'delivery', together, cartHref = '
     <aside className={`${s.box} ${sticky ? s.sticky : ''}`} aria-label="Корзина">
       {count === 0 ? (
         <div className={s.empty}>
-          <span className={s.emptyPic}><img src={asset('/assets/empty-cart.png')} alt="" width={60} height={60} /></span>
+          <span className={s.emptyPic}><Img src={asset('/assets/empty-cart.png')} w={60} h={60} /></span>
           <b className={s.emptyTitle}>Корзина пуста</b>
           <span className={s.emptyText}>Добавьте товары — покажем сумму и доставку здесь</span>
         </div>
@@ -48,7 +49,7 @@ export function MartMiniCart({ cart, method = 'delivery', together, cartHref = '
           <div className={s.list} style={{ maxHeight: listMax }}>
             {lines.map(l => (
               <div key={l.p.id} className={s.row}>
-                {l.p.img ? <img src={l.p.img} alt="" className={s.thumb} /> : <span className={s.thumb} />}
+                {l.p.img ? <Img src={l.p.img} w={56} h={56} className={s.thumb} /> : <span className={s.thumb} />}
                 <span className={s.rowText}><span className={s.rowName}>{l.p.name}</span><span className={s.rowSum}>{money((l.p.price || 0) * l.qty)}</span></span>
                 <MartStepper qty={l.qty} size={36} tone="neutral" onChange={q => onChange?.(l.p.id, q)} />
               </div>

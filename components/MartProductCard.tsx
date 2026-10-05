@@ -1,6 +1,7 @@
 'use client';
 // MartProductCard — COMPONENTS.md → MartProductCard; референс site/MartProductCard.dc.html.
 // Название ровно 2 строки, низ прижат — в сетке с align-items: stretch карточки одной высоты.
+import Link from 'next/link';
 import { money, discountPct, groupDigits } from '@/lib/domain';
 import type { Product } from '@/lib/types';
 import { setFavorite, useIsFavorite } from '@/lib/store/favorites';
@@ -9,6 +10,7 @@ import { Badge } from './ui/Badge';
 import { BonusTag } from './ui/BonusCoin';
 import { HeartIcon } from './ui/HeartIcon';
 import s from './MartProductCard.module.css';
+import { Img } from '@/components/ui/Img';
 
 export interface MartProductCardProps {
   product: Product;
@@ -30,7 +32,7 @@ export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavo
   return (
     <article className={`${s.card} ${soldOut ? s.sold : ''}`} onClick={open}>
       <div className={s.photo}>
-        {p.img ? <img src={p.img} alt="" className={s.img} loading="lazy" /> : <span className={s.ph}>фото товара</span>}
+        {p.img ? <Img src={p.img} alt={p.name} fill sizes="(max-width: 1023px) 50vw, 220px" className={s.img} /> : <span className={s.ph}>фото товара</span>}
         {pct > 0 && !soldOut && <Badge tone="sale" className={s.disc}>−{pct}%</Badge>}
         {p.badge && !soldOut && <Badge tone="onPhoto" className={s.badge}>{p.badge}</Badge>}
         <button type="button" className={s.fav} aria-label={fav ? 'Убрать из избранного' : 'В избранное'} aria-pressed={fav}
@@ -45,7 +47,10 @@ export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavo
           <span className={s.price}>{(p.variants ? 'от ' : '') + money(p.price)}</span>
           {p.oldPrice != null && !soldOut && <span className={s.old}>{money(p.oldPrice)}</span>}
         </div>
-        <button type="button" className={s.nameBtn} onClick={e => { e.stopPropagation(); open(); }}><span className={s.name}>{p.name}</span></button>
+        <Link href={`/product/${p.id}`} className={s.nameBtn} prefetch={false}
+          onClick={e => { e.stopPropagation(); if (onOpen && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) { e.preventDefault(); open(); } }}>
+          <span className={s.name}>{p.name}</span>
+        </Link>
         <div className={s.metaRow}>
           <span className={s.weight}>{p.weight}</span>
           {!!p.bonus && !soldOut && <BonusTag pill><span>+</span><span>{groupDigits(p.bonus)}</span></BonusTag>}

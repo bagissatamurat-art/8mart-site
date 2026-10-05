@@ -10,7 +10,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  return { title: `Заказ №${(await params).id} — 8mart`, robots: { index: false } };
+  return { title: `Заказ №${(await params).id}`, robots: { index: false } };
 }
 
 // Заказ читается на клиенте: в моке созданные заказы живут в localStorage браузера.

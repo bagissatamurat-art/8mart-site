@@ -22,7 +22,7 @@ import { CATALOG } from '@/lib/copy';
 import { itemsTitle } from '@/lib/domain';
 import { useCart } from '@/lib/store/cart';
 import { setCartQty, useUi } from '@/lib/store/ui';
-import type { Category, ProductQuery, SortId } from '@/lib/types';
+import type { Category, Product, ProductQuery, SortId } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import c from '@/components/catalog/catalog.module.css';
 import k from './CatalogScreen.module.css';
@@ -32,7 +32,7 @@ export type { CatalogStats };
 /** Ввод цены пишем в адрес с задержкой, чтобы не плодить запросы на каждую цифру. */
 const PRICE_DEBOUNCE = 400;
 
-export function CatalogScreen({ categories, stats }: { categories: Category[]; stats: CatalogStats }) {
+export function CatalogScreen({ categories, stats, initial }: { categories: Category[]; stats: CatalogStats; /** Первая страница списка с сервера */ initial?: { items: Product[]; total: number } | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -78,7 +78,7 @@ export function CatalogScreen({ categories, stats }: { categories: Category[]; s
   const query = useMemo<Omit<ProductQuery, 'page'> | null>(() => level !== 'list' ? null : {
     category: url.cat ?? undefined, sub: url.sub ?? undefined, sort: url.sort, ...filtersToQuery(url.filters, defs),
   }, [level, url, defs]);
-  const list = useCatalogList(query);
+  const list = useCatalogList(query, initial);
   // Счётчик в CTA листа фильтров не падает в 0, пока грузится новая выборка.
   const [lastTotal, setLastTotal] = useState(0);
   useEffect(() => { if (!list.loading) setLastTotal(list.total); }, [list.loading, list.total]);

@@ -14,7 +14,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { section } = await params;
-  return { title: `${isSection(section) ? sectionTitle(section) : 'Личный кабинет'} — 8mart`, robots: { index: false } };
+  return { title: `${isSection(section) ? sectionTitle(section) : 'Личный кабинет'}`, robots: { index: false } };
 }
 
 export default async function AccountSectionPage({ params }: Params) {

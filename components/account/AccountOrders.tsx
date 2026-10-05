@@ -11,6 +11,7 @@ import { BonusCoin } from '../ui/BonusCoin';
 import { isActiveOrder, orderSteps, statusLabel } from './sections';
 import s from '../MartAccount.module.css';
 import { EMPTY } from '@/lib/copy';
+import { Img } from '@/components/ui/Img';
 
 export interface AccountOrdersProps {
   orders: Order[];
@@ -102,7 +103,7 @@ function PastOrder({ o, href, onOpen, onRepeat }: { o: Order; href: string; onOp
         </div>
         <div className={s.thumbs}>
           {thumbs.map((p, i) => p?.img
-            ? <img key={i} src={p.img} alt="" className={`${s.thumb} ${cancelled ? s.dim : ''}`} />
+            ? <Img key={i} src={p.img} w={44} h={44} className={`${s.thumb} ${cancelled ? s.dim : ''}`} />
             : <span key={i} className={`${s.thumb} ${cancelled ? s.dim : ''}`} aria-hidden />)}
           {n > 4 && <span className={s.more}>+{n - 4}</span>}
         </div>

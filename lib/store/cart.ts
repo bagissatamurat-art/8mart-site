@@ -3,6 +3,7 @@
 // В проде синхронизируется с POST /cart/validate (цены, наличие, отправления).
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { browserStorage } from './storage';
 
 export const CART_KEY = '8mart.cart';
 
@@ -35,7 +36,7 @@ export const useCart = create<CartState>()(persist(
     clear: () => set({ lines: {}, promo: null }),
   }),
   // Гидрация вручную после монтирования (StoreHydrator), чтобы SSR-разметка совпала с первой отрисовкой.
-  { name: CART_KEY, storage: createJSONStorage(() => localStorage), skipHydration: true, version: 1,
+  { name: CART_KEY, storage: createJSONStorage(browserStorage), skipHydration: true, version: 1,
     partialize: s => ({ lines: s.lines, together: s.together, promo: s.promo }) },
 ));
 

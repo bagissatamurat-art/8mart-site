@@ -6,6 +6,7 @@ import { MartStories } from '@/components/MartStories';
 import { MartBanner } from '@/components/MartBanner';
 import { MartChip } from '@/components/MartChip';
 import { Toast } from '@/components/ui/Toast';
+import { HOME_H1 } from '@/lib/seo';
 import { CategorySidebar } from '@/components/site/CategorySidebar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteTabBar } from '@/components/site/SiteTabBar';
@@ -37,6 +38,7 @@ export function HomeScreen({ categories, stories, banner, deals, flowers }: Home
       <div className={s.grid}>
         <div className={s.side}><CategorySidebar categories={categories} /></div>
         <main className={s.main}>
+          <h1 className="visually-hidden">{HOME_H1}</h1>
           <div className={h.top}>
             <div className={s.desktopOnly}><MartStories stories={stories} mode="desktop" /></div>
             <div className={s.mobileOnly}><MartStories stories={stories} mode="mobile" /></div>

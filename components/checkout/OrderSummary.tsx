@@ -5,6 +5,7 @@ import type { Totals } from '@/lib/domain';
 import type { PlanLine } from '@/lib/domain';
 import { BonusCoin } from '../ui/BonusCoin';
 import s from './checkout.module.css';
+import { Img } from '@/components/ui/Img';
 
 /** Зелёная плашка «+N бонусов начислим после получения заказа». */
 export function EarnNote({ children }: { children: React.ReactNode }) {
@@ -19,7 +20,7 @@ export function SummaryLines({ lines, mobile }: { lines: SummaryLine[]; mobile?:
     <div className={s.sumLines}>
       {lines.map(l => (
         <div key={l.key} className={`${s.sumLine} ${mobile ? s.sumLineM : ''}`}>
-          {l.img ? <img src={l.img} alt="" className={s.sumImg} /> : <span className={s.sumImg} />}
+          {l.img ? <Img src={l.img} w={48} h={48} className={s.sumImg} /> : <span className={s.sumImg} />}
           <span className={s.sumText}><span className={s.ellipsis}>{l.name}</span><span className={s.sumQty}>{l.qty} × {money(l.price)}</span></span>
           <span className={s.sumSum}>{money((l.price || 0) * l.qty)}</span>
         </div>

@@ -11,6 +11,7 @@ import { markStorySeen, useStoriesSeen } from '@/lib/store/storiesSeen';
 import type { Story } from '@/lib/types';
 import s from './MartStories.module.css';
 import { STATUS } from '@/lib/copy';
+import { Img } from '@/components/ui/Img';
 
 export type StoriesMode = 'desktop' | 'mobile';
 
@@ -47,7 +48,7 @@ export function MartStories({ stories, mode = 'mobile', className }: MartStories
               onClick={() => setOpenAt(i)}
             >
               <span className={s.thumbInner}>
-                <img src={t.cover} alt="" className={s.thumbImg} />
+                <Img src={t.cover} fill sizes="104px" className={s.thumbImg} />
                 <span className={s.thumbShade} aria-hidden />
                 <span className={s.thumbTitle}>{t.title}</span>
               </span>
@@ -256,8 +257,8 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
         </button>
       )}
       <div className={[s.card, desktop ? s.cardDesktop : s.cardMobile].join(' ')}>
-        <img src={slide.img} alt="" draggable={false} className={s.slideImg} />
-        {nextImg && <img src={nextImg} alt="" className={s.preload} aria-hidden />}
+        <Img src={slide.img} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} priority />
+        {nextImg && <span className={s.preload} aria-hidden><Img src={nextImg} fill sizes="(max-width: 1023px) 100vw, 400px" /></span>}
         <div className={s.tap} onPointerDown={onDown} onPointerUp={onUp} onPointerCancel={onCancel} aria-hidden />
         <div className={s.top}>
           <div className={s.bars}>
@@ -268,7 +269,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
             ))}
           </div>
           <div className={s.head}>
-            <img src={story.cover} alt="" className={s.avatar} />
+            <Img src={story.cover} w={32} h={32} className={s.avatar} />
             <b className={s.storyTitle}>{story.title}</b>
             {showPause && <span className={s.pause} role="img" aria-label="Пауза"><span /><span /></span>}
             <button ref={closeRef} type="button" className={s.close} aria-label="Закрыть" onClick={close}>

@@ -14,6 +14,8 @@ import { SearchField } from './MartSearch';
 import { Chevron, Cross } from './ui/Cross';
 import s from './MartHeader.module.css';
 import { asset } from '@/lib/basePath';
+import { Img } from '@/components/ui/Img';
+import { Skeleton } from './ui/Spinner';
 
 /** Разделы кабинета: /account/<section> (ids — как в маршрутах /account/[section]). */
 export type AccountSection = 'orders' | 'favorites' | 'addresses' | 'payments' | 'promos' | 'bonus' | 'profile';
@@ -28,6 +30,8 @@ export interface MartHeaderProps {
   /** Способ получения; null — не выбран («Как получить заказ?», оранжевая точка). */
   method?: Method | null;
   address?: string;
+  /** Сторы ещё не прочитаны из localStorage — вместо способа и адреса скелетон (без мигания «Как получить заказ?»). */
+  methodLoading?: boolean;
   /** Пусто — гость («Войти»). */
   userName?: string;
   userPhone?: string;
@@ -60,7 +64,7 @@ export interface MartHeaderProps {
 
 export function MartHeader(props: MartHeaderProps) {
   const {
-    mode = 'desktop', method = null, address = '', userName = '', query = '', searchFocused, searchPanel, menuOpen = false, contained,
+    mode = 'desktop', method = null, address = '', methodLoading, userName = '', query = '', searchFocused, searchPanel, menuOpen = false, contained,
     homeHref = '/', onMethod, onQuery, onSearchFocus, onSearchClose, onSubmit, onMenuOpenChange,
   } = props;
   const router = useRouter();
@@ -86,10 +90,10 @@ export function MartHeader(props: MartHeaderProps) {
     return (
       <header className={s.mobile}>
         <div className={s.mRow}>
-          <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src={asset('/assets/logo.svg')} alt="8mart" className={s.mLogo} /></Link>
+          <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src={asset('/assets/logo.svg')} alt="8mart" width={101} height={24} className={s.mLogo} /></Link>
           <button type="button" className={s.mMethod} onClick={onMethod} aria-haspopup="dialog">
             {dot}
-            <span className={s.mMethodText}>{method ? (address || methodLabel) : 'Как получить заказ?'}</span>
+            <span className={s.mMethodText}>{methodLoading ? <Skeleton w={150} h={14} r={6} /> : method ? (address || methodLabel) : 'Как получить заказ?'}</span>
             <span className={s.mChev}><Chevron size={7} direction="down" /></span>
           </button>
         </div>
@@ -107,13 +111,15 @@ export function MartHeader(props: MartHeaderProps) {
     <>
       {open && <div className={`${s.searchOverlay} ${contained ? s.abs : s.fixed}`} onClick={closeSearch} aria-hidden />}
       <header className={s.desktop}>
-        <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src={asset('/assets/logo.svg')} alt="8mart" className={s.logo} /></Link>
+        <Link href={homeHref} className={s.logoLink} aria-label="8mart — на главную"><img src={asset('/assets/logo.svg')} alt="8mart" width={118} height={28} className={s.logo} /></Link>
 
         <button type="button" className={s.method} onClick={onMethod} aria-haspopup="dialog">
           {dot}
           <span className={s.methodText}>
-            <span className={s.methodLabel}>{methodLabel}</span>
-            <span className={s.methodAddr}>{method ? (address || 'Укажите адрес') : 'Выбрать способ'}</span>
+            {methodLoading ? <><Skeleton w={70} h={10} r={5} /><Skeleton w={130} h={14} r={6} style={{ marginTop: 4 }} /></> : <>
+              <span className={s.methodLabel}>{methodLabel}</span>
+              <span className={s.methodAddr}>{method ? (address || 'Укажите адрес') : 'Выбрать способ'}</span>
+            </>}
           </span>
           <span className={s.methodChev}><Chevron size={8} direction="down" /></span>
         </button>
@@ -222,7 +228,7 @@ export function MartSideMenu({ userName = '', userPhone = '', orders = [], accou
             <span className={s.caption}>Каталог</span>
             {categories.map(c => (
               <Link key={c.slug} href={`/catalog?cat=${c.slug}`} className={s.row} onClick={onClose}>
-                <span className={s.catIcon}>{c.img && <img src={c.img} alt="" />}</span>{c.name}
+                <span className={s.catIcon}>{c.img && <Img src={c.img} w={32} h={32} />}</span>{c.name}
               </Link>
             ))}
           </div>

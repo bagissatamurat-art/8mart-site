@@ -22,6 +22,7 @@ export function SiteHeader({ categories, mobile = true, query }: { categories: C
   const method = useMethod(st => st.method);
   const label = useMethod(st => st.label);
   const openMethod = useUi(st => st.openMethod);
+  const hydrated = useUi(st => st.hydrated);
   const user = useAuth(st => st.user);
   const logout = useAuth(st => st.logout);
   const openQuickView = useUi(st => st.openQuickView);
@@ -50,7 +51,7 @@ export function SiteHeader({ categories, mobile = true, query }: { categories: C
     <>
       <div className={s.desktopOnly}>
         <div className={s.headerWrap}>
-          <MartHeader mode="desktop" method={method} address={label} categories={categories} query={q}
+          <MartHeader mode="desktop" method={method} address={label} methodLoading={!hydrated} categories={categories} query={q}
             userName={user ? user.name || 'Профиль' : ''} userPhone={user?.phone} onLogout={() => { logout(); router.push('/'); }}
             orders={user ? menuData.orders : []} accountBadges={{ ...menuData.badges, favorites: favorites.length }}
             loginHref={`/login?next=${encodeURIComponent(pathname || '/')}`}
@@ -61,7 +62,7 @@ export function SiteHeader({ categories, mobile = true, query }: { categories: C
       {mobile && (
         <div className={s.mobileOnly}>
           <div className={s.mobileHeader}>
-            <MartHeader mode="mobile" method={method} address={label} query="" onMethod={openMethod}
+            <MartHeader mode="mobile" method={method} address={label} methodLoading={!hydrated} query="" onMethod={openMethod}
               onSearchFocus={() => setScreen(true)} />
           </div>
           {screen && (

@@ -5,6 +5,7 @@ import { DELIVERY } from '@/lib/config';
 import { money } from '@/lib/domain/format';
 import type { Banner } from '@/lib/types';
 import s from './MartBanner.module.css';
+import { Img } from '@/components/ui/Img';
 
 /** Деньги в свободном тексте — «тг» без точки. */
 const tg = (n: number) => money(n).replace('тг.', 'тг');
@@ -21,7 +22,7 @@ export function MartBanner({ banner, mode = 'desktop', textShort, className }: M
   const desktop = mode === 'desktop';
   const link = (
     <Link href={banner.href} className={[s.banner, desktop ? s.desktop : s.mobile, !desktop && className].filter(Boolean).join(' ')}>
-      <img src={banner.img} alt="" className={s.img} />
+      <Img src={banner.img} fill priority sizes={desktop ? '(max-width: 1023px) 0px, 720px' : '(max-width: 1023px) 100vw, 0px'} className={s.img} />
       <b className={s.title}>{banner.title}</b>
       <span className={s.text}>{desktop ? banner.text : (textShort ?? banner.textShort ?? banner.text)}</span>
       {desktop && banner.cta && <span className={s.pill}>{banner.cta}</span>}

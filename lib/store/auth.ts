@@ -2,6 +2,7 @@
 // Вход: { user, accessToken }. В проде refresh — httpOnly cookie; в моке храним в localStorage '8mart.auth'.
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { browserStorage } from './storage';
 
 export interface AuthUser { phone: string; name: string }
 
@@ -20,6 +21,6 @@ export const useAuth = create<AuthState>()(persist(
     setName: name => { const u = get().user; if (u) set({ user: { ...u, name } }); },
     logout: () => set({ user: null, accessToken: null }),
   }),
-  { name: '8mart.auth', storage: createJSONStorage(() => localStorage), skipHydration: true, version: 1,
+  { name: '8mart.auth', storage: createJSONStorage(browserStorage), skipHydration: true, version: 1,
     partialize: s => ({ user: s.user, accessToken: s.accessToken }) },
 ));

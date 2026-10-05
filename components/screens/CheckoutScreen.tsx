@@ -30,6 +30,7 @@ import { useUi } from '@/lib/store/ui';
 import type { Bonus, Card, Category } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import c from './CheckoutScreen.module.css';
+import { Img } from '@/components/ui/Img';
 
 export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const router = useRouter();
@@ -151,7 +152,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
         <div key={sh.id} className={mobile ? c.shipM : c.ship}>
           <MartShipmentHead compact={mobile} kind={sh.kind} method={method} label={sh.label} meta={sh.meta} feeText={sh.feeText}
             when={sh.isCargo && !pk ? `${SHIPPING.cargo.days[cargoDay]}, ${SHIPPING.cargo.intervals[cargoInt]}` : sh.when} />
-          <div className={c.thumbs}>{sh.lines.filter(l => !l.soldOut).map(l => l.p.img && <img key={l.p.id} src={l.p.img} alt="" className={c.thumb} />)}</div>
+          <div className={c.thumbs}>{sh.lines.filter(l => !l.soldOut).map(l => l.p.img && <Img key={l.p.id} src={l.p.img} w={40} h={40} className={c.thumb} />)}</div>
           {!pk && sh.isCourier && (
             <div className={c.slotGroup}><span className={c.slotTitle}>Когда доставить</span>
               {chips(SHIPPING.courier.slots.map(([id, label]) => ({ label, sel: slot === id, pick: () => setSlot(id) })))}</div>

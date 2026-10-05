@@ -9,7 +9,8 @@ import type {
 } from './types';
 
 /** Задержка мока, чтобы экраны проходили через состояние загрузки. */
-const LATENCY = 250;
+/** Задержка мока только в браузере (видны состояния загрузки); на сервере — без задержки. */
+const LATENCY = typeof window === 'undefined' ? 0 : 250;
 const reply = <T,>(data: T, ms = LATENCY): Promise<T> =>
   new Promise(res => setTimeout(() => res(structuredClone(data)), ms));
 
@@ -192,10 +193,13 @@ const hhmm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.g
 const MOCK_ORDERS_KEY = '8mart.mockOrders';
 type MockOrders = { placed: Order[]; cancelled: Record<string, string> };
 const readMock = (): MockOrders => {
+  // На сервере хранилища нет (обращение к localStorage в Node даёт предупреждение); в тестах его подставляет vitest.setup.
+  const ls = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  if (typeof window === 'undefined' && !(ls && 'value' in ls)) return { placed: [], cancelled: {} };
   try { const v = JSON.parse(globalThis.localStorage?.getItem(MOCK_ORDERS_KEY) || 'null'); if (v?.placed && !Array.isArray(v.cancelled)) return v; } catch { /* нет хранилища */ }
   return { placed: [], cancelled: {} };
 };
-const writeMock = (m: MockOrders) => { try { globalThis.localStorage?.setItem(MOCK_ORDERS_KEY, JSON.stringify(m)); } catch { /* нет хранилища */ } };
+const writeMock = (m: MockOrders) => { if (typeof window === 'undefined' && !('value' in (Object.getOwnPropertyDescriptor(globalThis, 'localStorage') ?? {}))) return; try { globalThis.localStorage?.setItem(MOCK_ORDERS_KEY, JSON.stringify(m)); } catch { /* нет хранилища */ } };
 const allOrders = (): Order[] => {
   const m = readMock();
   return [...m.placed, ...M.ORDERS].map(o => (m.cancelled[o.id]

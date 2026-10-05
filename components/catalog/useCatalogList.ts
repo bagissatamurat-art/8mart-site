@@ -18,9 +18,12 @@ export interface CatalogList {
   sentinel: (el: HTMLElement | null) => void;
 }
 
-export function useCatalogList(query: Omit<ProductQuery, 'page'> | null): CatalogList {
+/** initial — первая страница, отрендеренная на сервере (SEO и без вспышки скелетонов); используется для стартового запроса. */
+export function useCatalogList(query: Omit<ProductQuery, 'page'> | null, initial?: { items: Product[]; total: number } | null): CatalogList {
   const key = query ? JSON.stringify(query) : '';
-  const [st, setSt] = useState({ key: '', items: [] as Product[], total: 0, page: 0, loading: true, loadingMore: false, error: false });
+  const [st, setSt] = useState(() => initial && key
+    ? { key, items: initial.items, total: initial.total, page: 1, loading: false, loadingMore: false, error: false }
+    : { key: '', items: [] as Product[], total: 0, page: 0, loading: true, loadingMore: false, error: false });
   const [attempt, setAttempt] = useState(0);
   const req = useRef(0);
   const stRef = useRef(st);
@@ -29,6 +32,7 @@ export function useCatalogList(query: Omit<ProductQuery, 'page'> | null): Catalo
 
   useEffect(() => {
     if (!key) return;
+    if (attempt === 0 && stRef.current.key === key && stRef.current.page > 0) return; // уже есть с сервера
     const id = ++req.current;
     busy.current = false;
     setSt({ key, items: [], total: 0, page: 0, loading: true, loadingMore: false, error: false });

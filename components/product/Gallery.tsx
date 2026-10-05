@@ -4,6 +4,7 @@
 import { useEffect, useRef } from 'react';
 import { HeartIcon } from '../ui/HeartIcon';
 import s from '../MartProductView.module.css';
+import { Img } from '@/components/ui/Img';
 
 /** null — плейсхолдер вместо фото. */
 export type Slide = string | null;
@@ -11,7 +12,7 @@ export type Slide = string | null;
 const PH_TEXT = 'фото товара';
 
 function Photo({ src, alt, small }: { src: Slide; alt: string; small?: boolean }) {
-  if (src) return <img src={src} alt={alt} className={s.photoImg} />;
+  if (src) return <Img src={src} alt={alt} fill sizes={small ? '64px' : '(max-width: 1023px) 100vw, 460px'} priority={!small} className={s.photoImg} />;
   return <span className={small ? s.phSmall : s.ph}>{small ? null : PH_TEXT}</span>;
 }
 

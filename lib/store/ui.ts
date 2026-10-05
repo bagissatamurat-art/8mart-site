@@ -45,5 +45,8 @@ const AUTO_KEY = '8mart.methodAutoShown';
 export function autoOpenMethodOnce() {
   if (useMethod.getState().method) return;
   try { if (sessionStorage.getItem(AUTO_KEY)) return; sessionStorage.setItem(AUTO_KEY, '1'); } catch { /* приватный режим — показываем */ }
-  useUi.setState({ methodOpen: true });
+  // После загрузки страницы и в простое: карта в модалке не конкурирует с главной картинкой (LCP).
+  const open = () => { if (!useMethod.getState().method) useUi.setState({ methodOpen: true }); };
+  const idle = () => ('requestIdleCallback' in window ? window.requestIdleCallback(open, { timeout: 1500 }) : setTimeout(open, 300));
+  if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle, { once: true });
 }
