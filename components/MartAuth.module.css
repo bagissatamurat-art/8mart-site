@@ -26,13 +26,6 @@
 .statusError { color: var(--danger); }
 .statusOk { color: var(--success); font-weight: 600; }
 .statusWait { display: flex; align-items: center; gap: var(--s-2); color: var(--ink-2); }
-/* Спиннер референса: 2px var(--border), верх — primary. 12 / 14 — из референса. */
-.spin {
-  width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--primary);
-  flex: none; animation: authspin .7s linear infinite;
-}
-.spin14 { width: 14px; height: 14px; }
-@keyframes authspin { to { transform: rotate(360deg); } }
 
 .links { display: flex; flex-direction: column; gap: var(--s-1); }
 .linkBtn {

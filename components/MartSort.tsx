@@ -8,6 +8,7 @@ import type { SortId } from '@/lib/types';
 import { MartSheet } from './MartSheet';
 import { Check, Chevron } from './ui/Cross';
 import s from './MartSort.module.css';
+import { RadioMark } from './ui/Marks';
 
 type SortList = [SortId, string][];
 
@@ -116,7 +117,7 @@ export function MartSortSheet({ open, onClose, value, onChange, sorts = SORTS, c
             <button key={id} type="button" role="radio" aria-checked={sel} className={`${s.radioRow} ${sel ? s.radioRowOn : ''}`}
               onClick={() => { onChange(id); onClose(); }}>
               {label}
-              <span className={s.radio} aria-hidden><span className={s.dot} /></span>
+              <RadioMark on={sel} />
             </button>
           );
         })}

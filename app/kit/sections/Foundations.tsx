@@ -1,7 +1,7 @@
 // Цвета, типографика, радиусы/тени/motion — как в site/UI Kit.dc.html. Значения — из styles/tokens.css.
 import { KitSection } from '../Kit';
 import { DELIVERY } from '@/lib/config';
-import { money } from '@/lib/domain';
+import { tg } from '@/lib/domain';
 import s from './sections.module.css';
 
 const COLORS: [string, string, boolean?][] = [
@@ -21,7 +21,7 @@ const TYPE: [string, React.CSSProperties, React.ReactNode][] = [
   ['h1 32/800', { fontSize: 'var(--fs-h1)', fontWeight: 800, letterSpacing: 'var(--tracking-tight)', lineHeight: 'var(--lh-h1)' }, 'Корзина · 3 товара'],
   ['h2 24/700', { fontSize: 'var(--fs-h2)', fontWeight: 700, lineHeight: 'var(--lh-h2)' }, 'Стройматериалы'],
   ['h3 18/600', { fontSize: 'var(--fs-h3)', fontWeight: 600, lineHeight: 'var(--lh-h3)' }, 'Способ получения'],
-  ['body 16/400', { fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-body)' }, `Бесплатная доставка от ${money(DELIVERY.freeFrom).replace('тг.', 'тг')}, иначе ${money(DELIVERY.fee).replace('тг.', 'тг')}`],
+  ['body 16/400', { fontSize: 'var(--fs-body)', lineHeight: 'var(--lh-body)' }, `Бесплатная доставка от ${tg(DELIVERY.freeFrom)}, иначе ${tg(DELIVERY.fee)}`],
   ['small 14/400', { fontSize: 'var(--fs-small)', lineHeight: 'var(--lh-small)', color: 'var(--ink-2)' }, 'Цены и наличие зависят от филиала'],
   ['caption 12/500', { fontSize: 'var(--fs-caption)', fontWeight: 500, color: 'var(--ink-3)' }, '50 кг · Товар дня'],
   ['price 16/700', { fontSize: 16, fontWeight: 700 }, <>4 090 тг. <s style={{ fontWeight: 400, color: 'var(--ink-3)', fontSize: 13 }}>4 590 тг.</s></>],

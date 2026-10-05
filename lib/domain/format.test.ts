@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { bonusText, formatPhone, itemsTitle, money, phoneComplete, plural } from './format';
+import { bonusText, formatPhone, itemsTitle, money, phoneComplete, plural, tg } from './format';
+
+describe('tg', () => {
+  it('сумма внутри фразы — без точки', () => {
+    expect(tg(20000)).toBe('20 000 тг');
+  });
+});
 
 describe('money', () => {
   it('формат «4 090 тг.» с обычным пробелом', () => {

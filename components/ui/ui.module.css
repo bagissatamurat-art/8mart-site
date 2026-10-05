@@ -30,8 +30,21 @@
 .alert_success { background: var(--success-bg); }
 .alert_success .alertIcon { background: var(--success); }
 
-.spinner { display: block; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: mart-spin .7s linear infinite; box-sizing: content-box; }
-.skeleton { display: block; background: var(--surface-disabled); animation: mart-pulse 1.4s ease-in-out infinite; }
+.spinner { display: block; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: var(--anim-spin); box-sizing: content-box; }
+.skeleton { display: block; background: var(--surface-disabled); animation: var(--anim-pulse); }
+/* Спиннер референса в строках статуса (подсказки адреса, вход): кольцо --border, верх — primary, 2px. */
+.spinnerTrack { border: 2px solid var(--border); border-top-color: var(--primary); box-sizing: border-box; flex: none; }
+
+/* Скелетон карточки товара (07 Каталог): 300 (mobile 290), r20, p8, фото 1:1 r14 + две строки r6, пульс 1.4 с. */
+.cardSkel {
+  height: 300px; border-radius: var(--r-20); background: var(--surface-card); padding: 8px;
+  display: flex; flex-direction: column; gap: 10px; animation: var(--anim-pulse);
+}
+.cardSkel > span { display: block; background: var(--surface-page); border-radius: 6px; /* из референса, нет в tokens.css */ }
+.cardSkel > span:first-child { aspect-ratio: 1 / 1; border-radius: var(--r-14); }
+.cardSkel > span:nth-child(2) { width: 50%; height: 16px; }
+.cardSkel > span:nth-child(3) { width: 80%; height: 14px; }
+@media (max-width: 1023.98px) { .cardSkel { height: 290px; } }
 
 .toast {
   position: fixed; left: 50%; top: 96px; transform: translateX(-50%); width: 460px; max-width: calc(100% - 32px); z-index: var(--z-toast);
@@ -51,10 +64,6 @@
 .alertCompact { padding: 12px 14px; border-radius: var(--r-14); font-size: var(--fs-13); gap: 10px; }
 .alertCompact .alertMain { gap: 10px; }
 .alertCompact .alertIcon { width: 18px; height: 18px; font-size: var(--fs-caption); }
-
-/* Кадры локально: имена анимаций в CSS-модулях хешируются. Пульс скелетона — .5 ↔ 1, 1.4 с (07). */
-@keyframes mart-spin { to { transform: rotate(360deg); } }
-@keyframes mart-pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
 
 /* Анимации появления (prefers-reduced-motion — без них) */
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -12px); } to { opacity: 1; transform: translate(-50%, 0); } }

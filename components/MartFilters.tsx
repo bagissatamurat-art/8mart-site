@@ -11,6 +11,7 @@ import { MartButton } from './MartButton';
 import { MartSheet } from './MartSheet';
 import { Cross } from './ui/Cross';
 import s from './MartFilters.module.css';
+import { CheckMark, SwitchMark } from './ui/Marks';
 
 /** Значение фильтров: цена строками (только цифры), переключатели и выбранные значения групп по ключу группы. */
 export type FiltersValue = {
@@ -124,7 +125,7 @@ export function MartFilters({ value: v, groups, resultCount = 0, resultText, sho
               return (
                 <button key={label} type="button" role="checkbox" aria-checked={on} className={s.row} onClick={() => toggle(g.key, label)}>
                   <span className={s.rowLabel}>
-                    <span className={`${s.box} ${on ? s.boxOn : ''}`} aria-hidden><span className={s.tick} /></span>
+                    <CheckMark on={on} />
                     {label}
                   </span>
                   <span className={s.count}>{count}</span>
@@ -156,7 +157,7 @@ function SwitchRow({ label, on, onClick }: { label: string; on: boolean; onClick
   return (
     <button type="button" role="switch" aria-checked={on} className={s.row} onClick={onClick}>
       <span>{label}</span>
-      <span className={`${s.switch} ${on ? s.switchOn : ''}`} aria-hidden><span className={s.knob} /></span>
+      <SwitchMark on={on} />
     </button>
   );
 }

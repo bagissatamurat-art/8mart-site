@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/Spinner';
 import { createOrder, getBonus, getCards } from '@/lib/api';
 import { SHIPPING } from '@/lib/config';
 import { CART, CHECKOUT, CTA_BLOCKED } from '@/lib/copy';
-import { bonusText, groupDigits, itemsTitle, money, orderTotals, splitOptions } from '@/lib/domain';
+import { bonusText, groupDigits, itemsTitle, money, orderTotals, splitOptions, tg } from '@/lib/domain';
 import { useCartLines } from '@/lib/hooks/useCartLines';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { usePromo } from '@/lib/hooks/usePromo';
@@ -31,6 +31,8 @@ import type { Bonus, Card, Category } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import c from './CheckoutScreen.module.css';
 import { Img } from '@/components/ui/Img';
+import { Breadcrumbs } from '@/components/site/Breadcrumbs';
+import l from '@/components/site/page.module.css';
 
 export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const router = useRouter();
@@ -81,7 +83,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const cargo = t.plan.list.find(x => x.isCargo);
   const floorN = parseInt(floor, 10) || 0;
   const liftSub = !cargo ? '' : floorN > 1
-    ? CHECKOUT.liftSub.priced(money(SHIPPING.cargo.liftFee).replace('тг.', 'тг'), cargo.cargoUnits, floorN, money(SHIPPING.cargo.liftFee * cargo.cargoUnits * (floorN - 1)))
+    ? CHECKOUT.liftSub.priced(tg(SHIPPING.cargo.liftFee), cargo.cargoUnits, floorN, money(SHIPPING.cargo.liftFee * cargo.cargoUnits * (floorN - 1)))
     : floorN === 1 ? CHECKOUT.liftSub.firstFloor : CHECKOUT.liftSub.noFloor;
 
   const place = async () => {
@@ -204,9 +206,9 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
                 <SummaryLines lines={summary} mobile />
                 <MartPromo key={promoField.promoKey} {...promoField.props} />
                 {spend}
-                <div className={c.divider} />
+                <div className={l.divider} />
                 <TotalsRows compact totals={{ ...t, progress: null }} promo={promo} />
-                <div className={c.divider} />
+                <div className={l.divider} />
                 <TotalLine total={t.total} small />
                 {earn}
               </section>
@@ -222,21 +224,21 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   return (
     <div className={s.page}>
       <SiteHeader categories={categories} mobile={false} />
-      <div className={c.wrap}>
-        <nav className={c.crumbs} aria-label="Навигация"><Link href="/">Главная</Link><span aria-hidden>·</span><Link href="/cart">Корзина</Link><span aria-hidden>·</span><span className={c.current} aria-current="page">Оформление</span></nav>
-        <div className={c.grid}>
-          <main className={c.main}>
-            <h1 className={c.h1}>Оформление</h1>
+      <div className={l.wrap}>
+        <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Корзина', href: '/cart' }, { label: 'Оформление' }]} />
+        <div className={l.split}>
+          <main className={l.main}>
+            <h1 className={l.h1}>Оформление</h1>
             {!user ? auth : <>{recipient}{methodSection}{payment}{offerBox}</>}
           </main>
-          <aside className={c.aside}>
+          <aside className={l.aside}>
             <div className={c.asideHead}><b className={c.h18}>{title}</b><Link href="/cart" className={c.link}>Изменить</Link></div>
             <SummaryLines lines={summary} />
             {user && <MartPromo key={promoField.promoKey} {...promoField.props} />}
             {spend}
-            <div className={c.divider} />
+            <div className={l.divider} />
             <TotalsRows totals={{ ...t, progress: null }} promo={promo} />
-            <div className={c.divider} />
+            <div className={l.divider} />
             <TotalLine total={t.total} />
             {earn}
             {user ? <>{cta}{reasonText}</> : <span className={c.hint}>{CHECKOUT.loginToContinue}</span>}

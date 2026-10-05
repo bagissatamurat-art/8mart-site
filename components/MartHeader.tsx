@@ -16,6 +16,7 @@ import s from './MartHeader.module.css';
 import { asset } from '@/lib/basePath';
 import { Img } from '@/components/ui/Img';
 import { Skeleton } from './ui/Spinner';
+import { useModal } from '@/lib/hooks/useModal';
 
 /** Разделы кабинета: /account/<section> (ids — как в маршрутах /account/[section]). */
 export type AccountSection = 'orders' | 'favorites' | 'addresses' | 'payments' | 'promos' | 'bonus' | 'profile';
@@ -156,26 +157,18 @@ export interface MartSideMenuProps extends Pick<MartHeaderProps,
 /** Панель справа 420: гость — плашка «Войдите»; пользователь — профиль, активный заказ, разделы кабинета, «Выйти». */
 export function MartSideMenu({ userName = '', userPhone = '', orders = [], accountBadges = {}, categories = [], loginHref = '/account', contained, onLogout, onClose, autoFocus = true }: MartSideMenuProps) {
   const closeBtn = useRef<HTMLButtonElement>(null);
-  const closeRef = useRef(onClose);
-  useEffect(() => { closeRef.current = onClose; });
+  const asideRef = useRef<HTMLElement>(null);
   const user = !!userName;
   const active = orders.find(o => ACTIVE_STATUSES.includes(o.status));
 
   // Esc закрывает; фокус — на крестик; на весь экран — блокируем прокрутку страницы.
-  useEffect(() => {
-    if (autoFocus) closeBtn.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeRef.current(); };
-    window.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    if (!contained) document.body.style.overflow = 'hidden';
-    return () => { window.removeEventListener('keydown', onKey); if (!contained) document.body.style.overflow = prev; };
-  }, [contained, autoFocus]);
+  useModal({ active: !contained, ref: asideRef, onClose, initialFocus: autoFocus ? () => closeBtn.current : false, restoreFocus: false });
 
   const pos = contained ? s.abs : s.fixed;
   return (
     <>
       <div className={`${s.overlay} ${pos}`} onClick={onClose} aria-hidden />
-      <aside className={`${s.aside} ${pos}`} role="dialog" aria-modal="true" aria-label="Меню">
+      <aside ref={asideRef} className={`${s.aside} ${pos}`} role="dialog" aria-modal="true" aria-label="Меню">
         <div className={s.asideHead}>
           {user
             ? <Link href="/account" className={s.profile} onClick={onClose}>

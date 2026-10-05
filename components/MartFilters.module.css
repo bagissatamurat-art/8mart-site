@@ -29,25 +29,7 @@
 .rowLabel { display: flex; align-items: center; gap: 10px; }
 .count { font-size: var(--fs-caption); color: var(--ink-3); }
 
-/* Чекбокс 20, r6, бордер 1.5; галочка — геометрией. */
-.box {
-  width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--surface-card);
-  box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: none;
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
-}
-.boxOn { border-color: var(--primary); background: var(--primary); }
-.tick { width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg); margin-top: -2px; box-sizing: content-box; opacity: 0; }
-.boxOn .tick { opacity: 1; }
 
-/* Переключатель 40×24, бегунок 20. */
-.switch { position: relative; width: 40px; height: 24px; border-radius: 12px; background: var(--border); transition: background var(--dur) var(--ease); flex: none; }
-.switchOn { background: var(--primary); }
-.knob {
-  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
-  box-shadow: 0 1px 2px rgba(23, 21, 26, .2); /* из референса, нет в tokens.css */
-  transition: left var(--dur) var(--ease);
-}
-.switchOn .knob { left: 18px; }
 
 .actions { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
 

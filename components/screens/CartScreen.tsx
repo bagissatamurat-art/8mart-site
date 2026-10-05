@@ -1,6 +1,5 @@
 'use client';
 // Корзина — 02 Корзина.dc.html: 2a (1440) и 2b (390).
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { MartButton } from '@/components/MartButton';
 import { MartCartLine } from '@/components/MartCartLine';
@@ -27,6 +26,8 @@ import s from '@/components/site/site.module.css';
 import c from './CartScreen.module.css';
 import { asset } from '@/lib/basePath';
 import { Img } from '@/components/ui/Img';
+import { Breadcrumbs } from '@/components/site/Breadcrumbs';
+import l from '@/components/site/page.module.css';
 
 export function CartScreen({ categories }: { categories: Category[] }) {
   const mobile = useIsMobile();
@@ -108,9 +109,9 @@ export function CartScreen({ categories }: { categories: Category[] }) {
   return (
     <div className={s.page}>
       <SiteHeader categories={categories} mobile={false} />
-      <div className={c.wrap}>
-        <nav className={c.crumbs} aria-label="Навигация"><Link href="/">Главная</Link><span aria-hidden>·</span><span className={c.current} aria-current="page">Корзина</span></nav>
-        {!ready ? <div className={c.grid}><Skeleton h={320} r={24} /><Skeleton h={420} r={24} /></div>
+      <div className={l.wrap}>
+        <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Корзина' }]} />
+        {!ready ? <div className={l.split}><Skeleton h={320} r={24} /><Skeleton h={420} r={24} /></div>
           : empty ? (
             <div className={c.empty}>
               <span className={c.emptyPic}><Img src={asset('/assets/empty-cart.png')} w={100} h={100} /></span>
@@ -119,10 +120,10 @@ export function CartScreen({ categories }: { categories: Category[] }) {
               <MartButton label="В каталог" size={56} href="/catalog" />
             </div>
           ) : (
-            <div className={c.grid}>
-              <main className={c.main}>
+            <div className={l.split}>
+              <main className={l.main}>
                 <div className={c.titleRow}>
-                  <h1 className={c.h1}>Корзина <span className={c.h1Sub}>· {title}</span></h1>
+                  <h1 className={l.h1}>Корзина <span className={c.h1Sub}>· {title}</span></h1>
                   <button type="button" className={c.clear} onClick={clear}>{CART.clear}</button>
                 </div>
                 {alert}{split}{shipments}
@@ -135,12 +136,12 @@ export function CartScreen({ categories }: { categories: Category[] }) {
                   </section>
                 )}
               </main>
-              <aside className={c.aside}>
+              <aside className={l.aside}>
                 <MethodCard label={methodLabel} address={address} onChange={openMethod} />
                 <MartPromo key={promoField.promoKey} {...promoField.props} />
-                <div className={c.divider} />
+                <div className={l.divider} />
                 <TotalsRows totals={t} goodsLabel={title} promo={promo} />
-                <div className={c.divider} />
+                <div className={l.divider} />
                 <TotalLine total={t.total} />
                 {earn}
                 {cta}

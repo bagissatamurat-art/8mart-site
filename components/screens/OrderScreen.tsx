@@ -1,6 +1,5 @@
 'use client';
 // Статус заказа — 03 Оформление.dc.html, шаг success (3a / 3b): шкала по отправлениям, поддержка, отмена до передачи в доставку.
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { MartButton } from '@/components/MartButton';
 import { ConfirmDialog } from '@/components/account/ConfirmDialog';
@@ -17,6 +16,8 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { Category, Order } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import c from './OrderScreen.module.css';
+import { Breadcrumbs } from '@/components/site/Breadcrumbs';
+import l from '@/components/site/page.module.css';
 
 export function OrderScreen({ id, categories }: { id: string; categories: Category[] }) {
   const mobile = useIsMobile();
@@ -27,7 +28,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
 
   if (order === undefined) return <div className={c.loading}><Skeleton h={48} r={12} w="40%" /><Skeleton h={360} r={24} /><Skeleton h={120} r={24} /></div>;
   if (order === null) return (
-    <div className={c.loading}><h1 className={c.h1}>{ORDER_PAGE.notFound}</h1><MartButton label="На главную" size={56} href="/" /></div>
+    <div className={c.loading}><h1 className={l.h1}>{ORDER_PAGE.notFound}</h1><MartButton label="На главную" size={56} href="/" /></div>
   );
 
   const kaspi = order.payment === 'kaspi', cancelled = order.status === 'cancelled', pk = order.method === 'pickup';
@@ -66,9 +67,9 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   const summaryBody = (
     <>
       <SummaryLines lines={lines} mobile={mobile} />
-      <div className={c.divider} />
+      <div className={l.divider} />
       <TotalsRows compact totals={totals} promo={promo} />
-      <div className={c.divider} />
+      <div className={l.divider} />
       <TotalLine small total={order.total} paid={cancelled ? ORDER_PAGE.refundShort : ORDER_PAGE.paid(kaspi)} />
       {earnText && <EarnNote>{earnText}</EarnNote>}
     </>
@@ -102,11 +103,11 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   return (
     <div className={s.page}>
       <SiteHeader categories={categories} mobile={false} />
-      <div className={c.wrap}>
-        <nav className={c.crumbs} aria-label="Навигация"><Link href="/">Главная</Link><span aria-hidden>·</span><Link href="/cart">Корзина</Link><span aria-hidden>·</span><span className={c.current} aria-current="page">Оформление</span></nav>
-        <div className={c.grid}>
-          <main className={c.main}>
-            <div className={c.titleRow}><h1 className={c.h1}>Заказ №{order.id}</h1><span className={c.date}>от {order.date}</span></div>
+      <div className={l.wrap}>
+        <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Корзина', href: '/cart' }, { label: 'Оформление' }]} />
+        <div className={l.split}>
+          <main className={l.main}>
+            <div className={c.titleRow}><h1 className={l.h1}>Заказ №{order.id}</h1><span className={c.date}>от {order.date}</span></div>
             <section className={c.trackCard}>
               <OrderTrack order={order} refundText={refund} />
               <div className={c.supportRow}>{supportLink}</div>
@@ -114,7 +115,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
             <section className={c.infoCard}>{info}</section>
             {cancelBtn}
           </main>
-          <aside className={c.aside}>
+          <aside className={l.aside}>
             <b className={c.h18}>{title}</b>
             {summaryBody}
             <MartButton label="Продолжить покупки" variant="ghost" size={56} full href="/" />

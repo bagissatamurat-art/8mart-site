@@ -14,4 +14,3 @@
 .cartGrid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
 @media (max-width: 900px) { .cartGrid { grid-template-columns: 1fr; } }
 .stack { display: flex; flex-direction: column; gap: 12px; }
-.subtle { background: var(--surface-page); border-radius: var(--r-20); padding: 12px; display: flex; flex-direction: column; gap: 8px; }

@@ -5,6 +5,8 @@
 // contained — лист внутри ближайшего position:relative родителя (артборд 390 в витрине /kit), без портала и блокировки скролла.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useModal } from '@/lib/hooks/useModal';
+import { useMounted } from '@/lib/hooks/useMounted';
 import s from './MartSheet.module.css';
 
 export interface MartSheetProps {
@@ -32,29 +34,13 @@ export interface MartSheetProps {
 const SWIPE_CLOSE = 80;
 
 export function MartSheet({ open, onClose, children, label, labelledBy, gap = 16, maxHeight = '88%', handle, contained, autoFocus = true, className }: MartSheetProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [dy, setDy] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
   const drag = useRef<{ y: number; active: boolean } | null>(null);
 
-  useEffect(() => { setMounted(true); }, []);
-
-  // Esc, фокус в лист и возврат фокуса, блокировка прокрутки страницы.
-  useEffect(() => {
-    if (!open) return;
-    const prev = autoFocus ? document.activeElement as HTMLElement | null : null;
-    if (autoFocus) panel.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } };
-    // Встроенный (contained) лист витрины всегда открыт — глобальный Esc ему не нужен и мешал бы остальным модалкам.
-    if (!contained) document.addEventListener('keydown', onKey);
-    let overflow = '';
-    if (!contained) { overflow = document.body.style.overflow; document.body.style.overflow = 'hidden'; }
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      if (!contained) document.body.style.overflow = overflow;
-      prev?.focus?.({ preventScroll: true });
-    };
-  }, [open, contained, autoFocus, onClose]);
+  // Esc, фокус в лист и возврат фокуса, блокировка прокрутки. Встроенный (contained) лист витрины — без этого.
+  useModal({ active: open && !contained, ref: panel, onClose, initialFocus: autoFocus ? undefined : false, restoreFocus: autoFocus });
 
   useEffect(() => { if (!open) setDy(0); }, [open]);
 

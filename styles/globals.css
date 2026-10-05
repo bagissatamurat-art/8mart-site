@@ -10,6 +10,24 @@ img { display: block; max-width: 100%; }
 :focus { outline: none; }
 :focus-visible { box-shadow: var(--focus-ring); }
 
-/* @keyframes объявляются в CSS-модулях рядом с использованием: глобальные имена модули не видят (имена хешируются). */
+/* Общие анимации. CSS-модули хешируют имена в `animation`, поэтому модули берут их через токены --anim-*
+   (значение var() не переписывается). Свои, разовые keyframes — в модуле рядом с использованием. */
+@keyframes m-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes m-rise { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes m-sheet { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes m-drop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes m-heart { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@keyframes m-spin { to { transform: rotate(360deg); } }
+@keyframes m-pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+:root {
+  --anim-fade: m-fade var(--dur-enter) var(--ease-out);   /* оверлей, проявление */
+  --anim-rise: m-rise var(--dur-enter) var(--ease-out);   /* окно модалки (desktop) */
+  --anim-sheet: m-sheet var(--dur-enter) var(--ease-out); /* лист снизу (mobile) */
+  --anim-drop: m-drop var(--dur-enter) var(--ease-out);   /* выпадающее меню */
+  --anim-heart: m-heart var(--dur-pop) var(--ease-pop);   /* «В избранное» */
+  --anim-spin: m-spin .7s linear infinite;
+  --anim-pulse: m-pulse 1.4s ease-in-out infinite;        /* скелетоны */
+}
+@media (prefers-reduced-motion: reduce) { :root { --anim-pulse: none; --anim-spin: m-spin 1.4s linear infinite; } }
 
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

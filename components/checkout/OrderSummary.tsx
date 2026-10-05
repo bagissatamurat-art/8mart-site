@@ -1,6 +1,6 @@
 'use client';
 // Итоги заказа (02, 03): состав, строки стоимости, «Итого», плашка бонусов.
-import { money } from '@/lib/domain';
+import { money, tg } from '@/lib/domain';
 import type { Totals } from '@/lib/domain';
 import type { PlanLine } from '@/lib/domain';
 import { BonusCoin } from '../ui/BonusCoin';
@@ -58,7 +58,7 @@ export function TotalsRows({ totals: t, goodsLabel = 'Товары', promo, disc
       {t.progress && (
         <div className={s.progress}>
           <div className={s.bar}><div className={s.fill} style={{ width: t.progress.pct + '%' }} /></div>
-          <span className={s.progressText}>{t.progress.label} {money(t.progress.left).replace('тг.', 'тг')}</span>
+          <span className={s.progressText}>{t.progress.label} {tg(t.progress.left)}</span>
         </div>
       )}
       {children}

@@ -11,6 +11,7 @@ import { markStorySeen, useStoriesSeen } from '@/lib/store/storiesSeen';
 import type { Story } from '@/lib/types';
 import s from './MartStories.module.css';
 import { STATUS } from '@/lib/copy';
+import { modalAbove, useModal } from '@/lib/hooks/useModal';
 import { Img } from '@/components/ui/Img';
 
 export type StoriesMode = 'desktop' | 'mobile';
@@ -162,34 +163,19 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   const storyId = stories[pos.si]?.id;
   useEffect(() => { if (!isPreview && storyId) markStorySeen(storyId); }, [storyId, isPreview]);
 
-  // Клавиши, ловушка фокуса, блокировка прокрутки, возврат фокуса.
+  // Esc, ловушка фокуса, блокировка прокрутки, возврат фокуса — общий слой; здесь только ←→ и Пробел.
+  useModal({ active: !isPreview, ref: dialogRef, onClose: close, initialFocus: () => closeRef.current });
   useEffect(() => {
     if (isPreview) return;
-    const opener = document.activeElement as HTMLElement | null;
-    closeRef.current?.focus();
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { e.preventDefault(); close(); }
-      else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      if (modalAbove(dialogRef)) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
       else if (e.key === ' ') { e.preventDefault(); setPaused(p => !p); }
-      else if (e.key === 'Tab' && dialogRef.current) {
-        const f = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]'));
-        if (!f.length) return;
-        const first = f[0], last = f[f.length - 1];
-        if (!dialogRef.current.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
-        else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
     };
     window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
-      opener?.focus?.();
-    };
-  }, [isPreview, close, next, prev]);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isPreview, next, prev]);
 
   useEffect(() => () => { clearTimeout(copyTimer.current); clearTimeout(holdTimer.current); }, []);
 

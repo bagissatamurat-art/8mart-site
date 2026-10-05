@@ -1,0 +1,9 @@
+/* Общая раскладка экранов с итогом справа — корзина, оформление, заказ (02, 03 · desktop):
+   padding 0 40 40, gap 20; контент 1fr · колонка 400 (sticky карточка r24 p20). Mobile-раскладки — в модулях экранов. */
+.wrap { padding: 0 var(--page-pad-desktop) 40px; display: flex; flex-direction: column; gap: 20px; max-width: 1440px; width: 100%; margin: 0 auto; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; align-items: start; }
+.main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.aside { background: var(--surface-card); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
+.divider { height: 1px; background: var(--divider); }
+/* Заголовок страницы desktop: 32/800, трекинг -0.02em (каталог, поиск, корзина, оформление, заказ, кабинет). */
+.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; letter-spacing: var(--tracking-tight); }

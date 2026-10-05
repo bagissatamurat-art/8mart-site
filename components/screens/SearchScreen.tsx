@@ -3,18 +3,17 @@
 // Состояния: загрузка (скелетоны), результаты (лента по PAGE_SIZE с подгрузкой), «С такими фильтрами ничего нет»,
 // «Ничего не нашли» (как в MartSearch: подсказка + «Часто ищут»), пустой запрос («Вы искали» + «Часто ищут»).
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MartButton } from '@/components/MartButton';
 import { MartChip } from '@/components/MartChip';
 import {
-  MartFiltersButton, MartFiltersPanel, MartFiltersSheet, filterChips, filtersToQuery, hasActiveFilters, type FilterGroup, type FiltersValue,
+  MartFiltersButton, MartFiltersPanel, MartFiltersSheet, filterChips, filtersToQuery, type FilterGroup, type FiltersValue,
 } from '@/components/MartFilters';
 import { MartProductCard } from '@/components/MartProductCard';
 import { MartSearch, MartSearchScreen, SEARCH_POPULAR } from '@/components/MartSearch';
 import { MartSort, MartSortSheet } from '@/components/MartSort';
 import { Chevron } from '@/components/ui/Cross';
-import { Skeleton } from '@/components/ui/Spinner';
+import { CardSkeleton, Skeleton } from '@/components/ui/Spinner';
 import { CategorySidebar } from '@/components/site/CategorySidebar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteMiniCart } from '@/components/site/SiteMiniCart';
@@ -32,6 +31,7 @@ import { EMPTY, SEARCH } from '@/lib/copy';
 import site from '@/components/site/site.module.css';
 import s from './SearchScreen.module.css';
 import { Img } from '@/components/ui/Img';
+import { Breadcrumbs } from '@/components/site/Breadcrumbs';
 
 /** Сортировки поиска: по умолчанию «По релевантности» (5c) — порядок выдачи, в API это sort по умолчанию (id 'popular'). */
 const SEARCH_SORTS: [SortId, string][] = [['popular', SEARCH.relevance], ...SORTS.filter(x => x[0] !== 'popular')];
@@ -106,7 +106,6 @@ export function SearchScreen({ q, categories }: { q: string; categories: Categor
 
   const chips = filterChips(filters, groups);
   const fCount = chips.length;
-  const active = hasActiveFilters(filters);
   const resetAll = () => setFilters(EMPTY_FILTERS);
   /** Смена подкатегории: значения групп другого корня сбрасываем. */
   const pickSub = (slug: string | null) => {
@@ -125,7 +124,7 @@ export function SearchScreen({ q, categories }: { q: string; categories: Categor
   const cards = (list: Product[]) => list.map(p => (
     <MartProductCard key={p.id} product={p} qty={lines[p.id] || 0} onQty={setCartQty} onOpen={x => openQuickView(x.id)} />
   ));
-  const skeletons = (n: number) => Array.from({ length: n }, (_, i) => <SkeletonCard key={i} />);
+  const skeletons = (n: number) => Array.from({ length: n }, (_, i) => <CardSkeleton key={i} />);
 
   const list = (
     <>
@@ -219,7 +218,7 @@ export function SearchScreen({ q, categories }: { q: string; categories: Categor
         </div>
 
         <main className={s.main}>
-          <nav className={s.crumbs} aria-label="Хлебные крошки"><Link href="/">Главная</Link><span>·</span><span className={s.current}>{SEARCH.crumb}</span></nav>
+          <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: SEARCH.crumb }]} />
           <div className={s.titleRow}>
             <h1 className={s.h1}>{q ? SEARCH.title(q) : SEARCH.emptyQuery}</h1>
             {q && (countText ? <span className={s.count}>{countText}</span> : !nothing && <Skeleton w={90} h={16} r={6} />)}
@@ -258,17 +257,6 @@ function NothingFound({ q, onQuery }: { q: string; onQuery: (q: string) => void 
       <b className={s.emptyTitle}>{EMPTY.search.title(q)}</b>
       <span className={s.emptyText}>{EMPTY.search.text}</span>
       <div className={s.popular}>{SEARCH_POPULAR.map(t => <MartChip key={t} label={t} onClick={() => onQuery(t)} />)}</div>
-    </div>
-  );
-}
-
-/** Скелетон карточки — 07 Каталог: 300 (mobile 290), r20, p8, фото 1:1 r14 + две строки, пульс 1.4 с. */
-function SkeletonCard() {
-  return (
-    <div className={s.skelCard} aria-hidden>
-      <span className={s.skelPhoto} />
-      <span className={s.skelLine} style={{ width: '50%', height: 16 }} />
-      <span className={s.skelLine} style={{ width: '80%', height: 14 }} />
     </div>
   );
 }

@@ -24,8 +24,10 @@ import { useCart } from '@/lib/store/cart';
 import { setCartQty, useUi } from '@/lib/store/ui';
 import type { Category, Product, ProductQuery, SortId } from '@/lib/types';
 import s from '@/components/site/site.module.css';
-import c from '@/components/catalog/catalog.module.css';
 import k from './CatalogScreen.module.css';
+import l from '@/components/site/page.module.css';
+import { CardSkeleton } from '@/components/ui/Spinner';
+import { Breadcrumbs } from '@/components/site/Breadcrumbs';
 
 export type { CatalogStats };
 
@@ -114,7 +116,7 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
   const skeletons = (n: number, ref?: (el: HTMLElement | null) => void) => (
     <div className={k.grid} ref={ref} aria-hidden>
       {Array.from({ length: n }, (_, i) => (
-        <div key={i} className={`${c.skel} ${i >= n / 2 ? k.desktopExtra : ''}`}><div className={c.skelPhoto} /><div className={c.skelLine} /><div className={c.skelLine2} /></div>
+        <CardSkeleton key={i} className={i >= n / 2 ? k.desktopExtra : undefined} />
       ))}
     </div>
   );
@@ -177,16 +179,9 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
 
         <main className={k.main}>
           <div className={s.desktopOnly}>
-            <nav className={k.crumbs} aria-label="Навигация">
-              {crumbs.map(([label, href], i) => (
-                <span key={label + i} className={k.crumb}>
-                  {i > 0 && <span aria-hidden>·</span>}
-                  {href ? <Link href={href}>{label}</Link> : <span className={k.current} aria-current="page">{label}</span>}
-                </span>
-              ))}
-            </nav>
+            <Breadcrumbs items={crumbs.map(([label, href]) => ({ label, href }))} />
             <div className={k.titleRow}>
-              <h1 className={k.h1}>{title}</h1>
+              <h1 className={l.h1}>{title}</h1>
               {countText && <span className={k.count}>{countText}</span>}
             </div>
           </div>

@@ -4,13 +4,7 @@
 .main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .aside { position: sticky; top: 16px; }
 
-.crumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: var(--fs-small); color: var(--ink-2); }
-.crumb { display: contents; }
-.crumbs a { color: var(--ink-2); text-decoration: none; transition: color var(--dur) var(--ease); }
-.crumbs a:hover { color: var(--ink-1); }
-.current { color: var(--ink-1); }
 .titleRow { display: flex; align-items: baseline; gap: 12px; }
-.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; letter-spacing: var(--tracking-tight); }
 .count { font-size: var(--fs-body); color: var(--ink-3); }
 
 .chips { display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; }

@@ -1,12 +1,4 @@
-.wrap { padding: 0 var(--page-pad-desktop) 40px; display: flex; flex-direction: column; gap: 20px; max-width: 1440px; width: 100%; margin: 0 auto; }
-.crumbs { display: flex; gap: 8px; font-size: var(--fs-small); color: var(--ink-2); }
-.crumbs a { color: var(--ink-2); text-decoration: none; }
-.crumbs a:hover { color: var(--ink-1); }
-.current { color: var(--ink-1); }
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; align-items: start; }
-.main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .titleRow { display: flex; align-items: baseline; gap: 12px; }
-.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; letter-spacing: var(--tracking-tight); }
 .date { font-size: var(--fs-15); color: var(--ink-3); }
 .h16 { font-size: 16px; }
 .h18 { font-size: var(--fs-h3); }
@@ -28,8 +20,6 @@
   color: var(--ink-3); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; flex: none; transition: color var(--dur) var(--ease);
 }
 .cancel:hover { color: var(--danger); }
-.aside { background: var(--surface-card); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
-.divider { height: 1px; background: var(--divider); }
 .loading { max-width: 600px; margin: 40px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
 
 /* 3b */

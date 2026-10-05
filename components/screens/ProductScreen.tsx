@@ -13,6 +13,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { Category, Product, ProductDetail } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import p from './ProductScreen.module.css';
+import { Breadcrumbs } from '@/components/site/Breadcrumbs';
 
 export interface ProductData { product: ProductDetail; group: Product[]; categories: Category[] }
 
@@ -51,12 +52,8 @@ export function ProductScreen({ product, group, categories }: ProductData) {
     <div className={s.page}>
       <SiteHeader categories={categories} mobile={false} />
       <div className={p.wrap}>
-        <nav className={p.crumbs} aria-label="Навигация">
-          <Link href="/">Главная</Link><span aria-hidden>·</span>
-          <Link href="/catalog">Каталог</Link><span aria-hidden>·</span>
-          {cat && <><Link href={`/catalog?cat=${cat.slug}`}>{cat.name}</Link><span aria-hidden>·</span></>}
-          <span className={p.current} aria-current="page">{sub?.name}</span>
-        </nav>
+        <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Каталог', href: '/catalog' },
+          ...(cat ? [{ label: cat.name, href: `/catalog?cat=${cat.slug}` }] : []), { label: sub?.name ?? '' }]} />
         <div className={s.grid2}>
           <div className={p.min0}>{view}</div>
           <div className={s.aside}><SiteMiniCart /></div>

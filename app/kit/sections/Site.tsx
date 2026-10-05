@@ -1,9 +1,12 @@
 'use client';
-// Элементы раскладки сайта (этап 2): сайдбар категорий, тост, полка товаров.
+// Элементы раскладки сайта: сайдбар категорий, полка товаров, тост, крошки, скелетон карточки, индикаторы выбора.
 import { useState } from 'react';
 import { CategorySidebar } from '@/components/site/CategorySidebar';
 import { ProductShelf } from '@/components/site/ProductShelf';
 import { Toast } from '@/components/ui/Toast';
+import { Breadcrumbs } from '@/components/site/Breadcrumbs';
+import { CardSkeleton } from '@/components/ui/Spinner';
+import { CheckMark, RadioMark, SwitchMark } from '@/components/ui/Marks';
 import { MartButton } from '@/components/MartButton';
 import { CATEGORIES, PRODUCTS } from '@/lib/mock';
 import { KitItem, KitSection } from '../Kit';
@@ -27,6 +30,21 @@ export default function Site() {
           <div style={{ width: 460, maxWidth: '100%' }}><Toast inline onClose={() => {}}>{TOASTS.accountDeleted}</Toast></div>
           <MartButton label="Показать тост" variant="secondary" size={44} onClick={() => setToast(true)} />
           {toast && <Toast onClose={() => setToast(false)}>{TOASTS.orderRepeated}</Toast>}
+        </div>
+      </KitSection>
+      <KitSection id="crumbs" title="Хлебные крошки · Breadcrumbs" note="Desktop-экраны: 14, #6B6873, разделитель «·», gap 8; текущая страница — ink-1 без ссылки.">
+        <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Каталог', href: '/catalog' }, { label: 'Стройматериалы' }]} />
+      </KitSection>
+      <KitSection id="card-skeleton" title="Скелетон карточки · CardSkeleton" note="07 Каталог: 300 (mobile 290), r20, p8, фото 1:1 r14 + две строки r6, пульс 1.4 с. Каталог, поиск, загрузка страницы.">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(180px,100%),180px))', gap: 12, background: 'var(--surface-page)', padding: 12, borderRadius: 20 }}>
+          <CardSkeleton /><CardSkeleton />
+        </div>
+      </KitSection>
+      <KitSection id="marks" title="Индикаторы выбора · RadioMark / CheckMark / SwitchMark" note="Рисуются внутри кнопки-строки с role radio / checkbox / switch. Радио 20 (strong — рамка #C9C7CF), чекбокс 20 r6, переключатель 40×24 (bonus — зелёный).">
+        <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+          <RadioMark on={false} /><RadioMark on /><RadioMark on={false} strong />
+          <CheckMark on={false} /><CheckMark on />
+          <SwitchMark on={false} /><SwitchMark on /><SwitchMark on tone="bonus" />
         </div>
       </KitSection>
     </>

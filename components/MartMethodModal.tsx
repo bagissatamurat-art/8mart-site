@@ -3,11 +3,14 @@
 // Референс: site/MartMethodModal.dc.html, «04 Выбор способа получения.dc.html», карта — public/map.html (порт site/map.html).
 // Desktop — модалка 960×600 (карта слева, панель 380 справа); mobile — sheet 92% высоты (карта 46% сверху).
 // Закрыть можно всегда: крестик, Esc, клик по фону. addressOnly — режим для кабинета (без свича, с полем «Название»).
-import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getCities, getPickupPoints } from '@/lib/api';
 import { DELIVERY } from '@/lib/config';
-import { money } from '@/lib/domain/format';
+import { tg } from '@/lib/domain/format';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useModal } from '@/lib/hooks/useModal';
+import { useMounted } from '@/lib/hooks/useMounted';
 import type { City, Method, PickupPoint } from '@/lib/types';
 import { MartButton } from './MartButton';
 import { MartInput } from './MartInput';
@@ -46,18 +49,7 @@ export interface MartMethodModalProps {
   userGeo?: LatLng | null;
 }
 
-const MOBILE_MQ = '(max-width: 1023.98px)'; // один брейкпоинт сайта — 1024 (README → «Адаптив»)
-const subscribeMq = (cb: () => void) => {
-  const mq = window.matchMedia(MOBILE_MQ);
-  mq.addEventListener('change', cb);
-  return () => mq.removeEventListener('change', cb);
-};
-const useIsMobile = () => useSyncExternalStore(subscribeMq, () => window.matchMedia(MOBILE_MQ).matches, () => false);
-const useMounted = () => useSyncExternalStore(() => () => {}, () => true, () => false);
-
-const tg = (n: number) => money(n).replace('тг.', 'тг'); // в свободном тексте «тг» без точки
 const NO_POINTS: PickupPoint[] = [];
-const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),iframe,[tabindex]:not([tabindex="-1"])';
 
 export function MartMethodModal(props: MartMethodModalProps) {
   if (!props.open) return null;
@@ -74,8 +66,6 @@ function MethodDialog({
   const titleId = useId(), subId = useId();
   const card = useRef<HTMLDivElement>(null);
   const map = useRef<MethodMapHandle>(null);
-  const closeRef = useRef(onClose);
-  closeRef.current = onClose;
 
   const [cities, setCities] = useState<City[]>([]);
   const [tab, setTab] = useState<Method>(addressOnly ? 'delivery' : initial?.method ?? 'delivery');
@@ -106,37 +96,8 @@ function MethodDialog({
     return () => { on = false; };
   }, [cid]);
 
-  // ── Модальность: фокус в диалог, блокировка скролла, возврат фокуса ──
-  useEffect(() => {
-    if (inline) return;
-    const prevFocus = document.activeElement as HTMLElement | null;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    card.current?.focus({ preventScroll: true });
-    // Фокус мог уйти из карточки (клик по оверлею карты, body) — Esc всё равно закрывает.
-    const onDocKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !e.defaultPrevented && !card.current?.contains(e.target as Node)) closeRef.current();
-    };
-    document.addEventListener('keydown', onDocKey);
-    return () => {
-      document.removeEventListener('keydown', onDocKey);
-      document.body.style.overflow = prevOverflow;
-      prevFocus?.focus?.({ preventScroll: true });
-    };
-  }, [inline]);
-
-  // Esc и фокус-ловушка — React-обработчиком на карточке: срабатывает после списков (подсказки, города),
-  // которые гасят Esc через preventDefault, и не зависит от чужих document-слушателей со stopPropagation.
-  const onCardKey = (e: React.KeyboardEvent) => {
-    if (inline) return;
-    if (e.key === 'Escape') { if (!e.defaultPrevented) { e.preventDefault(); closeRef.current(); } return; }
-    if (e.key !== 'Tab' || !card.current) return;
-    const f = [...card.current.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(el => el.offsetParent !== null || el === document.activeElement);
-    if (!f.length) return;
-    const first = f[0], last = f[f.length - 1];
-    if (e.shiftKey && (document.activeElement === first || document.activeElement === card.current)) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  };
+  // Esc (после списков подсказок и городов — они гасят свой Esc), ловушка фокуса, блокировка прокрутки.
+  useModal({ active: !inline, ref: card, onClose });
 
   const pickCity = (id: string) => {
     setCityId(id); setStore(null); setStreet(''); setPos(null);
@@ -166,7 +127,7 @@ function MethodDialog({
   };
 
   const body = (
-    <div ref={card} role={inline ? 'group' : 'dialog'} aria-modal={inline ? undefined : true} aria-labelledby={titleId} aria-describedby={subId} tabIndex={-1} onKeyDown={onCardKey}
+    <div ref={card} role={inline ? 'group' : 'dialog'} aria-modal={inline ? undefined : true} aria-labelledby={titleId} aria-describedby={subId} tabIndex={-1}
       className={`${s.card} ${inline ? s.inline : ''} ${inline && mobile ? s.mobile : ''}`}>
       <button type="button" className={s.close} aria-label="Закрыть" onClick={onClose}><Cross size={14} color="var(--ink-1)" /></button>
 

@@ -20,10 +20,7 @@
 }
 .opt:hover { border-color: var(--border-strong); }
 .sel, .sel:hover { border-color: var(--primary); background: var(--primary-50); }
-.radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-strong); display: flex; align-items: center; justify-content: center; flex: none; margin-top: 1px; }
-.sel .radio { border-color: var(--primary); }
-.dot { width: 10px; height: 10px; border-radius: 50%; background: transparent; }
-.sel .dot { background: var(--primary); }
+.radio { margin-top: 1px; }
 .optBody { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
 .optTop { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .optTitle { font-size: var(--fs-15); font-weight: 600; }

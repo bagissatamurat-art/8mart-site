@@ -5,6 +5,11 @@ export function money(n: number | null | undefined): string {
   return n == null ? 'Цена уточняется' : `${Math.round(n).toLocaleString('ru-RU').replace(/ /g, ' ')} тг.`;
 }
 
+/** `4 090 тг` — сумма внутри фразы («бесплатно от 20 000 тг»): без точки, как в макете. */
+export function tg(n: number): string {
+  return money(n).replace('тг.', 'тг');
+}
+
 /** Склонение: plural(n, 'товар', 'товара', 'товаров'). */
 export function plural(n: number, one: string, few: string, many: string): string {
   const a = Math.abs(n) % 100, b = a % 10;

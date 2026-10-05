@@ -158,12 +158,10 @@
 .logout:hover { color: var(--ink-1); }
 
 /* Анимации появления (prefers-reduced-motion — без них) */
-@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideIn { from { transform: translateX(100%); } to { transform: none; } }
-@keyframes drop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
-  .overlay { animation: fade var(--dur-enter) var(--ease-out); }
+  .overlay { animation: var(--anim-fade); }
   .aside { animation: slideIn var(--dur-enter) var(--ease-out); }
-  .dropdown { animation: drop var(--dur-enter) var(--ease-out); }
-  .searchOverlay { animation: fade var(--dur-enter) var(--ease-out); }
+  .dropdown { animation: var(--anim-drop); }
+  .searchOverlay { animation: var(--anim-fade); }
 }

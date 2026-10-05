@@ -22,7 +22,7 @@ const TOC: [string, string][] = [
   ['shipments', 'Отправления'], ['stepper', 'Счётчик'], ['chips', 'Чипы'], ['filters', 'Фильтры'], ['stories', 'Сторис'], ['banner', 'Баннер'],
   ['card', 'Карточка товара'], ['badges', 'Бейджи и алерты'], ['cart', 'Корзина'], ['tabbar', 'Таб-бар'], ['header', 'Шапка'], ['search', 'Поиск'],
   ['product', 'Быстрый просмотр'], ['method', 'Способ получения'], ['auth', 'Вход'], ['account', 'Кабинет'],
-  ['sidebar', 'Сайдбар'], ['shelf', 'Полка'], ['toast', 'Тост'],
+  ['sidebar', 'Сайдбар'], ['shelf', 'Полка'], ['toast', 'Тост'], ['crumbs', 'Крошки'], ['card-skeleton', 'Скелетон карточки'], ['marks', 'Радио · чекбокс · свитч'],
   ['checkout-controls', 'Оформление'], ['checkout-summary', 'Итоги'], ['order-track', 'Статус заказа'], ['topbar', 'Шапка экрана'],
 ];
 

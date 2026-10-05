@@ -14,6 +14,7 @@ import { FORM_ERRORS, STATUS } from '@/lib/copy';
 import { formatPhone, phoneComplete } from '@/lib/domain';
 import bs from './MartButton.module.css';
 import s from './MartAuth.module.css';
+import { Spinner } from './ui/Spinner';
 
 export type AuthMode = 'desktop' | 'mobile';
 export type AuthPurpose = 'login' | 'changePhone';
@@ -261,7 +262,7 @@ export function MartAuth({
   const head = (title: string, sub: React.ReactNode) => (
     <div className={s.head}><h2 className={s.title}>{title}</h2><p className={s.sub}>{sub}</p></div>
   );
-  const spin = (big?: boolean) => <span className={`${s.spin} ${big ? s.spin14 : ''}`} aria-hidden />;
+  const spin = (big?: boolean) => <Spinner size={big ? 14 : 12} variant="track" />;
 
   return (
     <div className={`${s.root} ${className || ''}`}>

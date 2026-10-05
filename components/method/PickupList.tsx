@@ -7,6 +7,7 @@ import type { PickupPoint } from '@/lib/types';
 import type { LatLng } from './types';
 import s from '../MartMethodModal.module.css';
 import { GEO } from '@/lib/copy';
+import { RadioMark } from '../ui/Marks';
 
 /** Расстояние по гаверсинусу, км. */
 const km = (a: LatLng, b: LatLng) => {
@@ -68,7 +69,7 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
                 <span className={s.storeName}>{p.name}{geo && i === 0 && <span className={s.nearest}>Ближайшая</span>}</span>
                 <span className={s.storeMeta}>{p.d != null ? `${distText(p.d)} · ${p.hours}` : p.hours}</span>
               </span>
-              <span className={s.radio} aria-hidden />
+              <RadioMark on={sel} />
             </button>
           );
         })}

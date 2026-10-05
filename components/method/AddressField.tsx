@@ -7,6 +7,7 @@ import { MartInput } from '../MartInput';
 import type { MethodDemoState, Suggestion } from './types';
 import s from '../MartMethodModal.module.css';
 import { GEO } from '@/lib/copy';
+import { Spinner } from '../ui/Spinner';
 
 const MIN_CHARS = 3;
 const DEBOUNCE = 300;
@@ -116,7 +117,7 @@ export function AddressField({ value, onChange, city, mobile, onPick, error, dem
         onKeyDown={onKey} />
       {open && (
         <div id={listId} role={list.length ? 'listbox' : undefined} aria-label="Подсказки адреса" aria-live="polite" className={s.list}>
-          {showLoading && <div className={s.status}><span className={s.spin} aria-hidden />Ищем адрес…</div>}
+          {showLoading && <div className={s.status}><Spinner size={14} variant="track" />Ищем адрес…</div>}
           {showEmpty && <div className={s.empty}>{emptyText}</div>}
           {list.map((sg, i) => (
             <button key={sg.title + sg.subtitle} id={`${listId}-${i}`} type="button" role="option" tabIndex={-1} aria-selected={i === idx}

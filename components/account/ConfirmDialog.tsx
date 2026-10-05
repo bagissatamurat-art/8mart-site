@@ -1,7 +1,8 @@
 'use client';
 // Диалог подтверждения (удаление аккаунта) — из site/06 Личный кабинет.dc.html.
 // Desktop — карточка 440 по центру; mobile — sheet снизу, кнопки столбиком («Удалить» первой). Esc и клик по фону закрывают.
-import { useEffect, useId, useRef } from 'react';
+import { useId, useRef } from 'react';
+import { useModal } from '@/lib/hooks/useModal';
 import { createPortal } from 'react-dom';
 import { MartButton } from '../MartButton';
 import { Cross } from '../ui/Cross';
@@ -26,20 +27,10 @@ export function ConfirmDialog({ open, title, text, confirmLabel, cancelLabel = '
   const boxRef = useRef<HTMLDivElement>(null);
   const m = mode === 'mobile';
 
-  // Свежие колбэки без перезапуска эффекта на каждый рендер родителя
-  const live = useRef({ onClose, loading });
-  live.current = { onClose, loading };
-
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.activeElement as HTMLElement | null;
-    // Фокус на «Отмена» — безопасное действие по умолчанию
-    // (в витрине диалог открыт сразу — фокус не перехватываем, чтобы страница не прыгала)
-    if (!inline) boxRef.current?.querySelector<HTMLElement>('[data-cancel] button')?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !live.current.loading) { e.stopPropagation(); live.current.onClose(); } };
-    if (!inline) document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('keydown', onKey); if (!inline) prev?.focus?.({ preventScroll: true }); };
-  }, [open, inline]);
+  // Фокус на «Отмена» — безопасное действие по умолчанию; пока идёт запрос, Esc не закрывает.
+  // В витрине (inline) диалог открыт сразу — фокус и прокрутку не трогаем.
+  useModal({ active: open && !inline, ref: boxRef, onClose: () => { if (!loading) onClose(); },
+    initialFocus: () => boxRef.current?.querySelector<HTMLElement>('[data-cancel] button') });
 
   if (!open) return null;
   const cancel = <span data-cancel className={s.btnWrap}><MartButton label={cancelLabel} variant="ghost" size={56} full onClick={onClose} /></span>;

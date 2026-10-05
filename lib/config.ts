@@ -1,6 +1,6 @@
 // Одно значение — одно место: пороги, тарифы, условия. Тексты интерфейса — lib/copy.ts.
 // Источник — design_handoff_8mart_site/site/data.js. Значения — МОК, уточнить у бизнеса (см. README → открытые вопросы).
-import { money } from './domain/format';
+import { tg } from './domain/format';
 import type { DeliveryType, OrderStatus, SortId } from './types';
 
 export const BRAND = { name: '8mart', phone: '+7 700 133 90 71', phoneRaw: '+77001339071', email: 'mail@8mart.kz', instagram: '8mart_astana', tiktok: '8mart.kz' };
@@ -32,7 +32,6 @@ export const CAT_FILTERS: Record<string, FilterDef[]> = {
 
 export const COLOR_SWATCH: Record<string, string> = { 'Розовый': '#F4A6C0', 'Красный': '#D7263D', 'Белый': '#FFFFFF', 'Голубой': '#9EC5F0', 'Жёлтый': '#F7D774', 'Микс': 'conic-gradient(#F4A6C0 0 25%,#FFFFFF 0 50%,#9EC5F0 0 75%,#F7D774 0)', 'Слоновая кость': '#F3EBD8', 'Светло-серый': '#D9DADC', 'Бежевый': '#E6D3B3' };
 
-const tg = (n: number) => money(n).replace('тг.', 'тг');
 // Способ доставки зависит от товара: express — курьер за 60–90 мин; cargo — тяжёлое/габаритное, грузовой машиной на следующий день; flowers — курьер, букет в коробке с водой.
 export const DELIVERY_TYPES: Record<'express' | 'cargo' | 'flowers', DeliveryType> = {
   express: { tag: '', delivery: { when: 'Сегодня, за 60–90 минут', price: tg(DELIVERY.fee) + ', бесплатно от ' + tg(DELIVERY.freeFrom), note: '' },

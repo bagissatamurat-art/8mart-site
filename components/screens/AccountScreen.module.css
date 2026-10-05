@@ -5,7 +5,6 @@
 }
 .sticky { position: sticky; top: 16px; min-width: 0; }
 .main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; letter-spacing: var(--tracking-tight); }
 .error { margin: 0; font-size: var(--fs-small); color: var(--danger); }
 
 /* 6b / 6c: фон страницы, раскладка ~600 по центру, таб-бар 84 снизу */

@@ -3,7 +3,7 @@
 // DESIGN_RULES.md → «Карточка товара (быстрый просмотр)»; референс site/MartProductView.dc.html и «08 Товар.dc.html».
 // Desktop — модалка 1040 (галерея слева sticky, миниатюры, стрелки, ←→); mobile — sheet 94% (свайп-галерея с точками,
 // CTA закреплён снизу). page=true — та же разметка без оверлея и крестика (/product/[id]).
-import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { bonusText, cartKey, deliveryConditions, discountPct, money } from '@/lib/domain';
@@ -15,6 +15,8 @@ import { HeartIcon } from './ui/HeartIcon';
 import { Gallery, type Slide } from './product/Gallery';
 import { Colors, Cta, Description, Packs, Sizes, Specs, Ways } from './product/Sections';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { modalAbove, useModal } from '@/lib/hooks/useModal';
+import { useMounted } from '@/lib/hooks/useMounted';
 import s from './MartProductView.module.css';
 import { STATUS } from '@/lib/copy';
 import { asset } from '@/lib/basePath';
@@ -52,9 +54,7 @@ export function MartProductView(props: MartProductViewProps) {
   return <View key={props.product.id} {...props} mobile={mobile} />;
 }
 
-const noopSubscribe = () => () => {};
 const productUrl = (id: string) => `/product/${encodeURIComponent(id)}`;
-const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
 
 function View({
   product: pr, group, categories, method = null, qtyFor, onQty, onClose, onPickGroup, page = false, contained = false, appear = 'enter',
@@ -68,7 +68,7 @@ function View({
   const shareT = useRef<ReturnType<typeof setTimeout>>(undefined);
   const fav = useIsFavorite(pr.id);
   // Портал — только после гидрации (на сервере document нет).
-  const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const mounted = useMounted();
   const modal = !page;
   const trap = modal && !contained;
 
@@ -107,46 +107,22 @@ function View({
   };
   useEffect(() => () => clearTimeout(shareT.current), []);
 
-  // ── Клавиатура: Esc закрывает (не на странице), ←→ листают фото (desktop) ──
+  // ── Модалка: Esc, фокус внутрь и обратно, ловушка Tab, блокировка скролла — общий слой ──
+  useModal({ active: trap && mounted, ref: dialogRef, onClose });
+
+  // ── ←→ листают фото (desktop); не из полей и не когда поверх открыт другой слой ──
   const onStep = useEffectEvent((d: number) => step(d));
-  const onEsc = useEffectEvent(() => onClose?.());
   useEffect(() => {
-    if (contained) return;
+    if (contained || mobile) return;
     const onKey = (e: KeyboardEvent) => {
-      // Страница не реагирует, пока поверх открыта модалка.
-      if (page && document.querySelector('[data-mart-modal]')) return;
+      if (modalAbove(trap ? dialogRef : undefined)) return;
       const t = e.target as HTMLElement | null;
       if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
-      if (e.key === 'Escape' && !page) { e.preventDefault(); onEsc(); }
-      if (!mobile && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) onStep(e.key === 'ArrowLeft' ? -1 : 1);
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') onStep(e.key === 'ArrowLeft' ? -1 : 1);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [page, mobile, contained]);
-
-  // ── Модалка: фокус внутрь, ловушка Tab, возврат фокуса, блокировка скролла страницы ──
-  useEffect(() => {
-    if (!trap || !mounted) return;
-    const prev = document.activeElement as HTMLElement | null;
-    const dlg = dialogRef.current;
-    dlg?.focus({ preventScroll: true });
-    const onTab = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab' || !dlg) return;
-      const els = Array.from(dlg.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(el => el.offsetParent !== null);
-      if (!els.length) { e.preventDefault(); return; }
-      const first = els[0], last = els[els.length - 1], a = document.activeElement;
-      if (e.shiftKey && (a === first || a === dlg)) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && a === last) { e.preventDefault(); first.focus(); }
-    };
-    document.addEventListener('keydown', onTab);
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onTab);
-      document.body.style.overflow = overflow;
-      prev?.focus?.({ preventScroll: true });
-    };
-  }, [trap, mounted]);
+  }, [mobile, contained, trap]);
 
   const favBtnLabel = fav ? 'Убрать из избранного' : 'В избранное';
   const cta = <Cta price={price} qty={qty} mobile={mobile} cartHref={cartHref} onQty={setQ} />;
@@ -204,7 +180,7 @@ function View({
 
   const rootCls = [s.root, mobile ? s.mobile : s.desktop, page ? s.page : s.modal, contained ? s.contained : '', appear === 'swap' ? s.swap : ''].filter(Boolean).join(' ');
   const tree = (
-    <div className={rootCls} onClick={modal ? () => onClose?.() : undefined} data-mart-modal={trap || undefined}>
+    <div className={rootCls} onClick={modal ? () => onClose?.() : undefined}>
       <div ref={dialogRef} className={s.dialog} onClick={e => e.stopPropagation()}
         role={modal ? 'dialog' : undefined} aria-modal={modal || undefined} aria-label={modal ? pr.name : undefined} tabIndex={modal ? -1 : undefined}>
         {modal && (

@@ -1,12 +1,4 @@
 /* 3a: padding 0 40 40, gap 20; сетка 1fr · 400 */
-.wrap { padding: 0 var(--page-pad-desktop) 40px; display: flex; flex-direction: column; gap: 20px; max-width: 1440px; width: 100%; margin: 0 auto; }
-.crumbs { display: flex; gap: 8px; font-size: var(--fs-small); color: var(--ink-2); }
-.crumbs a { color: var(--ink-2); text-decoration: none; }
-.crumbs a:hover { color: var(--ink-1); }
-.current { color: var(--ink-1); }
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; align-items: start; }
-.main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; letter-spacing: var(--tracking-tight); }
 .h2 { margin: 0; font-size: 20px; font-weight: 700; }
 .h16 { font-size: 16px; }
 .h18 { font-size: var(--fs-h3); }
@@ -28,9 +20,7 @@
 .chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .offer { padding: 4px 8px; }
 .authCard { background: var(--surface-card); border-radius: var(--r-24); padding: 28px; max-width: 520px; }
-.aside { background: var(--surface-card); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px; }
 .asideHead { display: flex; align-items: baseline; justify-content: space-between; }
-.divider { height: 1px; background: var(--divider); }
 .reason { font-size: var(--fs-13); color: var(--danger); text-align: center; line-height: 1.4; }
 .hint { font-size: var(--fs-13); color: var(--ink-3); text-align: center; line-height: 1.4; }
 .loading { max-width: 600px; margin: 40px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }

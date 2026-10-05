@@ -2,13 +2,12 @@
 // Desktop: баннер 2/3 ширины × 260 (r24) + справа тёмная плашка «Бесплатная доставка от …». Mobile: 358×140 (r20), без кнопки.
 import Link from 'next/link';
 import { DELIVERY } from '@/lib/config';
-import { money } from '@/lib/domain/format';
+import { tg } from '@/lib/domain/format';
 import type { Banner } from '@/lib/types';
 import s from './MartBanner.module.css';
 import { Img } from '@/components/ui/Img';
 
 /** Деньги в свободном тексте — «тг» без точки. */
-const tg = (n: number) => money(n).replace('тг.', 'тг');
 
 export interface MartBannerProps {
   banner: Banner;

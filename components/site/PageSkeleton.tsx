@@ -1,17 +1,6 @@
 // Скелетон страницы на время перехода (app/**/loading.tsx): шапка, сайдбар, сетка карточек, мини-корзина. Пульс 1.4 с.
-import { Skeleton } from '@/components/ui/Spinner';
+import { CardSkeleton, Skeleton } from '@/components/ui/Spinner';
 import s from './PageSkeleton.module.css';
-
-function CardSkeleton() {
-  return (
-    <div className={s.card}>
-      <Skeleton w="100%" h="auto" r={14} style={{ aspectRatio: '1 / 1' }} />
-      <Skeleton w="50%" h={16} r={6} />
-      <Skeleton w="85%" h={14} r={6} />
-      <Skeleton w="100%" h={36} r={18} style={{ marginTop: 'auto' }} />
-    </div>
-  );
-}
 
 export function PageSkeleton({ variant = 'grid' }: { variant?: 'grid' | 'product' }) {
   return (

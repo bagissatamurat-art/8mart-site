@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { DELIVERY } from '@/lib/config';
-import { itemsTitle, money, planShipments } from '@/lib/domain';
+import { itemsTitle, money, planShipments, tg } from '@/lib/domain';
 import { resolveCartItem } from '@/lib/api';
 import type { Method } from '@/lib/types';
 import { MartStepper } from './MartStepper';
@@ -63,7 +63,7 @@ export function MartMiniCart({ cart, method = 'delivery', together, cartHref = '
           {showProgress && (
             <div className={s.progress}>
               <div className={s.bar}><div className={s.fill} style={{ width: Math.min(100, Math.round(goods / DELIVERY.freeFrom * 100)) + '%' }} /></div>
-              <span className={s.progressText}>{(plan!.multi ? 'До бесплатной доставки курьером ' : 'До бесплатной доставки ') + money(left).replace('тг.', 'тг')}</span>
+              <span className={s.progressText}>{(plan!.multi ? 'До бесплатной доставки курьером ' : 'До бесплатной доставки ') + tg(left)}</span>
             </div>
           )}
           <MartButton label="Оформить" amount={money(goods + (plan?.fee || 0))} size={56} full href={cartHref} />

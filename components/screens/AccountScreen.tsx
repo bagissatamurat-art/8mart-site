@@ -23,6 +23,7 @@ import { setCartQty, useUi } from '@/lib/store/ui';
 import type { Address, Card, Category, Order, Product, User } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import c from './AccountScreen.module.css';
+import l from '@/components/site/page.module.css';
 import { LoginScreen } from './LoginScreen';
 
 export interface AccountScreenProps {
@@ -170,7 +171,7 @@ export function AccountScreen({ categories, section }: AccountScreenProps) {
           <MartAccountNav mode="desktop" section={cur} user={navUser} orders={d.orders} promos={d.promos} bonus={d.bonus} hrefFor={hrefFor} onLogout={onLogout} />
         </div>
         <main className={c.main}>
-          <h1 className={c.h1}>{sectionTitle(cur)}</h1>
+          <h1 className={l.h1}>{sectionTitle(cur)}</h1>
           {error}
           {account}
         </main>

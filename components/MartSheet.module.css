@@ -1,5 +1,5 @@
 /* MartSheet — нижний лист. Значения из шторок site/07 Каталог.dc.html. */
-.overlay { inset: 0; background: var(--overlay); display: flex; align-items: flex-end; animation: sheet-fade var(--dur) var(--ease); }
+.overlay { inset: 0; background: var(--overlay); display: flex; align-items: flex-end; animation: var(--anim-fade); }
 .fixed { position: fixed; z-index: var(--z-modal); }
 .contained { position: absolute; z-index: 20; }
 
@@ -8,7 +8,7 @@
   background: var(--surface-card); border-radius: var(--r-24) var(--r-24) 0 0;
   padding: 20px 16px 24px; display: flex; flex-direction: column;
   font-family: var(--font); color: var(--ink-1); outline: none;
-  animation: sheet-up .22s var(--ease);
+  animation: var(--anim-sheet);
   transition: transform .2s var(--ease);
 }
 .fixed .panel { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
@@ -18,6 +18,4 @@
 .handle { flex: none; height: 20px; margin: -14px 0 -6px; display: flex; justify-content: center; align-items: center; cursor: grab; touch-action: none; }
 .handle span { width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
 
-@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-@keyframes sheet-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .overlay, .panel { animation: none; } }

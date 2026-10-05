@@ -4,6 +4,7 @@
 import type { Method, ShipmentKind } from '@/lib/types';
 import type { SplitOption } from '@/lib/domain';
 import s from './MartShipments.module.css';
+import { RadioMark } from './ui/Marks';
 
 export interface MartShipmentHeadProps {
   kind: ShipmentKind;
@@ -51,7 +52,7 @@ export function MartSplitChoice({ options, method = 'delivery', compact, onPick 
       <div className={s.grid} role="radiogroup" style={{ gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))' }}>
         {options.map(o => (
           <button key={o.id} type="button" role="radio" aria-checked={o.sel} className={`${s.opt} ${o.sel ? s.sel : ''}`} onClick={() => onPick?.(o.together)}>
-            <span className={s.radio}><span className={s.dot} /></span>
+            <RadioMark on={o.sel} strong className={s.radio} />
             <span className={s.optBody}>
               <span className={s.optTop}><span className={s.optTitle}>{o.title}</span><span className={`${s.optFee} ${o.feeText === 'Бесплатно' ? s.free : ''}`}>{o.feeText}</span></span>
               <span className={s.meta}>{o.sub}</span>
