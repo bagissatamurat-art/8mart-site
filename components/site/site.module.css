@@ -1,0 +1,57 @@
+/* Раскладка сайта (README → «Раскладка desktop / mobile»). Один брейкпоинт — 1024. */
+.desktopOnly { display: contents; }
+.mobileOnly { display: none; }
+@media (max-width: 1023.98px) {
+  .desktopOnly { display: none; }
+  .mobileOnly { display: contents; }
+}
+
+/* Desktop: шапка 80, затем сетка 260 · 1fr · 340, gap 16, padding 0 40 40 */
+.page { min-height: 100dvh; display: flex; flex-direction: column; gap: 16px; background: var(--surface-page); }
+.grid { display: grid; grid-template-columns: var(--desktop-cols); gap: 16px; padding: 0 var(--page-pad-desktop) 40px; align-items: start; max-width: 1440px; width: 100%; margin: 0 auto; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.headerWrap { max-width: 1440px; width: 100%; margin: 0 auto; }
+.main { display: flex; flex-direction: column; gap: 32px; min-width: 0; }
+.aside { position: sticky; top: 16px; }
+
+@media (max-width: 1023.98px) {
+  /* Mobile: раскладка ~600 по центру, контент padding 16 gap 20, таб-бар 84 */
+  .page { gap: 0; max-width: var(--mobile-max); margin: 0 auto; width: 100%; padding-bottom: var(--h-tabbar); }
+  .grid { display: block; padding: 16px var(--page-pad-mobile) 24px; }
+  .main { gap: 20px; }
+  .side, .aside { display: none; }
+}
+
+.mobileHeader { position: sticky; top: 0; z-index: 30; }
+
+/* Сайдбар категорий: белый, r24, padding 12, строки 48 */
+.sidebar { background: var(--surface-card); border-radius: var(--r-24); padding: 12px; display: flex; flex-direction: column; gap: 2px; }
+.sideRow {
+  display: flex; align-items: center; gap: 12px; height: var(--h-row); padding: 0 10px; border-radius: var(--r-14);
+  text-decoration: none; color: var(--ink-1); font-size: var(--fs-15); font-weight: 500; transition: background var(--dur) var(--ease);
+}
+.sideRow:hover { background: var(--surface-subtle); color: var(--ink-1); }
+.sideRowActive, .sideRowActive:hover { background: var(--primary-50); font-weight: 700; }
+.sideImg { width: 36px; height: 36px; border-radius: 10px; /* из референса, нет в tokens.css */ object-fit: cover; background: var(--surface-subtle); }
+
+/* Полка товаров */
+.shelf { display: flex; flex-direction: column; gap: 16px; }
+.shelfHead { display: flex; align-items: baseline; justify-content: space-between; }
+.shelfTitle { margin: 0; font-size: var(--fs-h2); font-weight: 700; }
+.shelfTitleLink, .shelfTitleLink:hover { color: inherit; text-decoration: none; }
+.shelfAll { font-size: var(--fs-small); font-weight: 600; text-decoration: none; }
+.cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+@media (max-width: 1023.98px) {
+  .shelf { gap: 12px; }
+  .shelfTitle { font-size: 20px; }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  /* 1b: на mobile в полке 2 карточки */
+  .cards > :nth-child(n + 3) { display: none; }
+}
+
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--page-pad-mobile)); padding: 0 var(--page-pad-mobile); }
+.chips::-webkit-scrollbar { display: none; }
+
+/* Экран поиска mobile поверх страницы */
+.searchScreen { position: fixed; inset: 0; z-index: 70; background: var(--surface-page); overflow-y: auto; }
+.searchScreenInner { max-width: var(--mobile-max); margin: 0 auto; min-height: 100%; background: var(--surface-page); }

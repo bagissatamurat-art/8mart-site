@@ -1,0 +1,60 @@
+/* Значения — из site/06 Личный кабинет.dc.html (6a сайдбар, 6b меню 390, 6c раздел 390). */
+.aside { background: var(--surface-card); border-radius: var(--r-24); padding: var(--s-3); display: flex; flex-direction: column; gap: var(--s-1); font-family: var(--font); color: var(--ink-1); }
+.profile { display: flex; align-items: center; gap: var(--s-3); padding: 12px 12px 16px; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary-50); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; flex: none; }
+.avatarM { width: 52px; height: 52px; font-size: 20px; }
+.who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.name { font-size: var(--fs-body); font-weight: 700; }
+.phone { font-size: var(--fs-13); color: var(--ink-2); }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-1); }
+
+.item {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); width: 100%; height: var(--h-row); padding: 0 12px;
+  border-radius: var(--r-14); border: 0; background: transparent; font-size: var(--fs-15); font-weight: 400; color: var(--ink-1);
+  cursor: pointer; text-align: left; text-decoration: none; transition: background var(--dur) var(--ease);
+}
+.item:hover { background: var(--surface-subtle); color: var(--ink-1); }
+.current, .current:hover { background: var(--primary-50); font-weight: 600; }
+.end { display: flex; align-items: center; gap: 10px; flex: none; }
+.badge { font-size: var(--fs-13); font-weight: 600; }
+.badge_primary { color: var(--primary); }
+.badge_ink { color: var(--ink-1); }
+.badge_muted { color: var(--ink-2); }
+.divider { height: 1px; background: var(--divider); margin: var(--s-2) 12px; }
+.logout, .logout:hover { color: var(--ink-2); }
+
+/* ── Mobile: экран «Профиль» ── */
+.mRoot { display: flex; flex-direction: column; min-height: 0; font-family: var(--font); color: var(--ink-1); }
+.mHead { background: var(--surface-card); border-radius: 0 0 var(--r-24) var(--r-24); padding: 8px 16px 20px; display: flex; align-items: center; gap: var(--s-3); flex: none; }
+.nameM { font-size: 20px; font-weight: 800; letter-spacing: var(--tracking-tight); }
+.phoneM { font-size: var(--fs-small); color: var(--ink-2); }
+.mBody { padding: 12px 16px 16px; display: flex; flex-direction: column; gap: var(--s-3); }
+.listM { background: var(--surface-card); border-radius: var(--r-20); padding: var(--s-1); gap: 0; }
+.listM .item { height: var(--h-56); padding: 0 12px 0 14px; border-radius: var(--r-16); font-size: var(--fs-body); }
+.listM .badge { font-size: var(--fs-small); }
+.logoutM {
+  display: flex; align-items: center; height: var(--h-56); padding: 0 18px; border: 0; border-radius: var(--r-20); background: var(--surface-card);
+  font-size: var(--fs-body); color: var(--ink-2); cursor: pointer; text-align: left;
+}
+
+.activeCard {
+  display: flex; flex-direction: column; gap: 10px; padding: var(--s-4); border-radius: var(--r-20); background: var(--surface-card);
+  border: 1.5px solid #F7C6DC; /* из референса, нет в tokens.css */
+  text-decoration: none; color: var(--ink-1);
+}
+.activeCard:hover { color: var(--ink-1); }
+.activeTop { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
+.activeNo { font-size: var(--fs-13); color: var(--ink-3); }
+.activeMid { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-2); }
+.activeLabel { font-size: var(--fs-h3); font-weight: 800; }
+.activeEta { font-size: var(--fs-small); color: var(--ink-2); white-space: nowrap; }
+.bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-1); }
+.bar { height: 4px; border-radius: 2px; background: var(--divider); }
+.bar_done { background: var(--success); }
+.bar_current { background: var(--primary); }
+
+/* ── Mobile: шапка экрана раздела ── */
+.screenHead { background: var(--surface-card); border-radius: 0 0 var(--r-24) var(--r-24); padding: 8px 16px 16px; display: flex; align-items: center; gap: var(--s-2); font-family: var(--font); color: var(--ink-1); }
+.back { width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0; background: var(--surface-subtle); display: flex; align-items: center; justify-content: center; flex: none; cursor: pointer; padding: 0; }
+.back > span { margin-left: 3px; }
+.screenTitle { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: var(--tracking-tight); flex: 1; min-width: 0; }

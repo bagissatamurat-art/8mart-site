@@ -1,0 +1,96 @@
+/* 8mart — дизайн-токены сайта. Источник: site/UI Kit.dc.html. Одно значение — одно место. */
+@import url('./fonts.css');
+
+:root {
+  /* Бренд */
+  --primary: #EE1D74;
+  --primary-hover: #D6136A;
+  --primary-active: #BF0F5E;
+  --primary-200: #F7B4D1;
+  --primary-100: #FBDCEA;
+  --primary-50: #FDF0F6;
+  --focus-ring: 0 0 0 3px rgba(238, 29, 116, .18);
+  --focus-ring-error: 0 0 0 3px rgba(226, 61, 61, .18);
+
+  /* Текст */
+  --ink-1: #17151A;   /* основной */
+  --ink-2: #6B6873;   /* вторичный, иконки */
+  --ink-3: #9E9BA6;   /* подписи, плейсхолдеры, disabled-текст */
+
+  /* Поверхности */
+  --surface-page: #F2F2F4;
+  --surface-card: #FFFFFF;
+  --surface-subtle: #F7F7F8;   /* фон фото, кнопок-иконок, hover строк */
+  --surface-disabled: #EEEDF1;
+  --overlay: rgba(23, 21, 26, .45);
+  --overlay-strong: rgba(23, 21, 26, .88); /* сторис desktop */
+
+  /* Линии — только две */
+  --border: #E3E2E7;   /* контуры инпутов, чипов, ghost-кнопок */
+  --divider: #EEEDF1;  /* разделители, линия над закреплённой панелью */
+
+  /* Семантика */
+  --success: #1DA765;  --success-ink: #13824D;  --success-bg: #EAF7F0;
+  --warning: #F59E0B;  --warning-bg: #FFF7E8;   --warning-ink: #8A5A00;
+  --danger: #E23D3D;   --danger-bg: #FDEDED;    --danger-hover: #FADADA; --danger-active: #F5C2C2;
+  --kaspi: #F14635;    /* только для кнопки/логотипа Kaspi, не перекрашивать */
+  --bonus: #1DA765;    --bonus-ink: #13824D;    --bonus-bg: #EAF7F0;
+  --fav: #EE1D74;      --fav-off: #6B6873;
+
+  /* Типографика — Onest */
+  --font: 'Onest', system-ui, sans-serif;
+  --fs-display: 40px; --lh-display: 1.1;  /* 800, -0.02em */
+  --fs-h1: 32px;      --lh-h1: 1.15;      /* 800, -0.02em; mobile h1 22px */
+  --fs-h2: 24px;      --lh-h2: 1.2;       /* 700; mobile 20px */
+  --fs-h3: 18px;      --lh-h3: 1.3;       /* 600 */
+  --fs-body: 16px;    --lh-body: 1.45;
+  --fs-15: 15px;                            /* пункты меню, кнопки 44 */
+  --fs-small: 14px;   --lh-small: 1.4;
+  --fs-13: 13px;                            /* мета, подписи полей */
+  --fs-caption: 12px;                       /* 500 */
+  --fs-tab: 11px;                           /* подписи таб-бара, 600 */
+  --tracking-tight: -.02em;
+
+  /* Отступы — шаг 4 */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+  --page-pad-desktop: 40px; --page-pad-mobile: 16px;
+
+  /* Радиусы */
+  --r-8: 8px;    /* бейдж */
+  --r-12: 12px;  /* фото в строке, мелкие плитки */
+  --r-14: 14px;  /* фото в карточке, пункты сайдбара */
+  --r-16: 16px;  /* инпут, строка корзины, алерт */
+  --r-18: 18px;  /* миниатюра сторис */
+  --r-20: 20px;  /* карточка товара, сторис desktop */
+  --r-24: 24px;  /* панели, модалки, шапка mobile снизу */
+  --r-pill: 999px;
+
+  /* Высоты контролов — одна шкала */
+  --h-36: 36px; /* чип, мини-кнопка */
+  --h-40: 40px; /* кнопка-иконка «назад», крестик */
+  --h-44: 44px; /* кнопка вторичная, степпер, мин. зона касания */
+  --h-56: 56px; /* основной CTA, инпут */
+  --h-textarea: 84px;
+  --h-row: 48px;        /* строка меню/списка (mobile 56) */
+  --h-row-search: 60px; /* строка подсказки поиска */
+  --h-header-desktop: 80px;
+  --h-tabbar: 84px;     /* 8px сверху + 20px safe-area */
+
+  /* Тени */
+  --shadow-1: 0 1px 2px rgba(23, 21, 26, .06);
+  --shadow-2: 0 8px 24px rgba(23, 21, 26, .08);
+  --shadow-toast: 0 8px 24px rgba(23, 21, 26, .2);
+
+  /* Motion */
+  --dur: 150ms; --ease: ease;            /* hover / focus / цвет */
+  --story-duration: 6000ms;              /* = STORY_DURATION в data.js */
+
+  /* Раскладка */
+  --desktop-cols: 260px minmax(0, 1fr) 340px; /* сайдбар · контент · мини-корзина */
+  --breakpoint: 1024px;
+  --mobile-max: 600px;
+}
+
+body { margin: 0; font-family: var(--font); color: var(--ink-1); background: var(--surface-page); }
+a { color: var(--primary); }
+a:hover { color: var(--primary-hover); }

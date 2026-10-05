@@ -1,0 +1,27 @@
+.bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); height: var(--h-tabbar); padding: 8px 8px 20px;
+  background: var(--surface-card); border-top: 1px solid var(--divider); font-family: var(--font); width: 100%;
+}
+.fixed { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); max-width: var(--mobile-max); z-index: 50; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+.tab {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  text-decoration: none; color: var(--ink-3); font-size: var(--fs-tab); font-weight: 600; border-radius: var(--r-12);
+}
+.tab:hover { color: var(--ink-2); }
+.active, .active:hover { color: var(--primary); }
+
+.iHome { width: 22px; height: 22px; border: 2.5px solid currentColor; border-radius: 7px 7px 4px 4px; position: relative; }
+.iHome > span { position: absolute; left: 6px; bottom: 0; width: 5px; height: 8px; background: currentColor; border-radius: 2px 2px 0 0; }
+.iCatalog { width: 22px; height: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.iCatalog > span { border: 2.5px solid currentColor; border-radius: 4px; }
+.iCart { width: 22px; height: 22px; position: relative; }
+.iCart > span:first-child { position: absolute; left: 1px; top: 6px; width: 20px; height: 14px; border: 2.5px solid currentColor; border-radius: 3px 3px 6px 6px; }
+.iCart > span:last-child { position: absolute; left: 6px; top: 1px; width: 10px; height: 8px; border: 2.5px solid currentColor; border-bottom: 0; border-radius: 5px 5px 0 0; }
+.iProfile { width: 22px; height: 22px; position: relative; }
+.iProfile > span:first-child { position: absolute; left: 6px; top: 0; width: 10px; height: 10px; border: 2.5px solid currentColor; border-radius: 50%; }
+.iProfile > span:last-child { position: absolute; left: 1px; bottom: 0; width: 20px; height: 9px; border: 2.5px solid currentColor; border-bottom: 0; border-radius: 10px 10px 0 0; }
+
+.count {
+  position: absolute; top: 2px; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--r-pill);
+  background: var(--primary); color: #fff; font-size: var(--fs-tab); font-weight: 700; display: flex; align-items: center; justify-content: center;
+}

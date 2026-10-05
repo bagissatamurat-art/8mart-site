@@ -1,0 +1,22 @@
+/* MartCodeInput — 4 ячейки поверх одного скрытого input. Значения — из site/MartAuth.dc.html. */
+.wrap { position: relative; }
+/* gap 10 — из референса, нет в tokens.css */
+.cells { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.cell {
+  /* высота 64 и шрифт 28/700 — из референса, нет в tokens.css */
+  height: 64px; border-radius: var(--r-16); border: 1.5px solid var(--border); background: var(--surface-card);
+  display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: var(--ink-1);
+  font-variant-numeric: tabular-nums; transition: all var(--dur) var(--ease);
+}
+.active { border-color: var(--primary); box-shadow: var(--focus-ring); }
+.error { border-color: var(--danger); }
+.ok { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+/* Каретка 2×28 — из референса */
+.caret { width: 2px; height: 28px; background: var(--primary); border-radius: 1px; }
+/* Скрытый input перекрывает ячейки: клик по любой ячейке фокусирует его; 16px — чтобы iOS не зумил. */
+.input {
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0;
+  font-size: 16px; color: transparent; caret-color: transparent; background: transparent; cursor: text;
+}
+.input:focus-visible { box-shadow: none; }
+.input:disabled { cursor: default; }

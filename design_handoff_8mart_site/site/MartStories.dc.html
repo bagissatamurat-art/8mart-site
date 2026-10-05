@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="display:flex;gap:{{ gap }};overflow-x:auto;scrollbar-width:none;padding:2px 0">
+  <sc-for list="{{ thumbs }}" as="t" hint-placeholder-count="5">
+    <button type="button" onClick="{{ t.open }}" aria-label="{{ t.title }}" style="flex:none;width:{{ thumbW }};height:{{ thumbH }};border-radius:18px;padding:2px;box-sizing:border-box;border:2.5px solid {{ t.ring }};background:transparent;cursor:pointer;font:inherit;display:flex">
+      <span style="position:relative;flex:1;border-radius:13px;overflow:hidden;background:#F7F7F8;display:flex;align-items:flex-end">
+        <img src="{{ t.cover }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 70%;display:block">
+        <span style="position:absolute;left:0;right:0;bottom:0;height:60%;background:linear-gradient(transparent,rgba(23,21,26,.72))"></span>
+        <span style="position:relative;padding:0 8px 8px;font-size:12px;line-height:15px;font-weight:600;color:#fff;text-align:left;text-wrap:balance">{{ t.title }}</span>
+      </span>
+    </button>
+  </sc-for>
+</div>
+<sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+  <div role="dialog" aria-label="Сторис" onClick="{{ backdrop }}" style="position:absolute;inset:0;z-index:60;background:{{ backBg }};display:flex;align-items:center;justify-content:center;gap:24px">
+    <sc-if value="{{ desktop }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ prevStory }}" aria-label="Предыдущая" disabled="{{ noPrevStory }}" style="width:44px;height:44px;border-radius:50%;border:0;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;opacity:{{ prevOp }}"><span style="width:10px;height:10px;border-left:2px solid #17151A;border-bottom:2px solid #17151A;transform:rotate(45deg);margin-left:4px"></span></button></sc-if>
+    <div onClick="{{ stop }}" style="position:relative;width:{{ cardW }};height:{{ cardH }};border-radius:{{ cardR }};overflow:hidden;background:{{ slideBg }};flex:none;user-select:none;touch-action:none">
+      <img src="{{ slide.img }}" alt="" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">
+      <img src="{{ nextImg }}" alt="" style="display:none">
+      <div onPointerDown="{{ down }}" onPointerUp="{{ up }}" onPointerCancel="{{ cancel }}" onPointerLeave="{{ cancel }}" style="position:absolute;inset:0;cursor:pointer"></div>
+      <div style="position:absolute;left:0;right:0;top:0;padding:{{ topPad }} 12px 0;display:flex;flex-direction:column;gap:12px;pointer-events:none">
+        <div style="display:flex;gap:4px"><sc-for list="{{ bars }}" as="b" hint-placeholder-count="1"><span style="flex:1;height:3px;border-radius:2px;background:rgba(23,21,26,.18);overflow:hidden"><span style="display:block;height:100%;width:{{ b.w }};background:#17151A;border-radius:2px"></span></span></sc-for></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <img src="{{ story.cover }}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;object-position:50% 70%;border:1.5px solid #fff">
+          <b style="font-size:14px;font-weight:600;color:#17151A;flex:1">{{ story.title }}</b>
+          <sc-if value="{{ paused }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:3px;padding:0 4px"><span style="width:3px;height:12px;background:#17151A;border-radius:1px"></span><span style="width:3px;height:12px;background:#17151A;border-radius:1px"></span></span></sc-if>
+          <button type="button" onClick="{{ close }}" aria-label="Закрыть" style="pointer-events:auto;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex:none"><span style="position:relative;width:14px;height:14px;display:block"><span style="position:absolute;left:0;top:6px;width:14px;height:2px;background:#17151A;transform:rotate(45deg)"></span><span style="position:absolute;left:0;top:6px;width:14px;height:2px;background:#17151A;transform:rotate(-45deg)"></span></span></button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:12px 4px 0">
+          <h2 style="margin:0;font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-.02em;color:#17151A;text-wrap:balance">{{ slide.title }}</h2>
+          <p style="margin:0;font-size:16px;line-height:1.4;color:#17151A;text-wrap:pretty;max-width:320px">{{ slide.text }}</p>
+        </div>
+      </div>
+      <sc-if value="{{ hasCta }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:16px;right:16px;bottom:{{ botPad }}"><dc-import name="MartButton" label="{{ ctaLabel }}" variant="primary" size="56" full="{{ true }}" on-click="{{ cta }}" hint-size="100%,56px"></dc-import></div>
+      </sc-if>
+    </div>
+    <sc-if value="{{ desktop }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ nextStory }}" aria-label="Следующая" style="width:44px;height:44px;border-radius:50%;border:0;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><span style="width:10px;height:10px;border-right:2px solid #17151A;border-top:2px solid #17151A;transform:rotate(45deg);margin-right:4px"></span></button></sc-if>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:120},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;mobile&quot;,&quot;options&quot;:[&quot;mobile&quot;,&quot;desktop&quot;],&quot;tsType&quot;:&quot;'mobile'|'desktop'&quot;}}">
+class Component extends DCLogic {
+  state = { D: null, open: false, si: 0, sl: 0, prog: 0, paused: false, seen: [], copied: false };
+  componentDidMount() {
+    import('./data.js').then(D => this.setState({ D, seen: D.getSeenStories() }));
+    this.onKey = (e) => { if (!this.state.open) return; if (e.key === 'Escape') this.close(); else if (e.key === 'ArrowRight') this.next(); else if (e.key === 'ArrowLeft') this.prev(); else if (e.key === ' ') { e.preventDefault(); this.setState(s => ({ paused: !s.paused })); } };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); cancelAnimationFrame(this.raf); clearTimeout(this.cT); }
+  list() { return this.state.D ? this.state.D.STORIES : []; }
+  openAt(i) { this.setState({ open: true, si: i, sl: 0, prog: 0, paused: false, copied: false }, () => { this.mark(); this.loop(); }); }
+  close() { cancelAnimationFrame(this.raf); this.setState({ open: false, paused: false }); }
+  mark() { const st = this.list()[this.state.si]; if (st && this.state.D) { this.state.D.markStorySeen(st.id); this.setState({ seen: this.state.D.getSeenStories() }); } }
+  go(si, sl) { this.last = performance.now(); this.setState({ si, sl, prog: 0, copied: false }, () => this.mark()); }
+  next() { const L = this.list(), st = L[this.state.si]; if (this.state.sl < st.slides.length - 1) this.go(this.state.si, this.state.sl + 1); else if (this.state.si < L.length - 1) this.go(this.state.si + 1, 0); else this.close(); }
+  prev() { const L = this.list(); if (this.state.sl > 0) this.go(this.state.si, this.state.sl - 1); else if (this.state.si > 0) this.go(this.state.si - 1, L[this.state.si - 1].slides.length - 1); else this.go(0, 0); }
+  loop() {
+    cancelAnimationFrame(this.raf); this.last = performance.now();
+    const dur = (this.state.D && this.state.D.STORY_DURATION) || 6000;
+    const tick = (now) => {
+      if (!this.state.open) return;
+      const dt = now - this.last; this.last = now;
+      if (!this.state.paused && !this.holding) { const p = this.state.prog + dt / dur; if (p >= 1) this.next(); else this.setState({ prog: p }); }
+      this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+  renderVals() {
+    const desktop = (this.props.mode ?? 'mobile') === 'desktop';
+    const L = this.list(), s = this.state, seen = s.seen;
+    const story = L[s.si] || { title: '', cover: '', slides: [{}] }, slide = story.slides[s.sl] || {};
+    const nxt = story.slides[s.sl + 1] || (L[s.si + 1] && L[s.si + 1].slides[0]) || {};
+    const ctaLabel = slide.cta ? (slide.cta.copy && s.copied ? 'Код скопирован' : slide.cta.label) : '';
+    return {
+      gap: desktop ? '12px' : '8px', thumbW: desktop ? '104px' : '88px', thumbH: desktop ? '140px' : '116px',
+      thumbs: L.map((t, i) => ({ title: t.title, cover: t.cover, ring: seen.includes(t.id) ? '#E3E2E7' : '#EE1D74', fg: seen.includes(t.id) ? '#6B6873' : '#17151A', open: () => this.openAt(i) })),
+      open: s.open, desktop, story, slide, nextImg: nxt.img || '',
+      backBg: desktop ? 'rgba(23,21,26,.88)' : '#17151A', cardW: desktop ? '400px' : '100%', cardH: desktop ? 'min(711px, calc(100% - 48px))' : '100%', cardR: desktop ? '20px' : '0',
+      topPad: desktop ? '12px' : '52px', botPad: desktop ? '16px' : '34px', slideBg: '#F7F7F8',
+      bars: story.slides.map((_, i) => ({ w: i < s.sl ? '100%' : i > s.sl ? '0%' : (s.prog * 100).toFixed(2) + '%' })),
+      paused: s.paused,
+      hasCta: !!slide.cta, ctaLabel,
+      cta: () => { const c = slide.cta; if (!c) return; if (c.copy) { try { navigator.clipboard.writeText(c.copy); } catch (e) {} this.setState({ copied: true, paused: true }); clearTimeout(this.cT); this.cT = setTimeout(() => this.setState({ copied: false, paused: false }), 1800); } else if (c.href) { this.close(); location.href = c.href; } },
+      close: (e) => { e && e.stopPropagation(); this.close(); },
+      backdrop: () => { if (desktop) this.close(); }, stop: (e) => e.stopPropagation(),
+      prevStory: (e) => { e.stopPropagation(); if (s.si > 0) this.go(s.si - 1, 0); },
+      nextStory: (e) => { e.stopPropagation(); if (s.si < L.length - 1) this.go(s.si + 1, 0); else this.close(); },
+      noPrevStory: s.si === 0, prevOp: s.si === 0 ? 0.4 : 1,
+      down: (e) => { this.holding = true; this.dT = performance.now(); this.dX = e.clientX; this.dY = e.clientY; },
+      cancel: () => { this.holding = false; },
+      up: (e) => {
+        const wasHold = this.holding; this.holding = false; if (!wasHold) return;
+        const dy = e.clientY - this.dY, dx = e.clientX - this.dX;
+        if (dy > 80 && Math.abs(dy) > Math.abs(dx)) { this.close(); return; }
+        if (Math.abs(dx) > 60) { dx < 0 ? (s.si < L.length - 1 ? this.go(s.si + 1, 0) : this.close()) : (s.si > 0 && this.go(s.si - 1, 0)); return; }
+        if (performance.now() - this.dT > 250) return;
+        const r = e.currentTarget.getBoundingClientRect();
+        (e.clientX - r.left) < r.width / 3 ? this.prev() : this.next();
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+/* Части экрана каталога — значения из inline-стилей site/07 Каталог.dc.html (7a 1440, 7b 390). */
+
+.stripes { display: block; background: repeating-linear-gradient(135deg, var(--surface-page) 0 8px, var(--surface-subtle) 8px 16px); }
+
+/* ── Сайдбар (7a) ── */
+.sideItem { display: contents; }
+.sideAll {
+  display: flex; align-items: center; height: var(--h-44); padding: 0 10px; border-radius: var(--r-14);
+  text-decoration: none; color: var(--ink-1); font-size: var(--fs-15); font-weight: 500; transition: background var(--dur) var(--ease);
+}
+.sideAll:hover { background: var(--surface-subtle); color: var(--ink-1); }
+.sideAllOn, .sideAllOn:hover { background: var(--primary-50); font-weight: 700; }
+.sideSubs { display: flex; flex-direction: column; padding: 2px 0 6px 58px; }
+.sideSub {
+  display: flex; align-items: center; height: var(--h-36); padding: 0 8px; border-radius: 10px; /* из референса, нет в tokens.css */
+  text-decoration: none; color: var(--ink-1); font-size: var(--fs-small); font-weight: 400; transition: background var(--dur) var(--ease);
+}
+.sideSub:hover { background: var(--surface-subtle); color: var(--ink-1); }
+.sideSubOn, .sideSubOn:hover { color: var(--primary); font-weight: 600; }
+
+/* ── Плитки корня: desktop 3 в ряд, r24, фото 4:3 r18; mobile — строки r20 с фото 72 ── */
+.rootTiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rootTile {
+  display: flex; flex-direction: column; gap: 12px; padding: 8px 8px 16px; border-radius: var(--r-24); background: var(--surface-card);
+  color: var(--ink-1); text-decoration: none; text-align: left; transition: box-shadow var(--dur) var(--ease);
+}
+.rootTile:hover { box-shadow: var(--shadow-2); color: var(--ink-1); }
+.rootImg { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-18); background: var(--surface-subtle); }
+.rootImg.stripes { background: repeating-linear-gradient(135deg, var(--surface-page) 0 12px, var(--surface-subtle) 12px 24px); }
+.rootText { display: flex; flex-direction: column; gap: 4px; padding: 0 8px; min-width: 0; }
+.rootName { font-size: var(--fs-h3); font-weight: 700; }
+.meta { font-size: var(--fs-13); color: var(--ink-2); }
+.rootArrow { display: none; }
+
+/* ── Плитки подкатегорий: desktop 3 в ряд r20, фото r14; «Все товары» — розовая плашка ── */
+.subTiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.subTile {
+  display: flex; flex-direction: column; gap: 10px; padding: 8px 8px 14px; border-radius: var(--r-20); background: var(--surface-card);
+  color: var(--ink-1); text-decoration: none; text-align: left; transition: box-shadow var(--dur) var(--ease);
+}
+.subTile:hover { box-shadow: var(--shadow-2); color: var(--ink-1); }
+.subImg { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-14); background: var(--surface-subtle); display: block; }
+.subImg.stripes { background: repeating-linear-gradient(135deg, var(--surface-page) 0 10px, var(--surface-subtle) 10px 20px); }
+.subAll { display: flex; align-items: center; justify-content: center; background: var(--primary-50); font-size: var(--fs-15); font-weight: 700; color: var(--primary); }
+.subText { display: flex; flex-direction: column; gap: 2px; padding: 0 6px; min-width: 0; }
+.subName { font-size: var(--fs-body); font-weight: 600; }
+
+@media (max-width: 1023.98px) {
+  .rootTiles { display: flex; flex-direction: column; gap: 10px; }
+  .rootTile { flex-direction: row; align-items: center; gap: 14px; padding: 10px 16px 10px 10px; border-radius: var(--r-20); }
+  .rootImg { width: 72px; height: 72px; aspect-ratio: auto; border-radius: var(--r-14); flex: none; }
+  .rootImg.stripes { background: repeating-linear-gradient(135deg, var(--surface-page) 0 8px, var(--surface-subtle) 8px 16px); }
+  .rootText { gap: 3px; padding: 0; flex: 1; }
+  .rootName { font-size: 17px; /* из референса, нет в tokens.css */ }
+  .rootArrow { display: flex; flex: none; }
+
+  .subTiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .subTile { gap: 8px; padding: 6px 6px 12px; border-radius: var(--r-18); }
+  .subImg { border-radius: var(--r-12); }
+  .subAll { font-size: var(--fs-small); }
+  .subName { font-size: var(--fs-15); line-height: 1.25; }
+  .subTile .meta { font-size: var(--fs-caption); }
+}
+
+/* ── Шапка mobile (7b) ── */
+.topBar {
+  background: var(--surface-card); border-radius: 0 0 var(--r-24) var(--r-24); padding: 8px 16px 14px;
+  display: flex; flex-direction: column; gap: 12px; position: sticky; top: 0; z-index: 20;
+}
+.topRoot { margin: 0; font-size: var(--fs-h2); font-weight: 800; letter-spacing: var(--tracking-tight); }
+.searchLink {
+  display: flex; align-items: center; gap: 10px; height: var(--h-44); padding: 0 16px; border-radius: var(--r-pill);
+  background: var(--surface-subtle); text-decoration: none; color: var(--ink-3); font-size: var(--fs-15);
+}
+.searchLink:hover { color: var(--ink-3); }
+.loupe { position: relative; width: 14px; height: 14px; border: 2px solid var(--ink-3); border-radius: 50%; flex: none; box-sizing: content-box; }
+.loupe::after { content: ''; position: absolute; right: -5px; bottom: -4px; width: 6px; height: 2px; background: var(--ink-3); transform: rotate(45deg); }
+.topRow { display: flex; align-items: center; gap: 8px; }
+.back { position: relative; width: var(--h-40); height: var(--h-40); border-radius: 50%; background: var(--surface-subtle); display: flex; align-items: center; justify-content: center; flex: none; }
+.back::after { content: ''; position: absolute; inset: -2px; }
+.back > span { margin-left: 3px; }
+.topTitle { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: var(--tracking-tight); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topCount { font-size: var(--fs-small); color: var(--ink-3); flex: none; }
+.topChips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--page-pad-mobile)); padding: 0 var(--page-pad-mobile); }
+.topChips::-webkit-scrollbar { display: none; }
+.topChips > * { flex: none; }
+
+/* ── Скелетон карточки: 300 (mobile 290), r20, фото r14, строки r6 ── */
+@keyframes pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+.skel {
+  height: 300px; border-radius: var(--r-20); background: var(--surface-card); padding: 8px; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 10px; animation: pulse 1.4s ease infinite;
+}
+.skelPhoto { aspect-ratio: 1 / 1; border-radius: var(--r-14); background: var(--surface-page); }
+.skelLine { height: 16px; width: 50%; border-radius: 6px; /* из референса, нет в tokens.css */ background: var(--surface-page); }
+.skelLine2 { height: 14px; width: 80%; border-radius: 6px; /* из референса, нет в tokens.css */ background: var(--surface-page); }
+@media (max-width: 1023.98px) {
+  .skel { height: 290px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; }
+}

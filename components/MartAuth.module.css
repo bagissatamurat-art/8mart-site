@@ -1,0 +1,81 @@
+/* MartAuth — COMPONENTS.md → MartAuth; значения — из inline-стилей site/MartAuth.dc.html. */
+.root { display: flex; flex-direction: column; gap: var(--s-5); width: 100%; font-family: var(--font); color: var(--ink-1); }
+.contents { display: contents; }
+
+/* gap 6 — из референса, нет в tokens.css */
+.head { display: flex; flex-direction: column; gap: 6px; }
+.title { margin: 0; font-size: var(--fs-h2); font-weight: 800; letter-spacing: var(--tracking-tight); }
+.sub { margin: 0; font-size: var(--fs-small); color: var(--ink-2); line-height: var(--lh-small); }
+.inlineLink {
+  position: relative; border: 0; background: transparent; padding: 0; font: inherit; font-size: var(--fs-small);
+  font-weight: 600; color: var(--primary); cursor: pointer; border-radius: var(--r-8);
+}
+/* Зона касания ≥ 44 у строчной ссылки — невидимым расширением */
+.inlineLink::after { content: ''; position: absolute; inset: -14px -8px; }
+.inlineLink:hover { color: var(--primary-hover); }
+
+.actions { display: flex; flex-direction: column; gap: var(--s-3); }
+.or { display: flex; align-items: center; gap: var(--s-3); font-size: var(--fs-13); color: var(--ink-3); }
+.or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--divider); }
+.terms { margin: 0; font-size: var(--fs-caption); color: var(--ink-3); line-height: var(--lh-small); text-align: center; }
+.terms a, .terms a:hover { color: var(--ink-2); }
+
+/* Код */
+.codeBlock { display: flex; flex-direction: column; gap: var(--s-2); }
+.status { font-size: var(--fs-13); padding: 0 var(--s-1); }
+.statusError { color: var(--danger); }
+.statusOk { color: var(--success); font-weight: 600; }
+.statusWait { display: flex; align-items: center; gap: var(--s-2); color: var(--ink-2); }
+/* Спиннер референса: 2px var(--border), верх — primary. 12 / 14 — из референса. */
+.spin {
+  width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--primary);
+  flex: none; animation: authspin .7s linear infinite;
+}
+.spin14 { width: 14px; height: 14px; }
+@keyframes authspin { to { transform: rotate(360deg); } }
+
+.links { display: flex; flex-direction: column; gap: var(--s-1); }
+.linkBtn {
+  height: var(--h-44); border: 0; background: transparent; padding: 0 var(--s-4); font: inherit; font-size: var(--fs-small);
+  font-weight: 600; color: var(--primary); cursor: pointer; border-radius: var(--r-pill);
+}
+.linkBtn:hover { color: var(--primary-hover); }
+.linkMuted, .linkMuted:hover { color: var(--ink-2); }
+.timer {
+  height: var(--h-44); display: flex; align-items: center; justify-content: center; font-size: var(--fs-small);
+  color: var(--ink-3); font-variant-numeric: tabular-nums;
+}
+.mockHint { font-size: var(--fs-caption); color: var(--ink-3); text-align: center; }
+
+/* Telegram */
+.tgSteps { display: flex; flex-direction: column; gap: var(--s-3); margin: 0; padding: 0; list-style: none; }
+.tgStep { display: flex; align-items: flex-start; gap: var(--s-3); font-size: var(--fs-15); line-height: var(--lh-small); }
+/* Кружок 28 — из референса, нет в tokens.css */
+.tgNum {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--primary-50); color: var(--primary); flex: none;
+  display: flex; align-items: center; justify-content: center; font-size: var(--fs-13); font-weight: 700;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.tgNumOk { background: var(--success-bg); color: var(--success); }
+/* padding-top 3 — из референса */
+.tgText { padding-top: 3px; }
+
+.qr { display: flex; align-items: center; gap: var(--s-4); padding: var(--s-4); border-radius: var(--r-20); border: 1px solid var(--border); }
+/* QR 132×132 — из референса, нет в tokens.css */
+.qrImg {
+  width: 132px; height: 132px; display: flex; align-items: center; justify-content: center; flex: none;
+  border-radius: var(--r-8); background: var(--surface-subtle); object-fit: contain;
+}
+.qrText { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+/* line-height 1.3 — из референса */
+.qrTitle { font-size: var(--fs-15); font-weight: 600; line-height: 1.3; }
+.qrNote { font-size: var(--fs-13); color: var(--ink-2); line-height: var(--lh-small); }
+.qrBot { color: var(--ink-1); font-weight: 500; overflow-wrap: anywhere; }
+
+/* gap 10 — из референса */
+.plate {
+  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: var(--h-44); padding: 0 var(--s-3);
+  border-radius: var(--r-14); background: var(--surface-subtle); font-size: var(--fs-small); color: var(--ink-2); text-align: center;
+}
+.plateOk { background: var(--success-bg); color: var(--success); font-weight: 600; }
+.tgBtn { text-decoration: none; }

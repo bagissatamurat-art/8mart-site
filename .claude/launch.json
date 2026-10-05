@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "8mart-dev", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev", "--", "-p", "3008"], "port": 3008 }
+  ]
+}

@@ -1,0 +1,100 @@
+/* Результаты поиска — значения из site/05 Поиск.dc.html (5c 1440, 5d 390); скелетоны и конец ленты — из 07 Каталог. */
+
+/* ── Desktop: левая колонка 260 — «Нашли в категориях» + «Фильтры» ── */
+.side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel { background: var(--surface-card); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.panelTitle { font-size: var(--fs-h3); font-weight: 700; }
+.tree { display: flex; flex-direction: column; gap: 2px; }
+.row {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: var(--h-40); padding: 0 10px;
+  border: 0; border-radius: var(--r-12); background: transparent; font-family: var(--font); font-size: var(--fs-15); font-weight: 400;
+  color: var(--ink-1); cursor: pointer; text-align: left; transition: background var(--dur) var(--ease);
+}
+.row::after { content: ''; position: absolute; inset: -2px 0; } /* зона касания 44 */
+.row:hover { background: var(--surface-subtle); }
+.row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.rowOn, .rowOn:hover { background: var(--primary-50); font-weight: 700; }
+.subRow { padding-left: 44px; }
+.rowCount { font-size: var(--fs-13); color: var(--ink-3); } /* жирность — от строки, как в 5c */
+.groupHead {
+  display: flex; align-items: center; gap: 10px; height: var(--h-40); padding: 0 10px;
+  font-size: var(--fs-13); font-weight: 600; color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase;
+}
+.groupImg { width: 24px; height: 24px; border-radius: 6px; /* из референса, нет в tokens.css */ object-fit: cover; }
+
+/* ── Desktop: центр ── */
+.main { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.crumbs { display: flex; gap: 8px; font-size: var(--fs-small); color: var(--ink-2); }
+.crumbs a { color: var(--ink-2); text-decoration: none; }
+.crumbs a:hover { color: var(--ink-1); }
+.current { color: var(--ink-1); }
+.titleRow { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; /* line-height normal — как в 5c */ letter-spacing: var(--tracking-tight); overflow-wrap: anywhere; }
+.count { font-size: var(--fs-body); color: var(--ink-3); }
+.toolbar { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.idle { background: var(--surface-card); border-radius: var(--r-24); padding: 12px; }
+
+/* Сетка: desktop 4 в ряд gap 12, mobile 2 gap 8 */
+.cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+.end { font-size: var(--fs-small); color: var(--ink-3); text-align: center; padding: 8px 0; }
+
+/* Пустые состояния: белая плашка r24, padding 64/24 */
+.emptyBox {
+  display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 64px 24px; text-align: center;
+  background: var(--surface-card); border-radius: var(--r-24);
+}
+.emptyTitle { font-size: 20px; font-weight: 700; }
+.emptyText { font-size: var(--fs-15); color: var(--ink-2); line-height: 1.4; }
+.popular { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+
+/* Скелетон карточки (07 Каталог): 300 / 290, r20, p8, gap 10, пульс 1.4 с */
+.skelCard {
+  height: 300px; border-radius: var(--r-20); background: var(--surface-card); padding: 8px; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 10px; animation: mart-pulse 1.4s ease infinite;
+}
+.skelPhoto { display: block; aspect-ratio: 1 / 1; border-radius: var(--r-14); background: var(--surface-page); }
+.skelLine { display: block; border-radius: 6px; /* из референса, нет в tokens.css */ background: var(--surface-page); }
+
+/* ── Mobile (5d) ── */
+.mTop {
+  position: sticky; top: 0; z-index: 30; background: var(--surface-card); border-radius: 0 0 var(--r-24) var(--r-24);
+  padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 12px;
+}
+.mBar { display: flex; align-items: center; gap: 8px; }
+.back {
+  position: relative; width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0; padding: 0 0 0 3px; background: var(--surface-subtle);
+  display: flex; align-items: center; justify-content: center; flex: none; cursor: pointer;
+}
+.back::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; } /* зона касания 44 */
+.back:focus-visible, .mQuery:focus-visible, .mSort:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.mQuery {
+  flex: 1; min-width: 0; display: flex; align-items: center; height: 48px; /* из референса: поле поиска mobile — вне шкалы контролов */
+  border: 0; border-radius: var(--r-pill); background: var(--surface-subtle); padding: 0 16px; font-family: var(--font); font-size: var(--fs-body);
+  color: var(--ink-1); cursor: text; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mChips {
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  margin: 0 calc(-1 * var(--page-pad-mobile)); padding: 0 var(--page-pad-mobile); /* как в 5d: без вертикальных отступов */
+}
+.mChips::-webkit-scrollbar { display: none; }
+.mChips > * { flex: none; }
+.mCountRow { display: flex; align-items: center; justify-content: space-between; }
+.mCount { font-size: var(--fs-small); color: var(--ink-3); }
+.mSort {
+  position: relative; display: flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 0;
+  font-family: var(--font); font-size: var(--fs-small); font-weight: 500; color: var(--ink-1); cursor: pointer; border-radius: var(--r-8);
+}
+.mSort::before { content: ''; position: absolute; inset: -12px -4px; } /* зона касания 44 */
+.mList { display: flex; flex-direction: column; gap: 8px; padding: 16px var(--page-pad-mobile) 24px; }
+.mScreen { min-height: 100dvh; display: flex; flex-direction: column; max-width: var(--mobile-max); margin: 0 auto; background: var(--surface-card); }
+
+@media (max-width: 1023.98px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .skelCard { height: 290px; }
+  .end { font-size: var(--fs-13); }
+  .emptyBox { padding: 40px 16px; }
+  .emptyTitle { font-size: var(--fs-h3); }
+}
+
+@keyframes mart-pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }

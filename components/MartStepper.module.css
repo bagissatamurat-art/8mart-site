@@ -1,0 +1,13 @@
+.root { display: inline-flex; align-items: center; border-radius: var(--r-pill); font-family: var(--font); font-weight: 600; }
+.primary { background: var(--primary); color: #fff; }
+.neutral { background: var(--surface-subtle); color: var(--ink-1); }
+.disabled { background: var(--surface-disabled); color: var(--ink-3); }
+.btn {
+  position: relative; border: 0; background: transparent; color: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-pill); padding: 0; flex: none; transition: background var(--dur) var(--ease);
+}
+.btn:hover:not(:disabled) { background: rgba(0, 0, 0, .06); }
+.btn:disabled { cursor: not-allowed; }
+.h { width: 12px; height: 2px; background: currentColor; border-radius: 1px; display: block; }
+.v { width: 2px; height: 12px; background: currentColor; border-radius: 1px; display: block; position: absolute; }
+.qty { flex: 1; text-align: center; min-width: 24px; font-variant-numeric: tabular-nums; }

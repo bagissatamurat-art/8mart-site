@@ -1,0 +1,221 @@
+/* MartProductView — значения из site/MartProductView.dc.html. Литералы без токена помечены «из референса, нет в tokens.css». */
+
+/* ── Оверлей / корень ── */
+.root { inset: 0; display: flex; justify-content: center; box-sizing: border-box; font-family: var(--font); color: var(--ink-1); z-index: 30; }
+.modal { position: fixed; background: var(--overlay); overflow: hidden; }
+.modal.contained { position: absolute; }
+.modal.desktop { align-items: flex-start; padding: 40px 24px; }
+.modal.mobile { align-items: flex-end; padding: 0; }
+.page { position: relative; background: transparent; padding: 0; }
+.page.desktop { align-items: flex-start; overflow: visible; }
+.page.mobile { position: absolute; height: 100%; align-items: flex-end; }
+
+.dialog {
+  position: relative; width: 100%; background: var(--surface-card); display: flex; flex-direction: column; flex: none; margin: 0;
+}
+.dialog:focus-visible { box-shadow: none; }
+.modal.desktop .dialog {
+  max-width: 1040px; /* из референса, нет в tokens.css */
+  max-height: min(820px, 100%); /* из референса 820, нет в tokens.css; не выше окна */
+  border-radius: var(--r-24); margin: 0 auto;
+}
+.modal.mobile .dialog {
+  max-height: 94%; /* из референса, нет в tokens.css */
+  border-radius: var(--r-24) var(--r-24) 0 0; overflow: hidden;
+}
+.page.desktop .dialog { max-width: 100%; border-radius: var(--r-24); }
+.page.mobile .dialog { height: 100%; max-height: 100%; border-radius: 0; overflow: hidden; }
+
+/* ── Тело: галерея · инфо ── */
+.body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-items: start; }
+.desktop .body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-8); padding: var(--s-6); }
+.page.desktop .body { padding: 28px; /* из референса, нет в tokens.css */ overflow: visible; }
+.mobile .body { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); padding: 0 var(--s-4) var(--s-5); }
+
+/* Белые круглые кнопки поверх фото: крестик, сердце, стрелки */
+.onPhoto {
+  position: absolute; border-radius: 50%; border: 0; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, .94); /* из референса, нет в tokens.css (--badge-on-photo = .92) */
+  box-shadow: 0 2px 8px rgba(23, 21, 26, .12); /* из референса, нет в tokens.css */
+  transition: box-shadow var(--dur) var(--ease);
+}
+.onPhoto:focus-visible { box-shadow: 0 2px 8px rgba(23, 21, 26, .12), var(--focus-ring); }
+.close { width: var(--h-44); height: var(--h-44); right: var(--s-4); top: var(--s-4); z-index: 5; }
+.mobile .close { right: var(--s-3); top: var(--s-3); }
+
+/* ── Галерея desktop ── */
+.gallery { position: sticky; top: 0; display: flex; flex-direction: column; gap: 10px; /* из референса */ min-width: 0; }
+.page .gallery { top: var(--s-4); }
+.main { position: relative; aspect-ratio: 1 / 1; border-radius: var(--r-18); background: var(--surface-subtle); overflow: hidden; }
+.photoImg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ph, .phSmall {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: ui-monospace, Menlo, monospace; /* из референса: подпись плейсхолдера */ font-size: var(--fs-13); color: var(--ink-3);
+}
+.ph { background: repeating-linear-gradient(135deg, var(--surface-page) 0 12px, var(--surface-subtle) 12px 24px); }
+.phSmall { background: repeating-linear-gradient(135deg, var(--surface-page) 0 6px, var(--surface-subtle) 6px 12px); }
+.favOnPhoto { left: var(--s-3); top: var(--s-3); width: var(--h-44); height: var(--h-44); z-index: 2; }
+.arrow { top: 50%; margin-top: -20px; width: var(--h-40); height: var(--h-40); }
+/* Стрелки 40 — как в референсе; зона касания расширена до 44 */
+.arrow::before { content: ''; position: absolute; inset: -2px; }
+.arrowL { left: var(--s-3); }
+.arrowR { right: var(--s-3); }
+.arrowIcoL, .arrowIcoR { width: 9px; height: 9px; transform: rotate(45deg); box-sizing: content-box; }
+.arrowIcoL { border-left: 2px solid var(--ink-1); border-bottom: 2px solid var(--ink-1); margin-left: 3px; }
+.arrowIcoR { border-right: 2px solid var(--ink-1); border-top: 2px solid var(--ink-1); margin-right: 3px; }
+.counter {
+  position: absolute; left: var(--s-3); bottom: var(--s-3); padding: 4px 10px; border-radius: var(--r-pill); color: #fff;
+  background: rgba(23, 21, 26, .6); /* из референса, нет в tokens.css */ font-size: var(--fs-caption); font-weight: 600;
+}
+.thumbs { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+.thumb {
+  position: relative; width: 64px; height: 64px; border-radius: var(--r-12); border: 0; padding: 0; flex: none; overflow: hidden; cursor: pointer;
+  background: var(--surface-subtle); box-shadow: inset 0 0 0 1px var(--divider);
+}
+.thumb .photoImg { position: relative; }
+/* Кольцо выбранной миниатюры рисуем поверх фото (inset у <img> не виден) */
+.thumb::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--divider); pointer-events: none; }
+.thumbOn { box-shadow: 0 0 0 2px var(--primary); }
+.thumbOn::after { box-shadow: none; }
+.thumb:focus-visible { box-shadow: var(--focus-ring); }
+.thumbOn:focus-visible { box-shadow: 0 0 0 2px var(--primary), var(--focus-ring); }
+
+/* ── Галерея mobile: свайп + точки ── */
+.galleryM { position: relative; margin: 0 calc(-1 * var(--s-4)); min-width: 0; }
+.strip { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.strip::-webkit-scrollbar { display: none; }
+.slide { position: relative; flex: 0 0 100%; aspect-ratio: 1 / 1; scroll-snap-align: start; background: var(--surface-subtle); }
+.dots { position: absolute; left: 0; right: 0; bottom: var(--s-3); display: flex; justify-content: center; gap: 6px; pointer-events: none; }
+.dot { width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .6); /* из референса, нет в tokens.css */ transition: all .2s ease; }
+.dotOn { width: 18px; background: #fff; }
+
+/* ── Инфо ── */
+.info { display: flex; flex-direction: column; gap: var(--s-5); min-width: 0; }
+.desktop .info { padding-top: var(--s-2); }
+.head { display: flex; flex-direction: column; gap: var(--s-2); }
+.metaRow { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+.modal.desktop .metaRow { padding-right: 56px; /* из референса: место под крестик */ }
+.cat { font-size: var(--fs-13); color: var(--ink-3); }
+.tag { padding: 2px 8px; border-radius: var(--r-pill); background: var(--warning-bg); color: var(--warning-ink); font-size: var(--fs-caption); font-weight: 600; }
+.titleRow { display: flex; align-items: flex-start; gap: var(--s-3); }
+.title { margin: 0; flex: 1; min-width: 0; font-weight: 800; letter-spacing: var(--tracking-tight); line-height: 1.2; text-wrap: pretty; font-size: 26px; /* из референса, нет в tokens.css */ }
+.mobile .title { font-size: 20px; /* из референса (= h2 mobile) */ }
+.favInline {
+  width: var(--h-44); height: var(--h-44); border-radius: 50%; border: 0; padding: 0; flex: none; cursor: pointer;
+  background: var(--surface-subtle); display: flex; align-items: center; justify-content: center;
+}
+.priceRow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.price { font-weight: 800; letter-spacing: -.01em; font-size: 30px; /* из референса, нет в tokens.css */ }
+.mobile .price { font-size: var(--fs-h2); }
+.price.priceNone { font-size: 20px; /* из референса */ }
+.old { font-size: var(--fs-body); color: var(--ink-3); text-decoration: line-through; }
+.unit { font-size: var(--fs-small); color: var(--ink-2); }
+.bonus {
+  align-self: flex-start; display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 5px; border-radius: var(--r-pill);
+  background: var(--bonus-bg); color: var(--bonus-ink); font-size: var(--fs-13); font-weight: 600;
+}
+.coin {
+  width: 18px; height: 18px; border-radius: 50%; background: var(--bonus); color: #fff; font-size: var(--fs-caption); font-weight: 800; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+}
+
+/* «Поделиться» / «Страница товара»: 36 по макету, зона касания 44 */
+.links { display: flex; align-items: center; gap: var(--s-1); margin: 0 calc(-1 * var(--s-2)); flex-wrap: wrap; }
+.link {
+  position: relative; display: flex; align-items: center; gap: var(--s-2); height: var(--h-36); padding: 0 var(--s-2); border: 0;
+  border-radius: 10px; /* из референса, нет в tokens.css */ background: transparent; font-family: inherit; font-size: var(--fs-small); font-weight: 600;
+  color: var(--ink-2); cursor: pointer; text-decoration: none; transition: background var(--dur) var(--ease);
+}
+.link::before { content: ''; position: absolute; inset: -4px 0; }
+.link:hover { background: var(--surface-subtle); color: var(--ink-2); }
+.linkDone, .linkDone:hover { color: var(--success); }
+.shareIco { position: relative; width: 14px; height: 14px; flex: none; }
+.shareIco > span { position: absolute; box-sizing: border-box; }
+.shareIco > span:nth-child(1) { left: 6px; top: 0; width: 2px; height: 10px; background: currentColor; }
+.shareIco > span:nth-child(2) { left: 4px; top: 1px; width: 6px; height: 6px; border-left: 2px solid currentColor; border-top: 2px solid currentColor; transform: rotate(45deg); box-sizing: content-box; }
+.shareIco > span:nth-child(3) { left: 0; bottom: 0; width: 14px; height: 6px; border: 2px solid currentColor; border-top: 0; border-radius: 0 0 3px 3px; }
+
+/* ── Опции: фасовка, размер, цвет ── */
+.block10 { display: flex; flex-direction: column; gap: 10px; /* из референса */ }
+.optTitle { font-size: var(--fs-15); }
+.optHead { display: flex; gap: 6px; font-size: var(--fs-15); }
+.wrap { flex-wrap: wrap; }
+.optHint { color: var(--ink-2); }
+.opt {
+  display: flex; flex-direction: column; justify-content: center; gap: 2px; height: var(--h-56); border-radius: var(--r-12);
+  border: 1.5px solid var(--border); background: var(--surface-card); font-family: inherit; color: var(--ink-1); cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.opt:hover:not(.optOn) { border-color: var(--border-strong); }
+.optOn { border-color: var(--primary); background: var(--primary-50); }
+.packs { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+.pack { align-items: flex-start; min-width: 96px; padding: 0 14px; }
+.packLabel { font-size: var(--fs-15); font-weight: 500; }
+.optOn .packLabel, .optOn .sizeLabel { font-weight: 700; }
+.optPrice { font-size: var(--fs-caption); color: var(--ink-2); }
+.sizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-2); }
+.size { align-items: center; }
+.sizeLabel { font-size: var(--fs-body); font-weight: 500; }
+.swatches { display: flex; gap: var(--s-3); flex-wrap: wrap; padding: 2px; }
+.swatch {
+  position: relative; width: var(--h-36); height: var(--h-36); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+/* Кружок 36 — зона касания 44 */
+.swatch::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; }
+.swatchOn { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary); }
+.swatch:focus-visible { box-shadow: inset 0 0 0 1px var(--border), var(--focus-ring); }
+.swatchOn:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary), 0 0 0 7px rgba(238, 29, 116, .18); }
+.note13 { font-size: var(--fs-13); color: var(--ink-2); line-height: var(--lh-small); }
+
+/* ── CTA ── */
+.ctaD { display: flex; flex-direction: column; gap: var(--s-2); }
+.inCart { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: var(--s-2); align-items: center; }
+.inCartM { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: var(--s-2); align-items: center; }
+.footer {
+  flex: none; display: flex; flex-direction: column; gap: 6px; padding: 10px var(--s-4) var(--s-5); /* из референса */
+  background: var(--surface-card); box-shadow: 0 -1px 0 var(--divider);
+}
+
+/* ── Доставка / Самовывоз ── */
+.ways { display: flex; flex-direction: column; border: 1px solid var(--divider); border-radius: var(--r-16); }
+.way { display: flex; flex-direction: column; gap: var(--s-1); padding: 14px var(--s-4); /* из референса */ }
+.way + .way { border-top: 1px solid var(--divider); }
+.wayHead { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
+.wayTitle { font-size: var(--fs-15); font-weight: 600; }
+.yours { padding: 2px 8px; border-radius: var(--r-pill); background: var(--primary-50); color: var(--primary); font-size: var(--fs-caption); font-weight: 600; }
+.wayWhen { font-size: var(--fs-small); line-height: var(--lh-small); }
+
+/* ── Описание ── */
+.h17 { font-size: 17px; /* из референса, нет в tokens.css */ }
+.desc {
+  position: relative; display: flex; flex-direction: column; gap: var(--s-2); overflow: hidden; font-size: var(--fs-15); line-height: 1.55;
+  color: #3A3740; /* из референса, нет в tokens.css */
+}
+.descCollapsed { max-height: 120px; /* ~5 строк, из референса */ }
+.para { margin: 0; text-wrap: pretty; }
+.fade { position: absolute; left: 0; right: 0; bottom: 0; height: var(--s-12); background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--surface-card)); pointer-events: none; }
+.more {
+  position: relative; align-self: flex-start; display: flex; align-items: center; gap: var(--s-2); padding: 0; border: 0; background: transparent;
+  font-family: inherit; font-size: var(--fs-15); font-weight: 600; color: var(--primary); cursor: pointer;
+}
+.more:hover { color: var(--primary-hover); }
+.more36 { height: var(--h-36); }
+.more36::before { content: ''; position: absolute; inset: -4px 0; }
+.more44 { height: var(--h-44); }
+
+/* ── Характеристики ── */
+.specs { display: flex; flex-direction: column; gap: 6px; }
+.specsTitle { padding-bottom: var(--s-1); }
+.dl { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.specRow {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--s-3); padding: 9px 0; /* из референса */
+  border-bottom: 1px solid var(--divider); font-size: var(--fs-small); line-height: var(--lh-small);
+}
+.specK { color: var(--ink-2); }
+.specV { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) { .dot, .opt, .link, .onPhoto { transition: none; } }
+
+/* Бейдж скидки в карточке товара — padding 3/8, как в макете (у общего Badge 4/8) */
+.saleBadge.saleBadge { padding: 3px 8px; line-height: normal; }

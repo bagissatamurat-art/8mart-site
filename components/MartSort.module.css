@@ -1,0 +1,53 @@
+/* MartSort — значения из site/07 Каталог.dc.html. */
+.wrap { position: relative; flex: none; font-family: var(--font); }
+
+/* Desktop: pill 36, белая, 14/500; зона касания добита до 44. */
+.trigger {
+  position: relative; display: flex; align-items: center; gap: 8px; height: var(--h-36); padding: 0 14px;
+  border-radius: var(--r-pill); border: 0; background: var(--surface-card); color: var(--ink-1);
+  font: inherit; font-size: var(--fs-small); font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: box-shadow var(--dur) var(--ease);
+}
+.trigger::before { content: ''; position: absolute; inset: -4px 0; }
+.trigger:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Выпадающий список 240, r16, p6, тень --shadow-menu. */
+.menu {
+  position: absolute; right: 0; top: 44px; width: 240px; box-sizing: border-box; z-index: 10;
+  background: var(--surface-card); border-radius: var(--r-16); box-shadow: var(--shadow-menu);
+  padding: 6px; display: flex; flex-direction: column; gap: 2px;
+}
+.option {
+  display: flex; align-items: center; justify-content: space-between; height: var(--h-44); padding: 0 12px;
+  border-radius: 10px; /* из референса, нет в tokens.css */
+  border: 0; background: transparent; font: inherit; font-size: var(--fs-15); font-weight: 400; color: var(--ink-1);
+  cursor: pointer; text-align: left; transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.option:hover { background: var(--surface-subtle); }
+.option:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.optionOn { background: var(--primary-50); font-weight: 600; }
+.optionOn:hover { background: var(--primary-50); }
+
+/* Mobile: pill 36 с контуром, 14/500. */
+.mBtn {
+  position: relative; display: inline-flex; align-items: center; gap: 8px; height: var(--h-36); padding: 0 14px; box-sizing: border-box;
+  border-radius: var(--r-pill); border: 1.5px solid var(--border); background: var(--surface-card); color: var(--ink-1);
+  font: inherit; font-family: var(--font); font-size: var(--fs-small); font-weight: 500; white-space: nowrap; flex: none; cursor: pointer;
+}
+.mBtn::before { content: ''; position: absolute; inset: -5px 0; }
+.mBtn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Mobile: лист «Сортировка». */
+.sheetTitle { font-size: 20px; font-weight: 800; letter-spacing: var(--tracking-tight); padding: 0 4px 8px; }
+.radios { display: flex; flex-direction: column; gap: 8px; }
+.radioRow {
+  display: flex; align-items: center; justify-content: space-between; height: var(--h-56); padding: 0 14px;
+  border-radius: var(--r-16); border: 0; background: transparent; font: inherit; font-size: var(--fs-body); font-weight: 400;
+  color: var(--ink-1); cursor: pointer; text-align: left; transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.radioRow:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.radioRowOn { background: var(--primary-50); font-weight: 600; }
+.radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: none; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: transparent; }
+.radioRowOn .radio { border-color: var(--primary); }
+.radioRowOn .dot { background: var(--primary); }

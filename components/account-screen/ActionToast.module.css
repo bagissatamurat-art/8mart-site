@@ -1,0 +1,18 @@
+/* 06: desktop — padding 12 12 12 20, pill, gap 16, текст 15; кнопка 36, padding 0 14, 14/600.
+   mobile — padding 10 10 10 16, r16, gap 12, текст 14; кнопка 36, padding 0 12, 13/600. */
+.toast {
+  position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); z-index: 80;
+  display: flex; align-items: center; gap: 16px; padding: 12px 12px 12px 20px; border-radius: var(--r-pill);
+  background: var(--ink-1); color: #fff; font-family: var(--font); font-size: var(--fs-15); box-shadow: var(--shadow-toast); white-space: nowrap;
+}
+.action {
+  height: var(--h-36); padding: 0 14px; border-radius: var(--r-pill); background: var(--surface-card); color: var(--ink-1);
+  font-size: var(--fs-small); font-weight: 600; text-decoration: none; display: flex; align-items: center; flex: none;
+}
+.action:hover { color: var(--ink-1); background: var(--surface-subtle); }
+.action:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.m {
+  left: 16px; right: 16px; bottom: calc(var(--h-tabbar) + 12px); transform: none; justify-content: space-between; gap: 12px;
+  padding: 10px 10px 10px 16px; border-radius: var(--r-16); font-size: var(--fs-small); white-space: normal; box-shadow: none;
+}
+.m .action { padding: 0 12px; font-size: var(--fs-13); }

@@ -1,0 +1,23 @@
+/* 6a: padding 0 40 40, сетка 280 · 1fr · 340 (--desktop-cols-account), gap 16; сайдбар и мини-корзина sticky top 16 */
+.grid {
+  display: grid; grid-template-columns: var(--desktop-cols-account); gap: 16px; align-items: start;
+  padding: 0 var(--page-pad-desktop) 40px; max-width: 1440px; width: 100%; margin: 0 auto; box-sizing: border-box;
+}
+.sticky { position: sticky; top: 16px; min-width: 0; }
+.main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; letter-spacing: var(--tracking-tight); }
+.error { margin: 0; font-size: var(--fs-small); color: var(--danger); }
+
+/* 6b / 6c: фон страницы, раскладка ~600 по центру, таб-бар 84 снизу */
+.mPage {
+  min-height: 100dvh; display: flex; flex-direction: column; background: var(--surface-page);
+  max-width: var(--mobile-max); margin: 0 auto; width: 100%; padding-bottom: var(--h-tabbar); box-sizing: border-box;
+}
+.mHead { position: sticky; top: 0; z-index: 20; flex: none; }
+/* 6c: контент раздела — padding 12 16 16 */
+.mBody { flex: 1; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+.mError { padding: 0 16px 16px; }
+
+/* Скелетон шапки 6b: белая, r24 снизу, padding 8 16 20, аватар 52 */
+.mSkelHead { background: var(--surface-card); border-radius: 0 0 var(--r-24) var(--r-24); padding: 8px 16px 20px; display: flex; align-items: center; gap: 12px; }
+.skelCol { display: flex; flex-direction: column; gap: 6px; }

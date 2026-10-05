@@ -1,0 +1,25 @@
+.box { background: var(--surface-card); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 16px; font-family: var(--font); color: var(--ink-1); width: 100%; }
+.sticky { position: sticky; top: 16px; }
+.empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px 0; text-align: center; }
+.emptyPic { width: 96px; height: 96px; border-radius: 50%; background: var(--primary-50); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.emptyTitle { font-size: 16px; }
+.emptyText { font-size: var(--fs-small); color: var(--ink-2); line-height: var(--lh-small); }
+.head { display: flex; align-items: baseline; justify-content: space-between; }
+.title { font-size: var(--fs-h3); }
+.open { font-size: var(--fs-small); font-weight: 600; text-decoration: none; color: var(--primary); }
+.list { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+.row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.thumb { width: 56px; height: 56px; border-radius: var(--r-12); object-fit: cover; background: var(--surface-subtle); }
+.rowText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rowName { font-size: var(--fs-small); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rowSum { font-size: var(--fs-13); color: var(--ink-2); }
+.divider { height: 1px; background: var(--divider); }
+.totals { display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-small); }
+.tRow { display: flex; justify-content: space-between; gap: 12px; }
+.muted { color: var(--ink-2); }
+.nowrap { white-space: nowrap; }
+.free { color: var(--success); white-space: nowrap; }
+.progress { display: flex; flex-direction: column; gap: 6px; }
+.bar { height: 6px; border-radius: 3px; background: var(--surface-page); overflow: hidden; }
+.fill { height: 100%; background: var(--success); border-radius: 3px; }
+.progressText { font-size: var(--fs-13); color: var(--ink-2); }

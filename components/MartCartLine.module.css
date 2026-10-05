@@ -1,0 +1,26 @@
+.line {
+  display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 12px;
+  border-radius: var(--r-16); background: var(--surface-card); font-family: var(--font); color: var(--ink-1); width: 100%;
+}
+.compact { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; padding: 8px; }
+.sold { background: var(--surface-subtle); }
+.photo { position: relative; width: 80px; height: 80px; border-radius: var(--r-12); background: var(--surface-subtle); overflow: hidden; flex: none; }
+.compact .photo { width: 64px; height: 64px; }
+.img { width: 100%; height: 100%; object-fit: cover; }
+.sold .img { opacity: .45; }
+.soldBadge { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 3px 8px; font-size: var(--fs-tab); line-height: normal; }
+.text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.name { font-size: var(--fs-15); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sold .name { color: var(--ink-3); }
+.meta { font-size: var(--fs-13); color: var(--ink-3); }
+.removeLink { align-self: flex-start; border: 0; background: transparent; padding: 0; font-size: var(--fs-small); font-weight: 600; color: var(--primary); cursor: pointer; }
+.side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex: none; }
+.sums { display: flex; align-items: baseline; gap: 6px; }
+.sum { font-size: 16px; font-weight: 700; white-space: nowrap; }
+.old { font-size: var(--fs-13); color: var(--ink-3); text-decoration: line-through; white-space: nowrap; }
+.removeBtn {
+  position: relative; width: var(--h-36); height: var(--h-36); border-radius: 50%; border: 0; background: var(--surface-subtle); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0; transition: background var(--dur) var(--ease);
+}
+.removeBtn::after { content: ''; position: absolute; inset: -4px; }
+.removeBtn:hover { background: var(--surface-disabled); }

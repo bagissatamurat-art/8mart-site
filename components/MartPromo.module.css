@@ -1,0 +1,12 @@
+.row { display: flex; gap: 8px; align-items: flex-start; width: 100%; }
+.field { flex: 1; min-width: 0; }
+.applied {
+  display: flex; align-items: center; justify-content: space-between; height: var(--h-56); padding: 0 8px 0 16px;
+  border-radius: var(--r-16); background: var(--success-bg); border: 1.5px solid var(--success-border); font-family: var(--font); width: 100%;
+}
+.col { display: flex; flex-direction: column; gap: 2px; }
+.ok { font-size: var(--fs-caption); color: var(--success); font-weight: 600; }
+.code { font-size: var(--fs-15); font-weight: 600; color: var(--ink-1); letter-spacing: .04em; }
+.right { display: flex; align-items: center; gap: 8px; }
+.disc { font-size: var(--fs-small); font-weight: 600; color: var(--success); }
+.remove { width: var(--h-36); height: var(--h-36); border-radius: 50%; border: 0; background: var(--surface-card); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }

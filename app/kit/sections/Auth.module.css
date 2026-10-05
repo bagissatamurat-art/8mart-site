@@ -1,0 +1,15 @@
+/* Витрина MartAuth. Оболочки — как в референсах: карточка оформления 03 (r24, p28, ≤520), mobile 390 (r20, p20). */
+.grid { display: grid; gap: var(--s-5); align-items: start; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); }
+.gridMobile { display: flex; flex-wrap: wrap; gap: var(--s-5); align-items: flex-start; }
+.card { background: var(--surface-card); border-radius: var(--r-24); padding: 28px; max-width: 520px; width: 100%; }
+/* Рамка 390 — артборд mobile */
+.frame { width: 390px; max-width: 100%; background: var(--surface-page); border: 1px solid var(--divider); border-radius: var(--r-24); padding: var(--s-6) var(--s-4); }
+.cardMobile { background: var(--surface-card); border-radius: var(--r-20); padding: var(--s-5); }
+.sub { margin: var(--s-2) 0 0; font-size: var(--fs-h3); font-weight: 600; }
+.live { display: flex; flex-wrap: wrap; gap: var(--s-5); align-items: flex-start; }
+.liveCol { display: flex; flex-direction: column; gap: var(--s-3); flex: 1 1 460px; max-width: 520px; min-width: 0; }
+.result { font-size: var(--fs-13); color: var(--ink-2); line-height: var(--lh-small); overflow-wrap: anywhere; }
+.row { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
+/* Рамки модалки/sheet: высота — чтобы поместился шаг «Новый номер» */
+.dialogFrame { position: relative; overflow: hidden; border-radius: var(--r-20); background: var(--surface-page); width: 100%; max-width: 600px; height: 520px; }
+.sheetFrame { position: relative; overflow: hidden; border-radius: var(--r-24); background: var(--surface-page); width: 390px; max-width: 100%; height: 600px; }

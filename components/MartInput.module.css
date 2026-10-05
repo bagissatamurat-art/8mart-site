@@ -1,0 +1,41 @@
+.root { display: flex; flex-direction: column; gap: 6px; width: 100%; font-family: var(--font); }
+.box {
+  position: relative; height: var(--h-56); border-radius: var(--r-16); background: var(--surface-card);
+  border: 1.5px solid var(--border); transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.boxArea { height: var(--h-textarea); }
+.focus { border-color: var(--primary); box-shadow: var(--focus-ring); }
+.error { border-color: var(--danger); }
+.error.focus, .error:focus-within { border-color: var(--danger); box-shadow: var(--focus-ring-error); }
+.box:focus-within:not(.error):not(.disabled) { border-color: var(--primary); box-shadow: var(--focus-ring); }
+.disabled { border-color: var(--surface-disabled); background: var(--surface-subtle); }
+
+.label {
+  position: absolute; left: 16px; top: 18px; font-size: 16px; line-height: 1.2; color: var(--ink-2);
+  pointer-events: none; transition: all var(--dur) var(--ease); display: flex; gap: 3px;
+}
+.up .label { top: 9px; font-size: var(--fs-caption); }
+.focus .label, .box:focus-within .label { color: var(--primary); }
+.error .label, .error:focus-within .label { color: var(--danger); }
+.disabled .label { color: var(--ink-3); }
+.req { color: var(--danger); }
+
+.control {
+  position: absolute; inset: 0; width: 100%; height: 100%; padding: 22px 16px 0 16px; border: 0; background: transparent;
+  font-size: 16px; color: var(--ink-1); border-radius: inherit;
+}
+.control:focus-visible { box-shadow: none; }
+.area { padding: 28px 16px 10px 16px; resize: none; line-height: 1.35; }
+.withClear { padding-right: 52px; }
+.code { letter-spacing: .2em; }
+.disabled .control { color: var(--ink-3); }
+
+.clear {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%;
+  border: 0; background: var(--surface-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
+  transition: background var(--dur) var(--ease);
+}
+.clear:hover { background: var(--surface-disabled); }
+
+.msg { font-size: var(--fs-13); line-height: 1.3; color: var(--ink-2); padding: 0 16px; }
+.msgError { color: var(--danger); }

@@ -1,0 +1,2 @@
+/* Сторис + баннер: gap 20 (desktop и mobile) */
+.top { display: flex; flex-direction: column; gap: 20px; min-width: 0; }

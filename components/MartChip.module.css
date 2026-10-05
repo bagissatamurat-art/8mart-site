@@ -1,0 +1,11 @@
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--r-pill);
+  border: 1.5px solid var(--border); background: var(--surface-card); color: var(--ink-1);
+  font-family: var(--font); font-size: var(--fs-small); font-weight: 500; cursor: pointer; white-space: nowrap; flex: none;
+  transition: background var(--dur) var(--ease);
+}
+.chip:hover { background: var(--surface-subtle); }
+.selected, .selected:hover { background: var(--ink-1); border-color: var(--ink-1); color: #fff; }
+.chip:disabled, .chip:disabled:hover { background: var(--surface-subtle); border-color: var(--surface-disabled); color: var(--ink-3); cursor: not-allowed; }
+.count { font-size: var(--fs-caption); opacity: .7; }
+.x { margin-left: 2px; display: block; }

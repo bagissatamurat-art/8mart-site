@@ -1,0 +1,39 @@
+.btn {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  border-radius: var(--r-pill); border: 1.5px solid transparent; font-family: var(--font); font-weight: 600; line-height: 1;
+  white-space: nowrap; cursor: pointer; text-decoration: none; user-select: none;
+  transition: background var(--dur) var(--ease), transform .1s var(--ease), box-shadow var(--dur) var(--ease);
+}
+.btn:active:not(:disabled) { transform: scale(.99); }
+.btn:focus-visible, .focused { box-shadow: var(--focus-ring-button); }
+.full { width: 100%; }
+
+.s56 { height: var(--h-56); min-height: var(--h-56); padding: 0 28px; font-size: 16px; }
+.s44 { height: var(--h-44); min-height: var(--h-44); padding: 0 20px; font-size: var(--fs-15); }
+.s40 { height: var(--h-40); min-height: var(--h-40); padding: 0 16px; font-size: var(--fs-small); }
+.s36 { height: var(--h-36); min-height: var(--h-36); padding: 0 16px; font-size: var(--fs-small); }
+
+.primary { background: var(--primary); color: #fff; }
+.primary:hover { background: var(--primary-hover); color: #fff; }
+.primary:active { background: var(--primary-active); }
+.secondary { background: var(--primary-50); color: var(--primary); }
+.secondary:hover { background: var(--primary-100); color: var(--primary); }
+.secondary:active { background: var(--primary-200); }
+.ghost { background: transparent; color: var(--ink-1); border-color: var(--border); }
+.ghost:hover { background: var(--surface-subtle); color: var(--ink-1); }
+.ghost:active { background: var(--surface-disabled); }
+.danger { background: var(--danger-bg); color: var(--danger); }
+.danger:hover { background: var(--danger-hover); color: var(--danger); }
+.danger:active { background: var(--danger-active); }
+/* Kaspi — официальный SVG как есть, радиус pill, без суммы. */
+.kaspi { background: var(--kaspi); color: #fff; overflow: hidden; }
+.kaspiImg { display: block; margin: 0 -28px; border-radius: var(--r-pill); max-width: none; }
+.s44 .kaspiImg { margin: 0 -20px; }
+.s40 .kaspiImg, .s36 .kaspiImg { margin: 0 -16px; }
+
+.disabled, .disabled:hover, .disabled:active { background: var(--surface-disabled); color: var(--ink-3); border-color: transparent; cursor: not-allowed; }
+.loading { cursor: progress; }
+.spinnerWrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--r-pill); background: inherit; }
+
+.sep { width: 1px; height: 16px; background: currentColor; opacity: .35; }
+.amount { font-weight: 500; font-variant-numeric: tabular-nums; }

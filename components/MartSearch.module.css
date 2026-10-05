@@ -1,0 +1,125 @@
+/* MartSearch — значения из site/MartSearch.dc.html и site/05 Поиск.dc.html. */
+
+/* ── Поле поиска (шапка desktop 56 / mobile 48, экран поиска 48) ── */
+.field {
+  display: flex; align-items: center; min-width: 0; margin: 0;
+  border-radius: var(--r-pill); background: var(--surface-subtle); border: 1.5px solid transparent;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.f56 { height: var(--h-56); padding: 0 20px; gap: 12px; }
+.f48 { height: 48px; /* из референса: поле шапки mobile и экрана поиска — вне шкалы контролов */ padding: 0 16px; gap: 10px; }
+.field:focus-within, .fieldFocused { border-color: var(--primary); box-shadow: var(--focus-ring); }
+
+.input {
+  flex: 1; min-width: 0; height: 100%; border: 0; padding: 0; background: transparent; outline: none;
+  font-family: var(--font); font-size: var(--fs-body); color: var(--ink-1); -webkit-appearance: none; appearance: none;
+}
+.input::placeholder { color: var(--ink-3); }
+.input:focus-visible { box-shadow: none; }
+.input::-webkit-search-cancel-button, .input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+
+/* Лупа: кольцо 12 + ручка 7, геометрией */
+.loupe { position: relative; width: 18px; height: 18px; flex: none; }
+.loupe > span:first-child { position: absolute; left: 0; top: 0; width: 12px; height: 12px; border: 2px solid var(--ink-2); border-radius: 50%; box-sizing: content-box; }
+.loupe > span:last-child {
+  position: absolute; left: 12px; top: 12px; width: 7px; height: 2px; background: var(--ink-2); border-radius: 1px;
+  transform: rotate(45deg); transform-origin: 0 50%;
+}
+
+/* Очистка 28 — зона касания расширена до 44 псевдоэлементом */
+.clear {
+  position: relative; width: 28px; height: 28px; flex: none; border-radius: 50%; border: 0; padding: 0;
+  background: var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.clear::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; }
+
+/* ── Панель подсказок ── */
+.panel {
+  display: flex; flex-direction: column; gap: 8px; width: 100%; background: var(--surface-card);
+  font-family: var(--font); color: var(--ink-1); overflow: auto;
+}
+.desktop {
+  border-radius: var(--r-20); padding: 8px; max-height: 560px;
+  box-shadow: 0 16px 40px rgba(23, 21, 26, .16); /* из референса, нет в tokens.css (--shadow-menu — 0 8px 24px) */
+}
+.mobile { border-radius: 0; padding: 8px 4px; }
+
+.group { display: flex; flex-direction: column; gap: 4px; }
+.groupHead { display: flex; align-items: center; justify-content: space-between; padding: 4px 12px; }
+.caps { font-size: var(--fs-caption); font-weight: 600; color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+.capsPad { padding: 4px 12px; }
+.clearRecent {
+  position: relative; border: 0; background: transparent; padding: 0; cursor: pointer;
+  font-family: var(--font); font-size: var(--fs-13); color: var(--ink-2); border-radius: var(--r-8);
+}
+.clearRecent::after { content: ''; position: absolute; inset: -12px -8px; } /* зона касания ≥ 44 */
+.clearRecent:hover { color: var(--ink-1); }
+
+.row44 {
+  display: flex; align-items: center; gap: 12px; height: var(--h-44); padding: 0 12px; border: 0; border-radius: var(--r-12);
+  background: transparent; font-family: var(--font); font-size: var(--fs-15); color: var(--ink-1); cursor: pointer; text-align: left;
+  transition: background var(--dur) var(--ease);
+}
+.row44:hover { background: var(--surface-subtle); }
+
+/* Часы «Вы искали» */
+.clock { position: relative; width: 16px; height: 16px; border: 2px solid var(--ink-3); border-radius: 50%; flex: none; box-sizing: content-box; }
+.clock > span { position: absolute; background: var(--ink-3); }
+.clock > span:first-child { left: 5px; top: 2px; width: 2px; height: 5px; }
+.clock > span:last-child { left: 5px; top: 6px; width: 4px; height: 2px; }
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 12px 8px; }
+.chipsCenter { justify-content: center; padding: 0; margin-top: 8px; }
+
+/* Категории */
+.list { display: flex; flex-direction: column; gap: 2px; }
+.catRow { justify-content: space-between; }
+.catName { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.grid { width: 16px; height: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; flex: none; }
+.grid > span { border: 1.5px solid var(--ink-3); border-radius: 3px; }
+.muted { color: var(--ink-3); }
+.count { font-size: var(--fs-13); color: var(--ink-3); }
+.divider { height: 1px; background: var(--divider); margin: 0 12px; flex: none; }
+
+/* Товар 60 */
+.productRow {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  height: var(--h-row-search); padding: 0 12px; border: 0; border-radius: var(--r-12); background: transparent;
+  font-family: var(--font); color: var(--ink-1); cursor: pointer; text-align: left; transition: background var(--dur) var(--ease);
+}
+.productRow:hover { background: var(--surface-subtle); }
+.thumb {
+  display: block; width: 44px; height: 44px; object-fit: cover; background: var(--surface-subtle);
+  border-radius: 10px; /* из референса, нет в tokens.css */
+}
+.productText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.productName { font-size: var(--fs-15); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hit { font-weight: 700; color: var(--primary); }
+.weight { font-size: var(--fs-13); color: var(--ink-3); }
+.price { font-size: var(--fs-15); font-weight: 700; white-space: nowrap; }
+
+.showAll {
+  display: flex; align-items: center; justify-content: center; gap: 8px; height: var(--h-44); margin: 4px 12px 0; flex: none;
+  border: 0; border-radius: var(--r-pill); background: var(--surface-subtle); cursor: pointer;
+  font-family: var(--font); font-size: var(--fs-small); font-weight: 600; color: var(--ink-1); transition: background var(--dur) var(--ease);
+}
+.showAll:hover { background: var(--surface-disabled); }
+
+.loading { display: flex; align-items: center; justify-content: center; padding: 28px 16px; color: var(--primary); }
+
+/* Ничего не нашли */
+.empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 16px; text-align: center; }
+.emptyTitle { font-size: var(--fs-body); }
+.emptyText { font-size: var(--fs-small); color: var(--ink-2); line-height: var(--lh-small); }
+
+/* ── Экран поиска mobile ── */
+.screen { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--surface-card); font-family: var(--font); }
+.screenBar { display: flex; align-items: center; gap: 8px; padding: 8px 16px 12px; flex: none; }
+.back {
+  width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0; padding: 0; background: var(--surface-subtle); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex: none; position: relative;
+}
+.back::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; } /* зона касания 44 */
+.backIcon { display: flex; margin-left: 3px; }
+.screenField { flex: 1; }
+.screenBody { flex: 1; min-height: 0; overflow: auto; padding: 0 12px; }

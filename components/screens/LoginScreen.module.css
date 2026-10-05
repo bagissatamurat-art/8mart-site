@@ -1,0 +1,7 @@
+/* Вход: карточка MartAuth. Desktop — 440, r24, padding 28 (модалка MartAuth в 06); mobile — r20, padding 20 (как вход в 03, 3b). */
+.wrap { padding: 24px var(--page-pad-desktop) 40px; display: flex; justify-content: center; }
+.card { width: 100%; max-width: 440px; box-sizing: border-box; background: var(--surface-card); border-radius: var(--r-24); padding: 28px; }
+
+.mPage { min-height: 100dvh; display: flex; flex-direction: column; background: var(--surface-page); max-width: var(--mobile-max); margin: 0 auto; padding-bottom: var(--h-tabbar); }
+.mWrap { flex: 1; padding: 24px 16px; }
+.cardM { background: var(--surface-card); border-radius: var(--r-20); padding: 20px; }

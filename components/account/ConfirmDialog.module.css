@@ -1,0 +1,21 @@
+/* Значения — из site/06 Личный кабинет.dc.html (модалки 6a / 6c). */
+.overlay { position: fixed; inset: 0; z-index: 100; background: var(--overlay); display: flex; align-items: center; justify-content: center; padding: var(--s-6); font-family: var(--font); color: var(--ink-1); }
+.overlayM { align-items: flex-end; padding: 0; }
+/* Витрина: оверлей внутри рамки, не на весь экран */
+.inline { position: absolute; }
+.box { position: relative; width: 100%; max-width: 440px; background: var(--surface-card); border-radius: var(--r-24); padding: 28px; display: flex; flex-direction: column; gap: var(--s-5); }
+.boxM { max-width: none; border-radius: var(--r-24) var(--r-24) 0 0; padding: var(--s-6) var(--s-4) var(--s-5); }
+.close {
+  position: absolute; right: var(--s-4); top: var(--s-4); width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0;
+  background: var(--surface-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.closeM { right: var(--s-3); top: var(--s-3); width: var(--h-44); height: var(--h-44); }
+.head { display: flex; flex-direction: column; gap: var(--s-2); padding-right: var(--s-10); }
+.boxM .head { padding-right: var(--s-12); }
+.title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: var(--tracking-tight); }
+.boxM .title { font-size: 20px; }
+.text { margin: 0; font-size: var(--fs-15); color: var(--ink-2); line-height: 1.5; }
+.boxM .text { font-size: var(--fs-small); }
+.btns { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+.btnsM { display: flex; flex-direction: column; gap: var(--s-2); }
+.btnWrap { display: block; }

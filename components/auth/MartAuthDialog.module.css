@@ -1,0 +1,25 @@
+/* Оболочка MartAuth в кабинете — из 06 Личный кабинет.dc.html (phoneModalD / phoneModalM). */
+.overlay {
+  position: fixed; inset: 0; z-index: 100; background: var(--overlay);
+  display: flex; align-items: center; justify-content: center; padding: var(--s-6);
+}
+/* Витрина: оверлей внутри рамки, а не на весь экран */
+.inline { position: absolute; z-index: 1; }
+.overlaySheet { align-items: flex-end; padding: 0; }
+
+/* max-width 440 и padding 28 — из референса, нет в tokens.css */
+.dialog {
+  position: relative; width: 100%; max-width: 440px; max-height: 100%; overflow-y: auto;
+  background: var(--surface-card); border-radius: var(--r-24); padding: 28px;
+}
+.sheet {
+  max-width: none; border-radius: var(--r-24) var(--r-24) 0 0;
+  padding: var(--s-6) var(--s-4) calc(var(--s-5) + env(safe-area-inset-bottom));
+}
+
+.close {
+  position: absolute; right: var(--s-4); top: var(--s-4); z-index: 2; width: var(--h-40); height: var(--h-40);
+  border-radius: 50%; border: 0; padding: 0; background: var(--surface-subtle); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.sheet .close { right: var(--s-3); top: var(--s-3); width: var(--h-44); height: var(--h-44); }

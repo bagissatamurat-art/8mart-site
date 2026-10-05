@@ -1,0 +1,17 @@
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.swatch { display: flex; flex-direction: column; gap: 6px; }
+.swatch b { font-size: var(--fs-13); }
+.swatch span { font-size: var(--fs-caption); color: var(--ink-2); }
+.swatchColor { height: 64px; border-radius: var(--r-12); }
+.typePanel { background: var(--surface-card); border-radius: var(--r-20); padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.typeRow { display: flex; align-items: baseline; gap: 16px; }
+.typeKey { width: 110px; flex: none; font-size: var(--fs-caption); color: var(--ink-3); }
+.tiles { display: flex; gap: 16px; flex-wrap: wrap; }
+.tile { width: 120px; height: 80px; background: var(--surface-card); display: flex; align-items: center; justify-content: center; font-size: var(--fs-caption); color: var(--ink-2); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; align-items: stretch; }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.phone { width: 390px; max-width: 100%; border-radius: var(--r-24); overflow: hidden; background: var(--surface-page); border: 1px solid var(--border); }
+.cartGrid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .cartGrid { grid-template-columns: 1fr; } }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.subtle { background: var(--surface-page); border-radius: var(--r-20); padding: 12px; display: flex; flex-direction: column; gap: 8px; }

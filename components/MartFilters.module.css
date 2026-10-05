@@ -1,0 +1,95 @@
+/* MartFilters — значения из site/MartFilters.dc.html и site/07 Каталог.dc.html. */
+.root { display: flex; flex-direction: column; gap: 20px; width: 100%; box-sizing: border-box; font-family: var(--font); color: var(--ink-1); }
+.block { display: flex; flex-direction: column; gap: 10px; }
+.title { font-size: var(--fs-15); font-weight: 700; }
+.groupTitle { margin-bottom: 4px; }
+
+/* Цена от–до: поле 44, r14, бордер 1.5. */
+.price { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.field {
+  display: flex; align-items: center; gap: 6px; height: var(--h-44); padding: 0 14px; box-sizing: border-box;
+  border-radius: var(--r-14); border: 1.5px solid var(--border); background: var(--surface-card); cursor: text;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.field:focus-within { border-color: var(--primary); box-shadow: var(--focus-ring); }
+.prefix { font-size: var(--fs-13); color: var(--ink-3); }
+.field input { width: 100%; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: var(--fs-15); color: var(--ink-1); padding: 0; }
+
+/* Строки групп и переключателей: 36, r8, hover — subtle. Зона касания добита до 42 за счёт зазора 6 между строками. */
+.group { display: flex; flex-direction: column; gap: 6px; }
+.row {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  height: var(--h-36); padding: 0 4px; border: 0; border-radius: var(--r-8); background: transparent;
+  font: inherit; font-size: var(--fs-small); color: var(--ink-1); text-align: left; cursor: pointer;
+  transition: background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.row::before { content: ''; position: absolute; inset: -3px 0; }
+.row:hover { background: var(--surface-subtle); }
+.row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.rowLabel { display: flex; align-items: center; gap: 10px; }
+.count { font-size: var(--fs-caption); color: var(--ink-3); }
+
+/* Чекбокс 20, r6, бордер 1.5; галочка — геометрией. */
+.box {
+  width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--surface-card);
+  box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex: none;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.boxOn { border-color: var(--primary); background: var(--primary); }
+.tick { width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg); margin-top: -2px; box-sizing: content-box; opacity: 0; }
+.boxOn .tick { opacity: 1; }
+
+/* Переключатель 40×24, бегунок 20. */
+.switch { position: relative; width: 40px; height: 24px; border-radius: 12px; background: var(--border); transition: background var(--dur) var(--ease); flex: none; }
+.switchOn { background: var(--primary); }
+.knob {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 2px rgba(23, 21, 26, .2); /* из референса, нет в tokens.css */
+  transition: left var(--dur) var(--ease);
+}
+.switchOn .knob { left: 18px; }
+
+.actions { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+
+/* Desktop: панель под категориями. */
+.panel { background: var(--surface-card); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 16px; box-sizing: border-box; }
+.head { display: flex; align-items: center; justify-content: space-between; }
+.panelTitle { font-size: var(--fs-h3); font-weight: 700; }
+.resetLink {
+  position: relative; border: 0; background: transparent; padding: 0; font: inherit; font-size: var(--fs-small); font-weight: 600;
+  color: var(--primary); cursor: pointer; border-radius: var(--r-8);
+}
+.resetLink::before { content: ''; position: absolute; inset: -12px -8px; }
+.resetLink:hover { color: var(--primary-hover); }
+.resetLink:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Mobile: шапка листа. */
+.sheetHead { display: flex; align-items: center; justify-content: space-between; }
+.sheetTitle { font-size: 20px; font-weight: 800; letter-spacing: var(--tracking-tight); }
+.close {
+  position: relative; width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0; background: var(--surface-subtle);
+  display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; flex: none;
+}
+.close::before { content: ''; position: absolute; inset: -2px; }
+.close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Mobile: кнопка «Фильтры» — pill 36, зона касания 44. */
+.fBtn {
+  position: relative; display: inline-flex; align-items: center; gap: 8px; height: var(--h-36); padding: 0 14px; box-sizing: border-box;
+  border-radius: var(--r-pill); border: 1.5px solid var(--border); background: var(--surface-card); color: var(--ink-1);
+  font: inherit; font-family: var(--font); font-size: var(--fs-small); font-weight: 500; white-space: nowrap; flex: none; cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.fBtn::before { content: ''; position: absolute; inset: -5px 0; }
+.fBtn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.fBtnOn { border-color: var(--primary); background: var(--primary); color: #fff; }
+.fBadge {
+  min-width: 18px; height: 18px; border-radius: 9px; background: #fff; color: var(--primary); font-size: var(--fs-caption); font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; box-sizing: border-box;
+}
+
+/* Иконка фильтров: три полоски 14/10/6, gap 3 (05 Поиск) */
+.fIcon { display: flex; flex-direction: column; gap: 3px; width: 14px; }
+.fIcon > span { height: 2px; background: currentColor; border-radius: 1px; }
+.fIcon > span:nth-child(2) { width: 10px; }
+.fIcon > span:nth-child(3) { width: 6px; }

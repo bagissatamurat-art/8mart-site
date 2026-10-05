@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>8mart map</title>
+<!-- Карта MartMethodModal. Порт design_handoff_8mart_site/site/map.html.
+     Встраивается iframe-ом; токен Mapbox (публичный pk.) приходит в query ?token= от родителя — в файле его нет.
+     Адрес по пину — через наш сервер GET /api/geo/reverse (DaData / Mapbox), ключи DaData в браузер не попадают.
+     Контракт сообщений:
+       карта → родитель {src:'8mart-map', id, type:'ready'|'moving'|'address'|'pick'|'geo'|'error', …}
+       (у 'pick' точка в pointId — id занят идентификатором карты; в референсе было id)
+       родитель → карта {src:'8mart-parent', mode?, points?, selected?, lat?, lng?, zoom?, fit?, quiet?, locate?} -->
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+<style>
+@font-face{font-family:'Onest';font-style:normal;font-weight:400 800;font-display:swap;src:url('/fonts/onest-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;}
+@font-face{font-family:'Onest';font-style:normal;font-weight:400 800;font-display:swap;src:url('/fonts/onest-cyrillic-ext.woff2') format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;}
+@font-face{font-family:'Onest';font-style:normal;font-weight:400 800;font-display:swap;src:url('/fonts/onest-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+/* Значения — 1:1 из site/map.html (iframe не видит tokens.css, поэтому литералы). */
+html,body,#map{margin:0;height:100%;width:100%;background:#EEEDF1;font-family:Onest,system-ui,sans-serif}
+.mapboxgl-ctrl-attrib{font-size:10px}
+.me{width:14px;height:14px;border-radius:50%;background:#2F80ED;border:2px solid #fff;box-shadow:0 0 0 6px rgba(47,128,237,.2)}
+#pin[hidden],#tip[hidden],#shadow[hidden],#fail[hidden]{display:none}
+#pin{position:absolute;left:50%;top:50%;width:32px;height:44px;margin:-44px 0 0 -16px;pointer-events:none;z-index:500;transition:transform .15s ease;display:flex;flex-direction:column;align-items:center}
+#pin.lift{transform:translateY(-8px)}
+#pin .head{width:28px;height:28px;border-radius:50%;background:#EE1D74;border:3px solid #fff;box-sizing:border-box;box-shadow:0 4px 12px rgba(238,29,116,.35);position:relative}
+#pin .head:after{content:"";position:absolute;left:8px;top:8px;width:6px;height:6px;border-radius:50%;background:#fff}
+#pin .leg{width:2.5px;height:16px;background:#17151A;border-radius:0 0 2px 2px;opacity:.75}
+#tip{position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-100% - 50px));max-width:260px;padding:8px 14px;border-radius:14px;background:#fff;color:#17151A;font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 6px 20px rgba(23,21,26,.18);z-index:501;pointer-events:none;display:flex;align-items:center;gap:8px;transition:transform .15s ease}
+#tip:after{content:"";position:absolute;left:50%;bottom:-5px;width:10px;height:10px;background:#fff;transform:translateX(-50%) rotate(45deg);border-radius:2px}
+#tip.lift{transform:translate(-50%,calc(-100% - 58px))}
+#tip.muted{color:#6B6873;font-weight:500}
+#tip .sp{width:14px;height:14px;border-radius:50%;border:2px solid #EE1D74;border-right-color:transparent;animation:spin .7s linear infinite;flex:none;box-sizing:border-box}
+@keyframes spin{to{transform:rotate(360deg)}}
+#shadow{position:absolute;left:50%;top:50%;width:10px;height:4px;margin:-2px 0 0 -5px;border-radius:50%;background:rgba(23,21,26,.3);z-index:499;pointer-events:none}
+.pp{width:36px;height:36px;border-radius:50%;background:#fff;border:2.5px solid #EE1D74;box-sizing:border-box;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(23,21,26,.18);cursor:pointer;transition:transform .15s ease;padding:0}
+.pp span{width:12px;height:12px;border-radius:50%;background:#EE1D74}
+.pp.sel{background:#EE1D74;transform:scale(1.15)}
+.pp.sel span{background:#fff}
+.pp:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(238,29,116,.18),0 4px 12px rgba(23,21,26,.18)}
+#ctl{position:absolute;right:12px;bottom:28px;display:flex;flex-direction:column;gap:8px;z-index:600}
+body.compact #ctl{bottom:12px;gap:6px}
+body.compact #ctl button{width:40px;height:40px}
+body.compact #zin,body.compact #zout{display:none}
+#ctl button{position:relative;width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:0 4px 12px rgba(23,21,26,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background .15s ease}
+#ctl button:hover{background:#F7F7F8}
+#ctl button:focus{outline:none}
+#ctl button:focus-visible{box-shadow:0 0 0 3px rgba(238,29,116,.18),0 4px 12px rgba(23,21,26,.15)}
+#ctl .h{width:14px;height:2.5px;background:#17151A;border-radius:1px}
+#ctl .v{position:absolute;width:2.5px;height:14px;background:#17151A;border-radius:1px}
+#locate i{width:16px;height:16px;border:2.5px solid #17151A;border-radius:50%;box-sizing:border-box;position:relative;display:block}
+#locate i:after{content:"";position:absolute;left:3px;top:3px;width:5px;height:5px;border-radius:50%;background:#17151A}
+#locate b{position:absolute;background:#17151A;border-radius:1px}
+#locate b.n{left:50%;top:7px;width:2.5px;height:6px;margin-left:-1.25px}
+#locate b.s{left:50%;bottom:7px;width:2.5px;height:6px;margin-left:-1.25px}
+#locate b.w{left:7px;top:50%;width:6px;height:2.5px;margin-top:-1.25px}
+#locate b.e{right:7px;top:50%;width:6px;height:2.5px;margin-top:-1.25px}
+#locate.on i,#locate.on b{border-color:#EE1D74;background-color:#EE1D74}
+#locate.on i{background:transparent}
+#locate.on i:after{background:#EE1D74}
+/* Карта не загрузилась (нет токена / сети) — родитель покажет свою заглушку, здесь только подпись. */
+#fail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:#6B6873;font-size:14px;line-height:1.4}
+</style></head>
+<body>
+<div id="map"></div>
+<div id="pin" hidden><div class="head"></div><div class="leg"></div></div>
+<div id="tip" hidden></div>
+<div id="shadow" hidden></div>
+<div id="fail" hidden>Карта недоступна — укажите адрес вручную</div>
+<div id="ctl"><button type="button" id="zin" aria-label="Приблизить"><span class="h"></span><span class="v"></span></button><button type="button" id="zout" aria-label="Отдалить"><span class="h"></span></button><button type="button" id="locate" aria-label="Моё местоположение" title="Моё местоположение"><i></i><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></button></div>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var post = function (m) { parent.postMessage(Object.assign({ src: '8mart-map', id: q.get('id') || '' }, m), location.origin); };
+  if (q.get('compact') === '1') document.body.classList.add('compact');
+  var token = q.get('token') || '';
+  function fail() {
+    document.getElementById('fail').hidden = false;
+    document.getElementById('ctl').hidden = true;
+    post({ type: 'error' });
+  }
+  if (!token || typeof mapboxgl === 'undefined' || !mapboxgl.supported || !mapboxgl.supported()) { fail(); return; }
+
+  var state = { mode: q.get('mode') || 'delivery', lat: +q.get('lat') || 51.1282, lng: +q.get('lng') || 71.4307, zoom: +q.get('zoom') || 15, points: [], selected: q.get('selected') || null };
+  mapboxgl.accessToken = token;
+  var map;
+  try {
+    map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v12', center: [state.lng, state.lat], zoom: state.zoom, language: 'ru', attributionControl: true, logoPosition: 'bottom-left', dragRotate: false, pitchWithRotate: false });
+  } catch (e) { fail(); return; }
+  map.on('error', function (e) { if (e && e.error && (e.error.status === 401 || e.error.status === 403)) fail(); });
+  map.touchZoomRotate.disableRotation();
+
+  var pin = document.getElementById('pin'), shadow = document.getElementById('shadow'), tip = document.getElementById('tip');
+  function setTip(kind, text) {
+    tip.className = kind === 'muted' ? 'muted' : '';
+    tip.textContent = '';
+    if (kind === 'loading') { var sp = document.createElement('span'); sp.className = 'sp'; tip.appendChild(sp); tip.appendChild(document.createTextNode('Определяем адрес…')); }
+    else tip.textContent = text;
+  }
+  var markers = [];
+  function fitPoints() {
+    var pts = state.points.map(function (p) { return [p.lng, p.lat]; });
+    if (pts.length === 1) { map.easeTo({ center: pts[0], zoom: 15 }); return; }
+    var b = pts.reduce(function (b, p) { return b.extend(p); }, new mapboxgl.LngLatBounds(pts[0], pts[0]));
+    map.fitBounds(b, { padding: 60, maxZoom: 15 });
+  }
+  function applyMode() {
+    var d = state.mode === 'delivery';
+    pin.hidden = !d; shadow.hidden = !d; tip.hidden = !d;
+    markers.forEach(function (m) { m.remove(); }); markers = [];
+    if (!d) state.points.forEach(function (p) {
+      var el = document.createElement('button'); el.type = 'button';
+      el.className = 'pp' + (p.id === state.selected ? ' sel' : ''); el.innerHTML = '<span></span>';
+      el.setAttribute('aria-label', p.name); el.setAttribute('aria-pressed', String(p.id === state.selected));
+      el.addEventListener('click', function (e) { e.stopPropagation(); state.selected = p.id; applyMode(); post({ type: 'pick', pointId: p.id }); });
+      markers.push(new mapboxgl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(map));
+    });
+  }
+  var t, req = 0, quiet = false, quietLabel = '';
+  map.on('movestart', function () { pin.classList.add('lift'); tip.classList.add('lift'); if (state.mode === 'delivery' && !quiet) setTip('loading'); });
+  map.on('moveend', function () {
+    pin.classList.remove('lift'); tip.classList.remove('lift');
+    if (state.mode !== 'delivery') return;
+    var c = map.getCenter();
+    // Выбор подсказки: пин ставится без повторного геокодирования.
+    if (quiet) { quiet = false; setTip('ok', quietLabel); return; }
+    clearTimeout(t); post({ type: 'moving' });
+    t = setTimeout(function () { reverse(c); }, 400);
+  });
+  function reverse(c) {
+    var my = ++req;
+    fetch('/api/geo/reverse?' + new URLSearchParams({ lat: String(c.lat), lng: String(c.lng) }))
+      .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+      .then(function (a) {
+        if (my !== req) return;
+        var street = (a && a.address) || '';
+        if (street) setTip('ok', street); else setTip('muted', 'Уточните адрес — двигайте карту');
+        post({ type: 'address', lat: c.lat, lng: c.lng, street: street, city: (a && a.city) || '' });
+      })
+      .catch(function () {
+        if (my !== req) return;
+        setTip('muted', 'Не удалось определить адрес');
+        post({ type: 'address', lat: c.lat, lng: c.lng, street: '', city: '', failed: true });
+      });
+  }
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || e.source !== parent) return;
+    var m = e.data || {}; if (m.src !== '8mart-parent') return;
+    if (m.mode) state.mode = m.mode;
+    if (m.points) state.points = m.points;
+    if ('selected' in m) state.selected = m.selected;
+    if (m.quiet) { quiet = true; quietLabel = m.quiet; setTimeout(function () { quiet = false; }, 1500); }
+    if (m.lat && m.lng) map.flyTo({ center: [m.lng, m.lat], zoom: m.zoom || map.getZoom(), speed: 1.6 });
+    if (m.locate) loc.click();
+    if (m.fit && state.points.length) fitPoints();
+    applyMode();
+  });
+  document.getElementById('zin').onclick = function () { map.zoomIn(); };
+  document.getElementById('zout').onclick = function () { map.zoomOut(); };
+  var loc = document.getElementById('locate'), me = null;
+  loc.onclick = function () {
+    if (!navigator.geolocation) return;
+    loc.classList.add('on');
+    navigator.geolocation.getCurrentPosition(function (p) {
+      var ll = [p.coords.longitude, p.coords.latitude];
+      post({ type: 'geo', lat: ll[1], lng: ll[0] });
+      if (state.mode === 'delivery') map.flyTo({ center: ll, zoom: 16 });
+      else { if (me) me.remove(); var el = document.createElement('div'); el.className = 'me'; me = new mapboxgl.Marker({ element: el }).setLngLat(ll).addTo(map); }
+    }, function () { loc.classList.remove('on'); });
+  };
+  applyMode();
+  // ?quiet=<адрес> — стартовый адрес уже известен (initial), обратное геокодирование при загрузке не делаем.
+  var initial = q.get('quiet') || '';
+  if (initial) setTip('ok', initial); else setTip('muted', 'Двигайте карту, чтобы указать дом');
+  map.on('load', function () { post({ type: 'ready' }); if (state.mode === 'delivery' && !initial) reverse(map.getCenter()); });
+})();
+</script>
+</body></html>

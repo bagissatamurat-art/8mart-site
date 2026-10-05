@@ -1,0 +1,89 @@
+/* MartStories — значения из site/MartStories.dc.html и tokens.css. */
+
+/* ── Ряд миниатюр ── */
+.row { display: flex; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.row::-webkit-scrollbar { display: none; }
+.rowDesktop { gap: 12px; }
+.rowMobile { gap: 8px; }
+.rowDesktop .thumb { width: 104px; height: 140px; }
+.rowMobile .thumb { width: 88px; height: 116px; }
+
+.thumb {
+  flex: none; display: flex; padding: 2px; box-sizing: border-box; border-radius: var(--r-18);
+  border: 2.5px solid var(--primary); background: transparent; cursor: pointer; font: inherit; outline: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.thumbNew { border-color: var(--primary); }
+.thumbSeen { border-color: var(--border); }
+.thumb:focus-visible { box-shadow: var(--focus-ring); }
+.thumbInner {
+  position: relative; flex: 1; display: flex; align-items: flex-end; overflow: hidden; background: var(--surface-subtle);
+  border-radius: 13px; /* из референса, нет в tokens.css: 18 − 2.5 − 2 ≈ 13 */
+}
+.thumbImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 70%; display: block; }
+.thumbShade {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 60%;
+  background: linear-gradient(transparent, rgba(23, 21, 26, .72)); /* из референса, нет в tokens.css */
+}
+.thumbTitle {
+  position: relative; padding: 0 8px 8px; font-size: var(--fs-caption); line-height: 15px; font-weight: 600;
+  color: #fff; text-align: left; text-wrap: balance;
+}
+
+/* ── Просмотр ── */
+.overlay {
+  position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; gap: 24px;
+  font-family: var(--font); color: var(--ink-1);
+}
+.overlayInline { position: absolute; z-index: auto; }
+.overlayDesktop { background: var(--overlay-strong); }
+.overlayMobile { background: var(--ink-1); }
+
+.card { position: relative; flex: none; overflow: hidden; background: var(--surface-subtle); user-select: none; touch-action: none; }
+.cardDesktop { width: 400px; height: min(711px, calc(100% - 48px)); border-radius: var(--r-20); }
+.cardMobile { width: 100%; height: 100%; border-radius: 0; }
+
+.slideImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.preload { display: none; }
+.tap { position: absolute; inset: 0; cursor: pointer; }
+
+.top { position: absolute; left: 0; right: 0; top: 0; padding: 12px 12px 0; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+.cardMobile .top { padding-top: 52px; } /* из референса: отступ под статус-бар */
+
+.bars { display: flex; gap: 4px; }
+.bar {
+  flex: 1; height: 3px; border-radius: 2px; overflow: hidden;
+  background: rgba(23, 21, 26, .18); /* из референса, нет в tokens.css */
+}
+.barFill { display: block; height: 100%; background: var(--ink-1); border-radius: 2px; }
+
+.head { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; object-position: 50% 70%; border: 1.5px solid #fff; box-sizing: content-box; flex: none; }
+.storyTitle { flex: 1; min-width: 0; font-size: var(--fs-small); font-weight: 600; color: var(--ink-1); }
+.pause { display: flex; gap: 3px; padding: 0 4px; }
+.pause > span { width: 3px; height: 12px; background: var(--ink-1); border-radius: 1px; }
+
+.close {
+  pointer-events: auto; flex: none; width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; outline: none;
+  background: rgba(255, 255, 255, .85); /* из референса, нет в tokens.css */
+  transition: box-shadow var(--dur) var(--ease);
+}
+.close:focus-visible { box-shadow: var(--focus-ring); }
+
+.text { display: flex; flex-direction: column; gap: 8px; padding: 12px 4px 0; }
+.title { margin: 0; font-size: 30px; line-height: 1.1; font-weight: 800; letter-spacing: var(--tracking-tight); color: var(--ink-1); text-wrap: balance; }
+.body { margin: 0; font-size: var(--fs-body); line-height: 1.4; color: var(--ink-1); text-wrap: pretty; max-width: 320px; }
+
+.cta { position: absolute; left: 16px; right: 16px; bottom: 16px; }
+.cardMobile .cta { bottom: 34px; } /* из референса: над home-индикатором */
+
+.arrow {
+  flex: none; width: var(--h-44); height: var(--h-44); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  background: var(--surface-card); display: flex; align-items: center; justify-content: center; outline: none;
+  transition: box-shadow var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.arrow:focus-visible { box-shadow: var(--focus-ring); }
+.arrow:disabled { opacity: .4; cursor: default; }
+.arrowPrev > span { margin-left: 4px; }
+.arrowNext > span { margin-right: 4px; }

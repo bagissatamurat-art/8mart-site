@@ -1,0 +1,57 @@
+.cross { position: relative; display: block; flex: none; }
+.cross > span { position: absolute; left: 0; border-radius: 1px; }
+
+.chevron { display: inline-block; flex: none; border-right: 2px solid; border-bottom: 2px solid; box-sizing: content-box; } /* как в макете: размер + рамка */
+.check { display: inline-block; width: 10px; height: 6px; border-left: 2px solid; border-bottom: 2px solid; transform: rotate(-45deg); margin-top: -3px; box-sizing: content-box; }
+
+.coin {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--bonus); color: #fff;
+  font-size: 8px; font-weight: 800; line-height: 1; display: inline-flex; align-items: center; justify-content: center; flex: none;
+}
+.bonusInline { display: flex; align-items: center; gap: 5px; font-size: var(--fs-caption); font-weight: 600; color: var(--bonus-ink); }
+.bonusPill {
+  display: flex; align-items: center; gap: 4px; padding: 2px 6px 2px 3px; border-radius: var(--r-pill);
+  background: var(--bonus-bg); color: var(--bonus-ink); font-size: var(--fs-caption); font-weight: 600; white-space: nowrap;
+}
+
+.badge { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: var(--r-pill); font-size: var(--fs-caption); font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.badge_sale { background: var(--primary); color: #fff; }
+.badge_neutral { background: var(--surface-subtle); color: var(--ink-1); font-weight: 500; }
+.badge_onPhoto { background: var(--surface-card); color: var(--ink-1); font-weight: 500; }
+.badge_dark { background: var(--ink-1); color: #fff; }
+.badge_success { background: var(--success-bg); color: var(--success); }
+
+.alert { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-16); color: var(--ink-1); font-size: var(--fs-small); line-height: var(--lh-small); }
+.alertIcon { width: 20px; height: 20px; border-radius: 50%; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
+.alert_danger { background: var(--danger-bg); }
+.alert_danger .alertIcon { background: var(--danger); }
+.alert_warning { background: var(--warning-bg); }
+.alert_warning .alertIcon { background: var(--warning); }
+.alert_success { background: var(--success-bg); }
+.alert_success .alertIcon { background: var(--success); }
+
+.spinner { display: block; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: mart-spin .7s linear infinite; box-sizing: content-box; }
+.skeleton { display: block; background: var(--surface-disabled); animation: mart-pulse 1.4s ease-in-out infinite; }
+
+.toast {
+  position: fixed; left: 50%; top: 96px; transform: translateX(-50%); width: 460px; max-width: calc(100% - 32px); z-index: 80;
+  display: flex; align-items: center; gap: 12px; padding: 12px 8px 12px 18px; border-radius: var(--r-16);
+  background: var(--ink-1); color: #fff; font-size: var(--fs-15); line-height: 1.35; box-shadow: var(--shadow-toast);
+}
+@media (max-width: 1023.98px) { .toast { top: 56px; width: auto; left: 16px; right: 16px; transform: none; max-width: none; } }
+.toastInline { position: static; transform: none; }
+.toastText { flex: 1; }
+.toastClose { position: relative; width: var(--h-36); height: var(--h-36); border-radius: 50%; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; flex: none; }
+.toastClose::after { content: ''; position: absolute; inset: -4px; }
+
+.alertMain { display: flex; gap: 12px; align-items: flex-start; }
+.alertSplit { align-items: center; justify-content: space-between; }
+.alertSplit .alertMain { align-items: center; }
+.alertAction { border: 0; background: transparent; padding: 0; font: inherit; font-size: inherit; font-weight: 600; color: var(--danger); cursor: pointer; white-space: nowrap; }
+.alertCompact { padding: 12px 14px; border-radius: var(--r-14); font-size: var(--fs-13); gap: 10px; }
+.alertCompact .alertMain { gap: 10px; }
+.alertCompact .alertIcon { width: 18px; height: 18px; font-size: var(--fs-caption); }
+
+/* Кадры локально: имена анимаций в CSS-модулях хешируются. Пульс скелетона — .5 ↔ 1, 1.4 с (07). */
+@keyframes mart-spin { to { transform: rotate(360deg); } }
+@keyframes mart-pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
