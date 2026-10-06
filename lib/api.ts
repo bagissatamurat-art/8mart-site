@@ -165,7 +165,7 @@ export async function geoSuggest(q: string, city: string, signal?: AbortSignal):
   return r.json();
 }
 /** GET /geo/reverse?lat&lng */
-export async function geoReverse(lat: number, lng: number): Promise<{ address: string; city: string } | null> {
+export async function geoReverse(lat: number, lng: number): Promise<{ address: string; city: string; hasHouse?: boolean } | null> {
   const r = await fetch(`/api/geo/reverse?${new URLSearchParams({ lat: String(lat), lng: String(lng) })}`);
   if (!r.ok) throw new ApiError(r.status, 'Сервис геокодирования недоступен');
   return r.json();

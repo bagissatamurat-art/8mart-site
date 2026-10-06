@@ -40,13 +40,14 @@ function StoreHydrator() {
 
 function MethodModalHost() {
   const open = useUi(s => s.methodOpen);
+  const auto = useUi(s => s.methodAuto);
   const close = useUi(s => s.closeMethod);
   const state = useMethod();
   const [cities, setCities] = useState<City[]>([]);
   useEffect(() => { getCities().then(setCities); }, []);
   if (!open) return null;
   return (
-    <MartMethodModal open mode="auto" initial={state.method ? methodValue(state) : undefined} onClose={close}
+    <MartMethodModal open mode="auto" lazyMap={auto} initial={state.method ? methodValue(state) : undefined} onClose={close}
       onConfirm={v => { state.set(v, methodLabel(v, cities)); flushPending(); }} />
   );
 }

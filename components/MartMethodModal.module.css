@@ -35,6 +35,24 @@
 /* Mobile: карта одной высоты в доставке и самовывозе — 40% экрана; панель забирает остальное. */
 .mobile .map, .card.mobile .map { flex: none; height: 40%; min-height: 0; }
 .frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+/* Пока интерактивная карта грузится — она невидима поверх картинки (без мигания при подмене). */
+.frameLoading { opacity: 0; pointer-events: none; }
+/* Картинка карты (Mapbox Static Images) до первого касания */
+.staticMap { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Кнопки поверх картинки — один в один с public/map.html (#ctl): зум-капсула 44×88 и круг «моё местоположение» */
+.sCtl { position: absolute; right: 12px; bottom: 28px; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sCtlCompact { bottom: 56px; }
+.sZoom { display: flex; flex-direction: column; width: 44px; border-radius: 22px; background: var(--surface-card); overflow: hidden; box-shadow: 0 4px 12px rgba(23, 21, 26, .15); /* как в map.html */ }
+.sZoom button + button { border-top: 1px solid var(--surface-disabled); }
+.sZoom button, .sLocate {
+  width: 44px; height: 44px; border: 0; padding: 0; margin: 0; background: var(--surface-card); color: var(--ink-1); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.sLocate { border-radius: 50%; box-shadow: 0 4px 12px rgba(23, 21, 26, .15); }
+.sZoom button:hover, .sLocate:hover { background: var(--surface-subtle); }
+.sZoom button:focus-visible { box-shadow: inset 0 0 0 2px var(--primary); }
+.sLocate:focus-visible { box-shadow: inset 0 0 0 2px var(--primary), 0 4px 12px rgba(23, 21, 26, .15); }
+.sCtl svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .mapTools { position: absolute; left: 16px; top: max(16px, env(safe-area-inset-top)); display: flex; gap: var(--s-2); z-index: 6; } /* выше панели (4): список городов не перекрывается */
 
 /* Город */

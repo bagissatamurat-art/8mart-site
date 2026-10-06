@@ -6,6 +6,8 @@ import { useMethod } from './method';
 
 interface UiState {
   methodOpen: boolean;
+  /** Модалка способа открылась сама (первый визит) — карта сначала картинкой, интерактивная — по касанию. */
+  methodAuto: boolean;
   /** Товар, который пытались добавить без способа получения — положим после выбора. */
   pending: { key: string; qty: number } | null;
   quickViewId: string | null;
@@ -17,8 +19,8 @@ interface UiState {
 }
 
 export const useUi = create<UiState>()(set => ({
-  methodOpen: false, pending: null, quickViewId: null, hydrated: false,
-  openMethod: () => set({ methodOpen: true }),
+  methodOpen: false, methodAuto: false, pending: null, quickViewId: null, hydrated: false,
+  openMethod: () => set({ methodOpen: true, methodAuto: false }),
   closeMethod: () => set({ methodOpen: false, pending: null }),
   openQuickView: id => set({ quickViewId: id }),
   closeQuickView: () => set({ quickViewId: null }),
@@ -33,7 +35,7 @@ export function closeOverlays() {
 /** Изменение количества с проверкой способа получения: без него «В корзину» открывает модалку. */
 export function setCartQty(key: string, qty: number) {
   if (qty > 0 && !useMethod.getState().method) {
-    useUi.setState({ methodOpen: true, pending: { key, qty } });
+    useUi.setState({ methodOpen: true, methodAuto: false, pending: { key, qty } });
     return;
   }
   useCart.getState().setQty(key, qty);
@@ -52,7 +54,7 @@ export function autoOpenMethodOnce() {
   if (useMethod.getState().method) return;
   try { if (sessionStorage.getItem(AUTO_KEY)) return; sessionStorage.setItem(AUTO_KEY, '1'); } catch { /* приватный режим — показываем */ }
   // После загрузки страницы и в простое: карта в модалке не конкурирует с главной картинкой (LCP).
-  const open = () => { if (!useMethod.getState().method) useUi.setState({ methodOpen: true }); };
+  const open = () => { if (!useMethod.getState().method) useUi.setState({ methodOpen: true, methodAuto: true }); };
   const idle = () => ('requestIdleCallback' in window ? window.requestIdleCallback(open, { timeout: 1500 }) : setTimeout(open, 300));
   if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle, { once: true });
 }

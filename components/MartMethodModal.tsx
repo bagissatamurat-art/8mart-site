@@ -48,6 +48,8 @@ export interface MartMethodModalProps {
   inline?: boolean;
   /** Не грузить Mapbox — показать заглушку карты. */
   staticMap?: boolean;
+  /** Модалка открылась сама: карта сначала картинкой, интерактивная — по первому касанию (не тормозит первый визит). */
+  lazyMap?: boolean;
   /** Известная геолокация (расстояния до точек и «Ближайшая»). */
   userGeo?: LatLng | null;
 }
@@ -63,7 +65,7 @@ export function MartMethodModal(props: MartMethodModalProps) {
 
 function MethodDialog({
   mode = 'auto', initial, addressOnly, title, subtitle, ctaLabel, onClose, onConfirm,
-  inline, staticMap, userGeo,
+  inline, staticMap, userGeo, lazyMap,
 }: MartMethodModalProps) {
   const autoMobile = useIsMobile();
   const mounted = useMounted();
@@ -169,7 +171,7 @@ function MethodDialog({
       <button type="button" className={s.close} aria-label="Закрыть" onClick={onClose}><Cross size={14} color="var(--ink-1)" /></button>
 
       {city ? (
-        <MethodMap ref={map} mode={tab} city={city} points={tab === 'pickup' ? points : NO_POINTS} selected={store} start={start} keepAddress={keepAddress} closed={closedIds}
+        <MethodMap ref={map} mode={tab} city={city} points={tab === 'pickup' ? points : NO_POINTS} selected={store} start={start} keepAddress={keepAddress} closed={closedIds} lazy={lazyMap}
           compact={mobile} staticMap={staticMap} geo={geo}
           onMoving={() => setLocating(true)} onAddress={onAddress} onPick={setStore} onGeo={setGeo}>
           <div className={s.mapTools}><CitySelect cities={cities} value={city} onChange={pickCity} /></div>

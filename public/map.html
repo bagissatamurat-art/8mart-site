@@ -173,6 +173,7 @@ body.compact .mapboxgl-ctrl-bottom-left,body.compact .mapboxgl-ctrl-bottom-right
     if (m.quiet) { quiet = true; setTimeout(function () { quiet = false; }, 4000); }
     if (m.lat && m.lng) map.flyTo({ center: [m.lng, m.lat], zoom: m.zoom || map.getZoom(), speed: 1.6 });
     if (m.locate) loc.click();
+    if (m.zoomBy) { if (m.zoomBy > 0) map.zoomIn(); else map.zoomOut(); }
     if (m.fit && state.points.length) fitPoints();
     applyMode();
   });
