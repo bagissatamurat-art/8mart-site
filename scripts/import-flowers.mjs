@@ -1,5 +1,7 @@
 // Импорт цветов из каталога 8mart.kz → lib/flowers.ts (мок в форме API-контракта сайта).
-// Источник: публичный API dukenfy-api.8mart.kz (тот же, что у 8mart.kz/catalog/tsvety), цены — филиала в Астане.
+// Источник: публичный API dukenfy-api.8mart.kz (тот же, что у 8mart.kz/catalog/tsvety) — все филиалы.
+// Цена размера — та, что чаще всего по филиалам (опечатки вроде 27 398 вместо 27 400 не попадут);
+// размер есть, если продаётся хотя бы в одном филиале.
 // Размеры S / M / L в каталоге — отдельные товары «НАЗВАНИЕ S|M|L»; здесь они — варианты одного букета.
 // Запуск: node scripts/import-flowers.mjs  (перезаписывает lib/flowers.ts; руками файл не править).
 import { writeFileSync } from 'node:fs';
@@ -7,7 +9,6 @@ import { writeFileSync } from 'node:fs';
 const API = 'https://dukenfy-api.8mart.kz/api/v1';
 const FILES = 'https://dukenfy-api.8mart.kz';
 const CATEGORY = 'c0a7e0e0-0000-4000-8000-000000000003'; // «Цветы»
-const BRANCH = { id: 'd45c8fea-de8a-497c-866e-e28e71e4b4a8', name: '8MART — Абылай хана 32, Астана' };
 const SUBS = { 'b4170724-6f6d-428d-89c9-b03e2679ea16': 'gortenzii', '50997070-0f27-49a7-93f5-8a4d3cb1478c': 'rozy', 'b7c0b473-c64e-4cd9-ae15-e9179d98379c': 'hrizantemy' };
 const SIZES = ['S', 'M', 'L'];
 
@@ -25,24 +26,33 @@ const KNOWN = {
 };
 const sentence = (t) => t.charAt(0) + t.slice(1).toLowerCase();
 
-const res = await fetch(`${API}/categories/${CATEGORY}/products?branchId=${BRANCH.id}&includeDescendants=true&page=0&size=200`);
-if (!res.ok) throw new Error(`API ${res.status}`);
-const { products } = await res.json();
+const branches = await (await fetch(`${API}/public/branches`)).json();
+const products = [];
+for (const b of branches) {
+  const res = await fetch(`${API}/categories/${CATEGORY}/products?branchId=${b.id}&includeDescendants=true&page=0&size=200`);
+  if (!res.ok) throw new Error(`API ${res.status} (${b.name})`);
+  for (const p of (await res.json()).products) if (p.price) products.push({ ...p, branch: b.id });
+}
+/** Самое частое значение (при равенстве — большее): цена «как в большинстве филиалов». */
+const mode = (xs) => [...xs.reduce((m, x) => m.set(x, (m.get(x) || 0) + 1), new Map())].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0][0];
 
 const groups = new Map();
 for (const p of products) {
   const m = p.title.trim().match(/^(.*?)\s+([SML])$/);
   const base = m ? m[1].trim() : p.title.trim(), size = m ? m[2] : 'M';
-  if (!p.price) continue; // нет цены в филиале — не продаётся
   const g = groups.get(base) ?? { base, cat: SUBS[p.categoryId], items: {} };
   // Состав: строки описания; описание, равное названию, — не состав.
   const lines = String(p.description || '').split(/\r?\n/).map(s => s.trim().replace(/\s+;?$/, '')).filter(Boolean);
   const composition = lines.join(' ').toUpperCase() === base ? '' : lines.join(', ').replace(/\s+,/g, ',');
-  g.items[size] = { price: p.price, img: FILES + p.image, composition, sourceId: p.id };
+  const it = g.items[size] ?? { prices: [], img: FILES + p.image, composition, sourceId: p.id, branches: 0 };
+  it.prices.push(p.price); it.branches++;
+  if (!it.composition && composition) it.composition = composition;
+  g.items[size] = it;
   groups.set(base, g);
 }
 
 const flowers = [], composition = {};
+for (const g of groups.values()) for (const it of Object.values(g.items)) it.price = mode(it.prices);
 for (const g of groups.values()) {
   const known = KNOWN[g.base];
   const id = known?.id ?? 'f-' + Object.values(g.items)[0].sourceId.slice(0, 8);
@@ -59,10 +69,10 @@ flowers.sort((a, b) => (a.cat + a.name).localeCompare(b.cat + b.name, 'ru'));
 
 const date = new Date().toISOString().slice(0, 10);
 const out = `// Сгенерировано scripts/import-flowers.mjs — НЕ ПРАВИТЬ РУКАМИ, перезапустить скрипт.
-// Источник: каталог 8mart.kz (${API}), цены филиала «${BRANCH.name}», ${date}.
+// Источник: каталог 8mart.kz (${API}), все филиалы (${branches.length}), цена — самая частая по филиалам, ${date}.
 import type { Product } from './types';
 
-export const FLOWERS_SOURCE = { api: '${API}', branch: '${BRANCH.name}', date: '${date}' };
+export const FLOWERS_SOURCE = { api: '${API}', branches: ${branches.length}, date: '${date}' };
 
 export const FLOWERS: Product[] = ${JSON.stringify(flowers, null, 2)};
 

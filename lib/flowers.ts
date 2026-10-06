@@ -1,17 +1,17 @@
 // Сгенерировано scripts/import-flowers.mjs — НЕ ПРАВИТЬ РУКАМИ, перезапустить скрипт.
-// Источник: каталог 8mart.kz (https://dukenfy-api.8mart.kz/api/v1), цены филиала «8MART — Абылай хана 32, Астана», 2026-10-06.
+// Источник: каталог 8mart.kz (https://dukenfy-api.8mart.kz/api/v1), все филиалы (7), цена — самая частая по филиалам, 2026-10-06.
 import type { Product } from './types';
 
-export const FLOWERS_SOURCE = { api: 'https://dukenfy-api.8mart.kz/api/v1', branch: '8MART — Абылай хана 32, Астана', date: '2026-10-06' };
+export const FLOWERS_SOURCE = { api: 'https://dukenfy-api.8mart.kz/api/v1', branches: 7, date: '2026-10-06' };
 
 export const FLOWERS: Product[] = [
   {
     "id": "f7",
     "name": "Гортензия с кустовыми розами",
-    "weight": "S · M",
+    "weight": "S · M · L",
     "price": 15900,
     "cat": "gortenzii",
-    "img": "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7505750d-349a-405d-9452-8ce0988760e8_1783525793141.png",
+    "img": "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_f13a65fd-3feb-4ea9-96ed-8950106eae87_1783525811054.png",
     "variants": [
       {
         "id": "f7-s",
@@ -24,11 +24,18 @@ export const FLOWERS: Product[] = [
         "size": "M",
         "price": 27400,
         "img": "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7505750d-349a-405d-9452-8ce0988760e8_1783525793141.png"
+      },
+      {
+        "id": "f7",
+        "size": "L",
+        "price": 33900,
+        "img": "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_f13a65fd-3feb-4ea9-96ed-8950106eae87_1783525811054.png"
       }
     ],
     "sizes": [
       "S",
-      "M"
+      "M",
+      "L"
     ],
     "delivery": "flowers",
     "weightKg": 1
@@ -339,6 +346,10 @@ export const FLOWER_COMPOSITION: Record<string, [string, string][]> = {
     [
       "M",
       "6 шт гортензий, 6 шт кустовых роз, 2 шт эвкалипт, 4 листа фоамирана"
+    ],
+    [
+      "L",
+      "7 шт гортензий, 8 шт кустовых роз, 2 шт эвкалипт, 6 листов фоамирана"
     ]
   ],
   "f4": [
