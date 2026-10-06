@@ -25,7 +25,8 @@ describe('lib/api (мок в форме контракта)', () => {
     expect(b1.specs.length).toBe(14);
     expect(b1.images).toEqual(['/assets/b-cement.png']);
     const f1 = await api.getProduct('f1');
-    expect(f1.images.length).toBe(2);
+    expect(f1.images.length).toBeGreaterThanOrEqual(2);
+    expect(f1.specs[0][0]).toMatch(/^Размер [SML]$/); // состав по размерам из каталога 8mart.kz
     await expect(api.getProduct('nope')).rejects.toThrow();
   });
   it('GET /search/suggest', async () => {
@@ -41,8 +42,8 @@ describe('lib/api (мок в форме контракта)', () => {
     expect(await api.checkPromo('XXX', 20000)).toEqual({ error: 'notFound' });
   });
   it('POST /cart/validate пересчитывает отправления', async () => {
-    const r = await api.validateCart({ b1: 2, b6: 1, 'f2|Розовый': 1 });
-    expect(r.lines.map(l => l.id)).toEqual(['b1', 'b6', 'f2|Розовый']);
+    const r = await api.validateCart({ b1: 2, b6: 1, f2: 1 });
+    expect(r.lines.map(l => l.id)).toEqual(['b1', 'b6', 'f2']);
     expect(r.plan.multi).toBe(true);
   });
   it('GET /orders: форма контракта', async () => {

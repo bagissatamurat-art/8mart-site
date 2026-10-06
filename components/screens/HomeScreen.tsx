@@ -1,5 +1,5 @@
 'use client';
-// Главная — 01 Главная и каталог.dc.html: 1a (1440) и 1b (390).
+// Главная — 01 Главная и каталог.dc.html: 1a (1440) и 1b (390). Основной товар — цветы: полки по подкатегориям букетов.
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MartStories } from '@/components/MartStories';
@@ -18,9 +18,10 @@ import s from '@/components/site/site.module.css';
 import h from './HomeScreen.module.css';
 import { TOASTS } from '@/lib/copy';
 
-export interface HomeData { categories: Category[]; stories: Story[]; banner: Banner; deals: Product[]; flowers: Product[] }
+export interface HomeShelf { title: string; href: string; products: Product[] }
+export interface HomeData { categories: Category[]; stories: Story[]; banner: Banner; shelves: HomeShelf[] }
 
-export function HomeScreen({ categories, stories, banner, deals, flowers }: HomeData) {
+export function HomeScreen({ categories, stories, banner, shelves }: HomeData) {
   const router = useRouter();
   const hydrated = useUi(st => st.hydrated);
   const [deleted, setDeleted] = useState(false);
@@ -51,8 +52,7 @@ export function HomeScreen({ categories, stories, banner, deals, flowers }: Home
             <div className={s.desktopOnly}><MartBanner banner={banner} mode="desktop" /></div>
             <div className={s.mobileOnly}><MartBanner banner={banner} mode="mobile" /></div>
           </div>
-          <ProductShelf title="Выгодная полка" href="/catalog?sale=1" products={deals} />
-          <ProductShelf title="Цветы" href="/catalog?cat=tsvety" products={flowers} />
+          {shelves.map(sh => <ProductShelf key={sh.href} title={sh.title} href={sh.href} products={sh.products} />)}
         </main>
         <div className={s.aside}><SiteMiniCart /></div>
       </div>

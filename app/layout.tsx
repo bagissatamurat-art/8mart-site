@@ -7,11 +7,11 @@ import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: '8mart — стройматериалы, инструменты и цветы с доставкой по Астане', template: '%s — 8mart' },
+  title: { default: '8mart — цветы и букеты с доставкой по Астане', template: '%s — 8mart' },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   alternates: { canonical: '/' },
-  openGraph: { type: 'website', locale: 'ru_KZ', siteName: SITE_NAME, url: '/', title: '8mart — стройматериалы, инструменты и цветы с доставкой', description: SITE_DESCRIPTION,
+  openGraph: { type: 'website', locale: 'ru_KZ', siteName: SITE_NAME, url: '/', title: '8mart — цветы и букеты с доставкой', description: SITE_DESCRIPTION,
     images: [{ url: '/assets/banner.jpg', width: 1600, height: 800, alt: '8mart' }] },
   twitter: { card: 'summary_large_image' },
   formatDetection: { telephone: false },

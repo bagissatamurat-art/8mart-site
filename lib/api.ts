@@ -3,6 +3,7 @@
 import * as M from './mock';
 import { CANCEL_BEFORE, CAT_FILTERS, PAGE_SIZE, PROMO, SHIPPING } from './config';
 import { cartItem, orderTotals, planShipments, type PlanOptions, type ShipmentPlan } from './domain';
+import { FLOWER_COMPOSITION } from './flowers';
 import type {
   Address, Banner, Bonus, Card, CartProduct, Category, City, Order, OrderDraft, PickupPoint, Product, ProductDetail,
   ProductQuery, PromoCheck, Story, User, UserPromo,
@@ -79,7 +80,8 @@ export function getProduct(id: string): Promise<ProductDetail> {
     ? [...new Set([p.img, ...p.variants.map(v => v.img)].filter((s): s is string => !!s))]
     : p.img ? [p.img] : [];
   const description = det?.description ?? (p.variants ? M.FLOWER_DESC : M.DEFAULT_DESC);
-  const specs = det?.specs ?? (p.variants ? M.FLOWER_SPECS : ([['Фасовка', p.pack || p.weight], ['Производитель', 'Уточняется']] as [string, string][]).filter(r => r[1]));
+  // Букет: состав по размерам — из каталога 8mart.kz (lib/flowers.ts).
+  const specs = det?.specs ?? (FLOWER_COMPOSITION[p.id]?.length ? FLOWER_COMPOSITION[p.id].map(([size, c]) => [`Размер ${size}`, c] as [string, string]) : ([['Фасовка', p.pack || p.weight], ['Производитель', 'Уточняется']] as [string, string][]).filter(r => r[1]));
   return reply({ ...p, images, description, specs });
 }
 
@@ -128,7 +130,8 @@ export function validateCart(cart: Record<string, number>, opts: PlanOptions = {
 }
 
 /** «Не забыть» в корзине (02): сопутствующие товары, которых ещё нет в корзине. В проде — рекомендации бэкенда. */
-const UPSELL = ['b6', 'b10', 'b11', 'b2', 'b8'];
+/** «Не забыть» в корзине — к букету: открытка, шары, упаковка. */
+const UPSELL = ['g3', 'g4', 'g5', 'g1', 'g2'];
 export const getUpsell = (cartKeys: string[]): Promise<Product[]> =>
   reply(UPSELL.filter(id => !cartKeys.includes(id)).map(id => M.PRODUCTS.find(p => p.id === id)!).filter(Boolean).slice(0, 5), 0);
 

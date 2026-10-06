@@ -25,7 +25,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const { c, s } = names(await getCategories(), url.cat, url.sub);
   const sale = !url.cat && url.filters.sale;
   const title = s ? `${s.name} — ${c!.name}` : c ? c.name : sale ? CATALOG.saleTitle : 'Каталог';
-  const what = s?.name ?? c?.name ?? (sale ? 'товары со скидкой' : 'стройматериалы, инструменты, товары для дома, подарки и цветы');
+  const what = s?.name ?? c?.name ?? (sale ? 'товары со скидкой' : 'цветы и букеты, а также стройматериалы и товары для дома');
   const description = `${what[0].toUpperCase() + what.slice(1)} в 8mart с доставкой по Астане за 60–90 минут и самовывозом. Цены, наличие, бонусы за покупки.`;
   const canonical = sale ? '/catalog?sale=1' : catalogPath(url.cat, url.sub);
   return {

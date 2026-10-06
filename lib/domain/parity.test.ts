@@ -1,18 +1,22 @@
 // Паритет с прототипом: результаты lib/domain и lib/mock совпадают с design_handoff_8mart_site/site/data.js.
+// Цветы — уже не прототип, а настоящий каталог 8mart.kz (lib/flowers.ts): сверяем всё, кроме них (их проверяет flowers.test.ts).
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — JS-прототип без типов
 import * as D from '../../design_handoff_8mart_site/site/data.js';
 import * as F from './format';
 import { planShipments, splitOptions, cargoFee } from './shipments';
 import { bonusFor, cartItem, deliveryConditions } from './catalog';
-import { PRODUCTS } from '../mock';
+import { PRODUCTS as ALL } from '../mock';
 import * as C from '../config';
 import * as T from '../copy';
 
+const notFlower = (p: { delivery?: string }) => p.delivery !== 'flowers';
+const PRODUCTS = ALL.filter(notFlower);
+const D_PRODUCTS = (D.PRODUCTS as { delivery?: string }[]).filter(notFlower);
 const fixPaths = <T,>(o: T): T => JSON.parse(JSON.stringify(o).replaceAll('"./assets/', '"/assets/'));
 
 describe('мок = data.js', () => {
-  it('PRODUCTS в итоговой форме', () => expect(PRODUCTS).toEqual(fixPaths(D.PRODUCTS)));
+  it('PRODUCTS в итоговой форме (кроме цветов)', () => expect(PRODUCTS).toEqual(fixPaths(D_PRODUCTS)));
   it('конфиг', () => {
     expect(C.DELIVERY).toEqual(D.DELIVERY);
     const { slots: _slots, ...courier } = C.SHIPPING.courier;
@@ -52,7 +56,7 @@ describe('функции = data.js', () => {
   });
   it('cartItem для всех ключей', () => {
     const keys = PRODUCTS.flatMap(p => p.variants ? p.variants.flatMap(v => [v.id, ...(p.colors || []).map(c => v.id + '|' + c)]) : [p.id, ...(p.colors || []).map(c => p.id + '|' + c)]);
-    for (const k of [...keys, 'nope', 'f1-s|Белый']) expect(cartItem(k, PRODUCTS)).toEqual(fixPaths(D.cartItem(k)));
+    for (const k of [...keys, 'nope']) expect(cartItem(k, PRODUCTS)).toEqual(fixPaths(D.cartItem(k)));
   });
   it('cargoFee / deliveryConditions', () => {
     for (const kg of [0, 1, 299, 300, 301, 999, 1000, 1001, 1500, 9999]) expect(cargoFee(kg)).toBe(D.cargoFee(kg));

@@ -1,12 +1,13 @@
-// 8mart — мок данных. Источник: design_handoff_8mart_site/site/data.js.
-// Формы объектов = контракт API (README → «API-контракт»). Доступ к мок-данным — только через lib/api.ts.
-// PRODUCTS — итоговая форма после всех преобразований data.js (цветы сгруппированы в варианты S/M/L,
-// проставлены bonus, pack, delivery, group, weightKg, conditions). Цены, бонусы, вес — МОК.
+// 8mart — мок данных. Формы объектов = контракт API (README → «API-контракт»). Доступ — только через lib/api.ts.
+// Цветы (основной товар) — настоящий каталог 8mart.kz: lib/flowers.ts, генерирует scripts/import-flowers.mjs
+// (размеры S/M/L — варианты одного букета, цены филиала в Астане, состав по размерам).
+// Стройматериалы, инструменты, дом, подарки — прототип из design_handoff_8mart_site/site/data.js (цены, бонусы, вес — МОК).
 import { BONUS_RULES, DELIVERY, PROMO } from './config';
 import { groupDigits } from './domain/format';
 import { BASE_PATH as A } from './basePath';
 import { bonusFor, cartItem } from './domain/catalog';
 import { orderTotals } from './domain/order';
+import { FLOWERS } from './flowers';
 import type {
   Address, Banner, Bonus, Card, Category, City, Order, PickupPoint, Product, Story, User, UserPromo,
 } from './types';
@@ -38,16 +39,18 @@ export const PICKUP_POINTS: PickupPoint[] = [
 ];
 
 export const CATEGORIES: Category[] = [
+  { slug: 'tsvety', name: 'Цветы', img: `${A}/assets/cat-flowers.png`, sub: [ { slug: 'gortenzii', name: 'Гортензии' }, { slug: 'rozy', name: 'Розы' }, { slug: 'hrizantemy', name: 'Хризантемы' } ] },
   { slug: 'stroymaterialy', name: 'Стройматериалы', img: `${A}/assets/cat-build.png`, sub: [
     { slug: 'sukhie-smesi', name: 'Сухие смеси' }, { slug: 'kirpich-i-bloki', name: 'Кирпич и блоки' }, { slug: 'gipsokarton', name: 'Гипсокартон' },
     { slug: 'kraski', name: 'Краски' }, { slug: 'uteplitel', name: 'Утеплитель' }, { slug: 'plitka', name: 'Плитка' }, { slug: 'germetiki', name: 'Герметики и пена' } ] },
   { slug: 'instrumenty', name: 'Инструменты', img: `${A}/assets/cat-tools.png`, sub: [ { slug: 'ruchnoy', name: 'Ручной инструмент' }, { slug: 'elektro', name: 'Электроинструмент' }, { slug: 'krepezh', name: 'Крепёж' } ] },
   { slug: 'dlya-doma', name: 'Для дома', img: `${A}/assets/cat-home.png`, sub: [ { slug: 'hoztovary', name: 'Хозтовары' }, { slug: 'svet', name: 'Освещение' }, { slug: 'santehnika', name: 'Сантехника' } ] },
   { slug: 'podarki', name: 'Подарки', img: `${A}/assets/cat-goods.png`, sub: [ { slug: 'upakovka', name: 'Упаковка' }, { slug: 'otkrytki', name: 'Открытки' }, { slug: 'shary', name: 'Шары' } ] },
-  { slug: 'tsvety', name: 'Цветы', img: `${A}/assets/cat-flowers.png`, sub: [ { slug: 'gortenzii', name: 'Гортензии' }, { slug: 'rozy', name: 'Розы' }, { slug: 'hrizantemy', name: 'Хризантемы' } ] },
 ];
 
+/** Цветы — из каталога 8mart.kz (lib/flowers.ts, scripts/import-flowers.mjs); основной товар — первыми. Стройка — прототип. */
 export const PRODUCTS: Product[] = [
+  ...FLOWERS,
   {id: "b1", name: "Цемент М400, 50 кг", weight: "50 кг", price: 2890, oldPrice: 3290, badge: "Товар дня", cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, bonus: 87, pack: "50 кг", delivery: "cargo", group: "m400", weightKg: 50},
   {id: "b8", name: "Цемент М500 Д0, 50 кг", weight: "50 кг", price: 3190, cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, bonus: 64, pack: "50 кг", delivery: "cargo", weightKg: 50},
   {id: "b9", name: "Цемент М400, 25 кг", weight: "25 кг", price: 1590, oldPrice: 1790, cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, pack: "25 кг", delivery: "express", group: "m400", weightKg: 25},
@@ -77,15 +80,6 @@ export const PRODUCTS: Product[] = [
   {id: "g3", name: "Открытка «С днём рождения»", weight: "1 шт", price: 490, cat: "otkrytki", img: `${A}/assets/p-g3.png`, pack: "1 шт", delivery: "express", weightKg: 1},
   {id: "g4", name: "Шар фольгированный «Сердце»", weight: "1 шт", price: 1490, cat: "shary", img: `${A}/assets/p-g4.png`, pack: "1 шт", delivery: "express", weightKg: 1},
   {id: "g5", name: "Набор латексных шаров, 10 шт", weight: "10 шт", price: 2490, cat: "shary", img: `${A}/assets/p-g5.png`, pack: "10 шт", delivery: "express", weightKg: 1},
-  {id: "f1", name: "Розы Мандала", weight: "S · M · L", price: 9900, cat: "rozy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_921d21b7-a498-4184-970f-350907f58d8d_1783525261145.png", colors: ["Розовый","Красный","Белый"], variants: [{id: "f1-s", size: "S", price: 9900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2b70d6aa-a229-427c-8843-4c13d4ab011d_1783525246444.png"},{id: "f2", size: "M", price: 14400, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2b70d6aa-a229-427c-8843-4c13d4ab011d_1783525246444.png"},{id: "f1", size: "L", price: 19800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_921d21b7-a498-4184-970f-350907f58d8d_1783525261145.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f3", name: "Кустовые розы в букете", weight: "S · M · L", price: 11900, cat: "rozy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png", colors: ["Розовый","Белый"], variants: [{id: "f3-s", size: "S", price: 11900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png"},{id: "f3-m", size: "M", price: 17300, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png"},{id: "f3", size: "L", price: 23800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_c6fa81b7-4989-420b-9435-b9a188a9b3ea_1783525368149.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f4", name: "Гортензия с хризантемами", weight: "S · M · L", price: 12900, cat: "gortenzii", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png", colors: ["Микс","Голубой"], variants: [{id: "f4-s", size: "S", price: 12900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png"},{id: "f4", size: "M", price: 18700, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png"},{id: "f4-l", size: "L", price: 25800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7db73bc2-d9a5-4ea4-8f63-09806bd05d3c_1783525655078.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f5", name: "Французские розы Мандала с гортензией", weight: "S · M · L", price: 10900, cat: "rozy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_1c97985e-0fcf-44cb-94a9-0d679043aaca_1783525461848.png", colors: ["Белый","Розовый"], variants: [{id: "f5-s", size: "S", price: 10900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_1c97985e-0fcf-44cb-94a9-0d679043aaca_1783525461848.png"},{id: "f5-m", size: "M", price: 15800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_1c97985e-0fcf-44cb-94a9-0d679043aaca_1783525461848.png"},{id: "f5", size: "L", price: 21800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_1c97985e-0fcf-44cb-94a9-0d679043aaca_1783525461848.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f6", name: "Роза микс", weight: "S · M · L", price: 14900, cat: "rozy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_47e1639d-b11f-48aa-8bd8-39ef22e972e4_1783524822428.png", colors: ["Микс"], variants: [{id: "f6-s", size: "S", price: 14900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_47e1639d-b11f-48aa-8bd8-39ef22e972e4_1783524822428.png"},{id: "f6", size: "M", price: 21600, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_47e1639d-b11f-48aa-8bd8-39ef22e972e4_1783524822428.png"},{id: "f6-l", size: "L", price: 29800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_47e1639d-b11f-48aa-8bd8-39ef22e972e4_1783524822428.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f7", name: "Гортензия с кустовыми розами", weight: "S · M · L", price: 8900, cat: "gortenzii", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_f13a65fd-3feb-4ea9-96ed-8950106eae87_1783525811054.png", colors: ["Белый","Голубой"], variants: [{id: "f7-s", size: "S", price: 8900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_f13a65fd-3feb-4ea9-96ed-8950106eae87_1783525811054.png"},{id: "f7-m", size: "M", price: 12900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_f13a65fd-3feb-4ea9-96ed-8950106eae87_1783525811054.png"},{id: "f7", size: "L", price: 17800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_f13a65fd-3feb-4ea9-96ed-8950106eae87_1783525811054.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f8", name: "Хризантема Момоко с розами Мандала", weight: "S · M · L", price: 13900, cat: "hrizantemy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_84d1c474-ddda-4f1d-9b42-7b30a1f94f14_1783525892580.png", colors: ["Микс","Жёлтый"], variants: [{id: "f8-s", size: "S", price: 13900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_84d1c474-ddda-4f1d-9b42-7b30a1f94f14_1783525892580.png"},{id: "f8-m", size: "M", price: 20200, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_84d1c474-ddda-4f1d-9b42-7b30a1f94f14_1783525892580.png"},{id: "f8", size: "L", price: 27800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_84d1c474-ddda-4f1d-9b42-7b30a1f94f14_1783525892580.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f9", name: "Хризантема с кустовыми розами", weight: "S · M · L", price: 9900, cat: "hrizantemy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7faa562f-d421-4653-929d-7502e12fb269_1783525561210.png", colors: ["Белый"], variants: [{id: "f9-s", size: "S", price: 9900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7faa562f-d421-4653-929d-7502e12fb269_1783525561210.png"},{id: "f9", size: "M", price: 14400, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7faa562f-d421-4653-929d-7502e12fb269_1783525561210.png"},{id: "f9-l", size: "L", price: 19800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_7faa562f-d421-4653-929d-7502e12fb269_1783525561210.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
-  {id: "f10", name: "Хризантема", weight: "S · M · L", price: 11900, cat: "hrizantemy", img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2ecefd47-0667-44ba-b30c-099dd8e8138c_1783525089085.png", colors: ["Белый","Жёлтый"], variants: [{id: "f10-s", size: "S", price: 11900, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2ecefd47-0667-44ba-b30c-099dd8e8138c_1783525089085.png"},{id: "f10-m", size: "M", price: 17300, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2ecefd47-0667-44ba-b30c-099dd8e8138c_1783525089085.png"},{id: "f10", size: "L", price: 23800, img: "https://dukenfy-api.8mart.kz/api/v1/catalog/files/product_2ecefd47-0667-44ba-b30c-099dd8e8138c_1783525089085.png"}], sizes: ["S","M","L"], delivery: "flowers", weightKg: 1},
 ];
 
 // ── Карточка товара (GET /products/{id}): описание и характеристики. МОК ──
@@ -98,24 +92,29 @@ export const PRODUCT_DETAILS: Record<string, { description: string; specs: [stri
 };
 export const FLOWER_DESC = 'Букет собираем в день заказа из свежих цветов. Состав может немного отличаться от фото — сохраним стиль и цветовую гамму.\nК каждому букету бесплатно прикладываем открытку и подкормку для цветов.';
 export const DEFAULT_DESC = 'Описание товара появится позже. Уточните детали у поддержки в WhatsApp.';
-export const FLOWER_SPECS: [string, string][] = [['S', '35 см, 9–11 цветков'], ['M', '45 см, 15–19 цветков'], ['L', '55 см, 25–29 цветков'], ['Упаковка', 'Крафт, атласная лента'], ['Стойкость', '5–7 дней'], ['Уход', 'Подрезать стебли, менять воду каждый день']];
 
 // ── Сторисы и баннер (GET /stories, GET /banners). МОК, текст накладывается вёрсткой ──
+// Сторисы — про цветы (основной товар): фото и цены «от …» берутся из каталога (lib/flowers.ts), не прописаны руками.
+const bouquet = (id: string) => FLOWERS.find(f => f.id === id) ?? FLOWERS[0];
+/** Слайд-букет: фото, «от N тг · размеры S, M, L», кнопка — на страницу букета (там выбирают размер). */
+const bouquetSlide = (id: string): Story['slides'][number] => {
+  const f = bouquet(id);
+  return { img: f.img!, title: f.name, text: `от ${groupDigits(f.price ?? 0)} тг · размеры ${(f.sizes ?? []).join(', ')}`, cta: { label: 'Выбрать размер', href: `/product/${f.id}` } };
+};
 export const STORIES: Story[] = [
-  { id: 's-sale', title: 'Скидки', cover: `${A}/assets/st-sale.jpg`, slides: [
-    { img: `${A}/assets/st-sale.jpg`, title: 'Цемент М400 — 2 890 тг', text: 'Вместо 3 290 тг. Товар дня в «Выгодной полке»', cta: { label: 'Смотреть скидки', href: '/catalog?cat=stroymaterialy' } } ] },
-  { id: 's-flowers', title: 'Цветы', cover: `${A}/assets/st-flowers.jpg`, slides: [
-    { img: `${A}/assets/st-flowers.jpg`, title: 'Букет за 60–90 минут', text: 'Выберите размер и цвет — соберём и привезём сегодня', cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
+  { id: 's-bouquets', title: 'Букеты', cover: `${A}/assets/st-flowers.jpg`, slides: [
+    { img: `${A}/assets/st-flowers.jpg`, title: `Букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут`, text: 'Розы, гортензии и хризантемы — соберём сегодня и привезём', cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
+  { id: 's-roses', title: 'Розы', cover: bouquet('f1').img!, slides: [bouquetSlide('f1'), bouquetSlide('f6'), bouquetSlide('f3')] },
+  { id: 's-hydrangeas', title: 'Гортензии', cover: bouquet('f4').img!, slides: [bouquetSlide('f4'), bouquetSlide('f7')] },
+  { id: 's-chrysanthemums', title: 'Хризантемы', cover: bouquet('f8').img!, slides: [bouquetSlide('f8'), bouquetSlide('f10')] },
   { id: 's-promo', title: 'Промокод', cover: `${A}/assets/st-gifts.jpg`, slides: [
     { img: `${A}/assets/st-gifts.jpg`, title: `−${PROMO.pct}% по коду ${PROMO.code}`, text: `На заказ от ${groupDigits(PROMO.minSum)} тг. Введите код в корзине`, cta: { label: 'Скопировать код', copy: PROMO.code } } ] },
-  { id: 's-tools', title: 'Инструменты', cover: `${A}/assets/st-tools.jpg`, slides: [
-    { img: `${A}/assets/st-tools.jpg`, title: 'Всё для ремонта', text: 'Дрели, шуруповёрты, ручной инструмент и расходники', cta: { label: 'В каталог', href: '/catalog?cat=instrumenty' } } ] },
   { id: 's-delivery', title: 'Доставка', cover: `${A}/assets/st-delivery.jpg`, slides: [
-    { img: `${A}/assets/st-delivery.jpg`, title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Курьер за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе ${groupDigits(DELIVERY.fee)} тг` },
-    { img: `${A}/assets/st-delivery.jpg`, title: 'Тяжёлое — Газелью', text: 'Цемент и кирпич привезём на следующий день, поднимем на этаж', cta: { label: 'Подробнее', href: '/catalog?cat=stroymaterialy' } } ] },
+    { img: `${A}/assets/st-delivery.jpg`, title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Привезём букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе ${groupDigits(DELIVERY.fee)} тг`, cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
 ];
 export const BANNERS: Banner[] = [
-  { img: `${A}/assets/banner.jpg`, title: 'Ремонт без лишних поездок', text: 'Стройматериалы, инструменты и цветы — привезём сегодня', textShort: 'Привезём сегодня', cta: 'В каталог', href: '/catalog' },
+  { img: `${A}/assets/banner-flowers.jpg`, title: `Букеты за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут`, text: 'Розы, гортензии и хризантемы — соберём сегодня и привезём',
+    textShort: 'Привезём сегодня', cta: 'Выбрать букет', href: '/catalog?cat=tsvety' },
 ];
 
 // ── Личный кабинет (GET /me/*, /orders) ──
@@ -154,7 +153,7 @@ export const ADDRESSES: Address[] = [
 ];
 // Карты сохраняет платёжный шлюз при оплате; фронт получает только маску
 export const CARDS: Card[] = [ { id: 'c1', brand: 'Visa', last4: '4821', exp: '09/28', isDefault: true }, { id: 'c2', brand: 'Mastercard', last4: '1097', exp: '03/27', isDefault: false } ];
-export const FAVORITES: string[] = ['b4', 'b1', 'b3', 'b5', 'b12', 'b6'];
+export const FAVORITES: string[] = ['f1', 'f4', 'f8', 'b4', 'b1', 'b3'];
 export const USER_PROMOS: UserPromo[] = [
   { code: 'MART10', title: '−10% на заказ', cond: 'от 15 000 тг', until: 'до 31 октября', status: 'active' },
   { code: 'FREEDEL', title: 'Бесплатная доставка', cond: 'на любой заказ', until: 'до 15 октября', status: 'active' },

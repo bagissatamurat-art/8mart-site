@@ -53,7 +53,11 @@
 .preload { display: none; }
 .tap { position: absolute; inset: 0; cursor: pointer; }
 
-.top { position: absolute; left: 0; right: 0; top: 0; padding: 12px 12px 0; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+.top {
+  position: absolute; left: 0; right: 0; top: 0; padding: 12px 12px 28px; display: flex; flex-direction: column; gap: 12px; pointer-events: none;
+  /* Светлая подложка под текст: на фото букетов верх бывает тёмным; на иллюстрациях почти незаметна. */
+  background: linear-gradient(rgba(255, 255, 255, .9), rgba(255, 255, 255, .72) 65%, rgba(255, 255, 255, 0));
+}
 .cardMobile .top { padding-top: 52px; } /* из референса: отступ под статус-бар */
 
 .bars { display: flex; gap: 4px; }

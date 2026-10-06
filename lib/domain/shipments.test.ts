@@ -101,9 +101,10 @@ describe('bonusFor / cartItem', () => {
     expect(bonusFor([line('t1', 3)])).toBe(0);
     expect(bonusFor([{ bonus: 10 }, { bonus: 5, qty: 2 }])).toBe(20);
   });
-  it('cartItem: вариант и цвет цветов', () => {
-    const x = cartItem('f2|Розовый', PRODUCTS)!;
-    expect(x).toMatchObject({ id: 'f2|Розовый', name: 'Розы Мандала, M, розовый', price: 14400, variant: 'M', color: 'Розовый' });
+  it('cartItem: вариант букета и цвет товара', () => {
+    const roses = PRODUCTS.find(p => p.id === 'f1')!;
+    const m = roses.variants!.find(v => v.size === 'M')!;
+    expect(cartItem(m.id, PRODUCTS)).toMatchObject({ id: m.id, name: 'Розы Мандала, M', price: m.price, variant: 'M' });
     expect(cartItem('b4|Бежевый', PRODUCTS)).toMatchObject({ id: 'b4|Бежевый', name: 'Краска интерьерная белая, 10 л, бежевый' });
     expect(cartItem('nope', PRODUCTS)).toBeNull();
   });
