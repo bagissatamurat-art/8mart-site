@@ -1,12 +1,13 @@
 // Футер (главная, каталог, товар): о магазине и соцсети · покупателям · каталог цветов · контакты и города.
 // Контакты и соцсети — как в футере 8mart.kz (BRAND, SUPPORT_WA в lib/config); города — филиалы (lib/branches).
-// Ссылок на приложения и юридические страницы пока нет: на 8mart.kz они ведут в «#».
+// Приложение — AppPromo (ссылки в APP_LINKS; пока «Скоро»). Юридических страниц пока нет: на 8mart.kz они ведут в «#».
 import Link from 'next/link';
 import { BRAND, SUPPORT_WA } from '@/lib/config';
 import { FOOTER } from '@/lib/copy';
 import { SNAPSHOT_CITIES } from '@/lib/branches';
 import { asset } from '@/lib/basePath';
 import type { Category } from '@/lib/types';
+import { AppPromo } from './AppPromo';
 import s from './footer.module.css';
 
 const MAIN_CATEGORY = 'tsvety';
@@ -37,6 +38,7 @@ export function SiteFooter({ categories = [] }: { categories?: Category[] }) {
               <a key={icon} href={href} target="_blank" rel="noopener noreferrer" className={s.socialBtn} aria-label={label}><Icon name={icon} /></a>
             ))}
           </div>
+          <AppPromo />
         </div>
 
         <nav className={s.col} aria-label={FOOTER.buyers}>

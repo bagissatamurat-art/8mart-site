@@ -18,6 +18,7 @@ import { Img } from '@/components/ui/Img';
 import { Skeleton } from './ui/Spinner';
 import { useModal } from '@/lib/hooks/useModal';
 import { PersonIcon } from './ui/PersonIcon';
+import { AppPromo } from './site/AppPromo';
 import { ACCOUNT_PAGE } from '@/lib/copy';
 
 /** Разделы кабинета: /account/<section> (ids — как в маршрутах /account/[section]). */
@@ -241,6 +242,8 @@ export function MartSideMenu({ userName = '', signedIn, userPhone = '', orders =
               <span className={s.supText}><span className={s.supTitle}>{BRAND.phone}</span><span className={s.supSub}>Ежедневно</span></span>
             </a>
           </div>
+
+          <AppPromo variant="menu" />
 
           {user && <button type="button" className={s.logout} onClick={() => { onClose(); onLogout?.(); }}>Выйти</button>}
         </div>

@@ -174,6 +174,15 @@ export const FOOTER = {
   copyright: (year: number) => `8mart © ${year}`,
 };
 
+/** Приложение 8mart (футер, боковое меню). TODO: согласовать с бизнесом */
+export const APP_PROMO = {
+  title: 'Приложение 8mart',
+  text: 'Букеты в пару касаний, бонусы и статус заказа — всегда под рукой',
+  soon: 'Скоро',
+  appStore: ['Загрузите в', 'App Store'] as const,
+  googlePlay: ['Доступно в', 'Google Play'] as const,
+};
+
 /** Вопросы и ответы (над футером). Цифры подставляются из конфига — lib/faq.ts. TODO: согласовать с бизнесом */
 export const FAQ_TITLE = 'Вопросы и ответы';
 export interface FaqFacts { fee: string; freeFrom: string; etaMin: number; etaMax: number; maxPart: number; refundDays: string; cities: string; slots: string; phone: string }

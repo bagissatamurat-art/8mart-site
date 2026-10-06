@@ -1,0 +1,25 @@
+/* Приложение 8mart: значки сторов (тёмные, как официальные), карточка в меню и строка в футере. */
+.badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge {
+  position: relative; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 10px;
+  border-radius: 10px; /* как у значков сторов */ background: var(--ink-1); color: #fff; text-decoration: none;
+  transition: background var(--dur) var(--ease);
+}
+a.badge:hover { background: #2B2830; color: #fff; }
+a.badge:focus-visible { box-shadow: var(--focus-ring); }
+.badgeText { display: flex; flex-direction: column; line-height: 1.05; }
+.badgeSmall { font-size: 10px; opacity: .8; }
+.badgeBig { font-size: var(--fs-15); font-weight: 700; letter-spacing: -.01em; }
+/* Ещё нет в сторе — приглушённо, с меткой «Скоро» */
+.badgeSoon { background: #3A3740; cursor: default; }
+.soon {
+  position: absolute; top: -10px; right: -8px; padding: 1px 6px; border-radius: var(--r-pill);
+  background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; line-height: 16px;
+}
+
+.footer { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.footerTitle { font-size: var(--fs-small); font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; }
+
+.card { display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: var(--r-16); background: var(--surface-subtle); }
+.title { font-size: var(--fs-15); font-weight: 700; }
+.text { font-size: var(--fs-13); line-height: 1.4; color: var(--ink-2); margin-bottom: 6px; }

@@ -10,6 +10,8 @@ export const DELIVERY = { fee: 1000, freeFrom: 20000, minOrder: 3000, etaMin: 60
 // Telegram-бот авторизации (мок — заменить на реальный). Ссылка с одноразовым токеном сессии от бэкенда.
 export const TG_BOT = { username: 'mart8_auth_bot', link: (token: string) => 'https://t.me/mart8_auth_bot?start=' + token };
 // Поддержка в WhatsApp (мок номера)
+/** Приложение 8mart в сторах. Пусто — приложения ещё нет: значки с пометкой «Скоро», без ссылки. Вписать URL — станут ссылками. */
+export const APP_LINKS = { appStore: '', googlePlay: '' };
 export const SUPPORT_WA = '77001339071'; // WhatsApp поддержки — как в футере 8mart.kz
 
 // Бонусы: 1 бонус = 1 тг, не сгорают; списать можно до maxPart% суммы товаров.
