@@ -39,6 +39,9 @@ html,body,#map{margin:0;height:100%;width:100%;background:#EEEDF1;font-family:On
 .pp{width:36px;height:36px;border-radius:50%;background:#fff;border:2.5px solid #EE1D74;box-sizing:border-box;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(23,21,26,.18);cursor:pointer;transition:transform .15s ease;padding:0}
 .pp span{width:12px;height:12px;border-radius:50%;background:#EE1D74}
 .pp.sel{background:#EE1D74;transform:scale(1.15)}
+/* Закрыта сейчас по графику — серый маркер (выбранная остаётся розовой). */
+.pp.closed:not(.sel){border-color:#A9A6B0;box-shadow:0 2px 8px rgba(23,21,26,.12)}
+.pp.closed:not(.sel) span{background:#A9A6B0}
 .pp.sel span{background:#fff}
 .pp:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(238,29,116,.18),0 4px 12px rgba(23,21,26,.18)}
 /* Кнопки карты справа снизу: зум — одна капсула 44×88 (+ / разделитель / −), под ней «Моё местоположение» — круг 44.
@@ -92,7 +95,7 @@ body.compact .mapboxgl-ctrl-bottom-left,body.compact .mapboxgl-ctrl-bottom-right
   }
   if (!token || typeof mapboxgl === 'undefined' || !mapboxgl.supported || !mapboxgl.supported()) { fail(); return; }
 
-  var state = { mode: q.get('mode') || 'delivery', lat: +q.get('lat') || 51.1282, lng: +q.get('lng') || 71.4307, zoom: +q.get('zoom') || 15, points: [], selected: q.get('selected') || null };
+  var state = { mode: q.get('mode') || 'delivery', lat: +q.get('lat') || 51.1282, lng: +q.get('lng') || 71.4307, zoom: +q.get('zoom') || 15, points: [], closed: [], selected: q.get('selected') || null };
   mapboxgl.accessToken = token;
   var map;
   try {
@@ -117,8 +120,9 @@ body.compact .mapboxgl-ctrl-bottom-left,body.compact .mapboxgl-ctrl-bottom-right
     markers.forEach(function (m) { m.remove(); }); markers = [];
     if (!d) state.points.forEach(function (p) {
       var el = document.createElement('button'); el.type = 'button';
-      el.className = 'pp' + (p.id === state.selected ? ' sel' : ''); el.innerHTML = '<span></span>';
-      el.setAttribute('aria-label', p.name); el.setAttribute('aria-pressed', String(p.id === state.selected));
+      var shut = (state.closed || []).indexOf(p.id) >= 0;
+      el.className = 'pp' + (p.id === state.selected ? ' sel' : '') + (shut ? ' closed' : ''); el.innerHTML = '<span></span>';
+      el.setAttribute('aria-label', p.name + (shut ? ', сейчас закрыто' : '')); el.setAttribute('aria-pressed', String(p.id === state.selected));
       el.addEventListener('click', function (e) { e.stopPropagation(); state.selected = p.id; applyMode(); post({ type: 'pick', pointId: p.id }); });
       markers.push(new mapboxgl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(map));
     });
@@ -164,6 +168,7 @@ body.compact .mapboxgl-ctrl-bottom-left,body.compact .mapboxgl-ctrl-bottom-right
     var m = e.data || {}; if (m.src !== '8mart-parent') return;
     if (m.mode) state.mode = m.mode;
     if (m.points) state.points = m.points;
+    if (m.closed) state.closed = m.closed;
     if ('selected' in m) state.selected = m.selected;
     if (m.quiet) { quiet = true; setTimeout(function () { quiet = false; }, 4000); }
     if (m.lat && m.lng) map.flyTo({ center: [m.lng, m.lat], zoom: m.zoom || map.getZoom(), speed: 1.6 });

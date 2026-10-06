@@ -12,6 +12,8 @@ import { DELIVERY } from '@/lib/config';
 import { tg } from '@/lib/domain/format';
 import { GEO } from '@/lib/copy';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { useNow } from '@/lib/hooks/useNow';
+import { isClosedNow } from '@/lib/domain/hours';
 import { useModal } from '@/lib/hooks/useModal';
 import { useMounted } from '@/lib/hooks/useMounted';
 import type { City, Method, PickupPoint } from '@/lib/types';
@@ -146,6 +148,8 @@ function MethodDialog({
   };
   const closeSearch = () => { setSearchOpen(false); };
 
+  const now = useNow();
+  const closedIds = tab === 'pickup' ? points.filter(p => isClosedNow(p.hours, now)).map(p => p.id) : [];
   const isD = tab === 'delivery';
   const point = points.find(p => p.id === store) ?? null;
   const ok = isD ? street.trim().length > 2 && house : !!point;
@@ -165,7 +169,7 @@ function MethodDialog({
       <button type="button" className={s.close} aria-label="Закрыть" onClick={onClose}><Cross size={14} color="var(--ink-1)" /></button>
 
       {city ? (
-        <MethodMap ref={map} mode={tab} city={city} points={tab === 'pickup' ? points : NO_POINTS} selected={store} start={start} keepAddress={keepAddress}
+        <MethodMap ref={map} mode={tab} city={city} points={tab === 'pickup' ? points : NO_POINTS} selected={store} start={start} keepAddress={keepAddress} closed={closedIds}
           compact={mobile} staticMap={staticMap} geo={geo}
           onMoving={() => setLocating(true)} onAddress={onAddress} onPick={setStore} onGeo={setGeo}>
           <div className={s.mapTools}><CitySelect cities={cities} value={city} onChange={pickCity} /></div>

@@ -1,7 +1,8 @@
 'use client';
 // Самовывоз: список точек города, синхронный с маркерами карты (site/MartMethodModal.dc.html).
 // При известной геолокации — расстояние, сортировка «сначала ближние» и метка «Ближайшая»; иначе — по алфавиту.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useNow } from '@/lib/hooks/useNow';
 import { plural } from '@/lib/domain/format';
 import { dayShort, hhmm, openState, SOON_MIN } from '@/lib/domain/hours';
 import type { PickupPoint } from '@/lib/types';
@@ -36,12 +37,7 @@ function storeStatus(hours: string, now: Date): { text: string; tone: Tone } | n
 /** График рядом со статусом — короче: «Ежедневно 09:00–22:00» → «09:00–22:00». */
 const shortHours = (h: string) => h.replace(/^ежедневно\s+/i, '');
 
-/** Текущее время, обновляется раз в 30 с — статусы «через N мин» не устаревают, пока список открыт. */
-function useNow(stepMs = 30000) {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => { const t = setInterval(() => setNow(new Date()), stepMs); return () => clearInterval(t); }, [stepMs]);
-  return now;
-}
+
 
 export function PickupList({ points, selected, geo, cityName, loaded = true, onPick }: {
   points: PickupPoint[];
@@ -83,7 +79,7 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
           const status = storeStatus(p.hours, now);
           return (
             <button key={p.id} type="button" role="radio" aria-checked={sel} data-store={p.id}
-              className={`${s.store} ${sel ? s.sel : ''}`} onClick={() => onPick(p.id)}>
+              className={`${s.store} ${sel ? s.sel : ''} ${status ? s['tone_' + status.tone] : ''}`} onClick={() => onPick(p.id)}>
               <span className={s.storeIco} aria-hidden><span className={s.storePin} /></span>
               <span className={s.storeText}>
                 <span className={s.storeName}><span>{p.name}</span>{geo && i === 0 && <span className={s.nearest}>Ближайшая</span>}</span>

@@ -21,6 +21,8 @@ export interface MethodMapProps {
   selected: string | null;
   /** Стартовая точка и подпись (initial из стора) */
   start?: { lat: number; lng: number; label?: string } | null;
+  /** id точек, закрытых сейчас по графику — маркеры серые. */
+  closed?: string[];
   /** Адрес уже известен (сохранённый, даже без координат) — при загрузке не определять его по центру карты. */
   keepAddress?: boolean;
   compact?: boolean;
@@ -39,7 +41,7 @@ const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 type MapMsg = { src?: string; id?: string; type?: string; pointId?: string; lat?: number; lng?: number; street?: string; hasHouse?: boolean; failed?: boolean };
 
 export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function MethodMap(
-  { mode, city, points, selected, start, keepAddress, compact, staticMap, geo, onMoving, onAddress, onPick, onGeo, children }, ref,
+  { mode, city, points, selected, start, keepAddress, closed, compact, staticMap, geo, onMoving, onAddress, onPick, onGeo, children }, ref,
 ) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [failed, setFailed] = useState(!TOKEN);
@@ -97,6 +99,14 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live, ready, mode, city.id, points]);
 
+  // Статусы точек (открыто/закрыто) поменялись — перекрасить маркеры без перецентровки карты.
+  const closedKey = (closed ?? []).join(',');
+  useEffect(() => {
+    if (!live || !ready) return;
+    post({ closed: closed ?? [] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live, ready, closedKey]);
+
   // Выбрали точку в списке → карта летит к ней.
   useEffect(() => {
     if (!live || !ready || mode !== 'pickup') return;
@@ -124,15 +134,15 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
       {live
         ? <iframe ref={frame} src={src} title="Карта" className={s.frame} allow="geolocation" />
         : <MapFallback mode={mode} points={points} selected={selected} geo={geo} onPick={onPick}
-            note={staticMap ? undefined : GEO.mapUnavailable} />}
+            closed={closed} note={staticMap ? undefined : GEO.mapUnavailable} />}
       {children}
     </div>
   );
 });
 
 /** Заглушка карты: «кварталы», пин по центру / точки, спроецированные в рамку по их координатам. */
-function MapFallback({ mode, points, selected, geo, onPick, note }: {
-  mode: Method; points: PickupPoint[]; selected: string | null; geo?: LatLng | null; onPick?: (id: string) => void; note?: string;
+function MapFallback({ mode, points, selected, geo, onPick, note, closed }: {
+  mode: Method; points: PickupPoint[]; selected: string | null; geo?: LatLng | null; onPick?: (id: string) => void; note?: string; closed?: string[];
 }) {
   const all = [...points, ...(geo && mode === 'pickup' ? [geo] : [])];
   const lats = all.map(p => p.lat), lngs = all.map(p => p.lng);
@@ -152,7 +162,7 @@ function MapFallback({ mode, points, selected, geo, onPick, note }: {
       ) : (
         <>
           {points.map(p => (
-            <button key={p.id} type="button" className={`${s.pp} ${p.id === selected ? s.sel : ''}`} style={pos(p)}
+            <button key={p.id} type="button" className={`${s.pp} ${p.id === selected ? s.sel : ''} ${closed?.includes(p.id) ? s.ppClosed : ''}`} style={pos(p)}
               aria-label={p.name} aria-pressed={p.id === selected} onClick={() => onPick?.(p.id)} />
           ))}
           {geo && <span className={s.me} style={pos(geo)} aria-hidden />}

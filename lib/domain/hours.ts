@@ -72,6 +72,9 @@ export function openState(hours: string, now: Date): OpenState | null {
   return { kind: 'closed', openAt: ((next.from % WEEK) + WEEK) % WEEK, inMin: next.from - n, days: Math.floor(next.from / 1440) - dayNow };
 }
 
+/** Точка сейчас закрыта (по графику). Нераспознанный график — не закрыта: не прячем то, чего не знаем. */
+export const isClosedNow = (hours: string, now: Date) => openState(hours, now)?.kind === 'closed';
+
 /** «09:00» из минуты недели. */
 export const hhmm = (weekMin: number) => {
   const m = ((weekMin % 1440) + 1440) % 1440;

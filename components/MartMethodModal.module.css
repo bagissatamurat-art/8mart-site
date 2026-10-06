@@ -120,6 +120,8 @@
 .pp::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; } /* зона касания 48 */
 .pp.sel { background: var(--primary); transform: scale(1.15); z-index: 3; }
 .pp.sel::before { background: var(--surface-card); }
+.ppClosed:not(.sel) { border-color: var(--ink-3); }
+.ppClosed:not(.sel)::before { background: var(--ink-3); }
 .pp:focus-visible { box-shadow: var(--focus-ring), 0 4px 12px rgba(23, 21, 26, .18); }
 .me {
   position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; z-index: 2; border: 2px solid var(--surface-card);
@@ -207,6 +209,15 @@
 .store.sel .storeIco { background: var(--primary); }
 .storePin { width: 12px; height: 12px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2px solid var(--primary); margin-top: -2px; }
 .store.sel .storePin { border-color: #fff; }
+/* Иконка строки — цветом статуса: открыто зелёная, скоро — оранжевая, закрыто — серая (выбранная — розовая). */
+.tone_open .storeIco { background: var(--success-bg); }
+.tone_open .storePin { border-color: var(--success); }
+.tone_soon .storeIco { background: var(--warning-bg); }
+.tone_soon .storePin { border-color: var(--warning-ink); }
+.tone_closed .storeIco { background: var(--surface-subtle); }
+.tone_closed .storePin { border-color: var(--ink-3); }
+.store.sel .storeIco { background: var(--primary); }
+.store.sel .storePin { border-color: #fff; }
 .storeText { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .storeName { display: flex; align-items: center; gap: var(--s-2); font-size: var(--fs-15); font-weight: 600; min-width: 0; }
 .storeName > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -216,7 +227,7 @@
 .storeStatus { font-weight: 600; }
 .status_open { color: var(--success); }
 .status_soon { color: var(--warning-ink); }
-.status_closed { color: var(--ink-2); }
+.status_closed { color: var(--danger); }
 .storeHours { color: var(--ink-3); }
 .nearest {
   padding: 2px 6px; border-radius: var(--r-pill); background: var(--success-bg); color: var(--success); font-weight: 600;
