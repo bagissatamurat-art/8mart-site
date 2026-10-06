@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>8mart map</title>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>8mart map</title><link rel="icon" href="data:,">
 <!-- Карта MartMethodModal. Порт design_handoff_8mart_site/site/map.html.
      Встраивается iframe-ом; токен Mapbox (публичный pk.) приходит в query ?token= от родителя — в файле его нет.
      Адрес по пину — через наш сервер GET /api/geo/reverse (DaData / Mapbox), ключи DaData в браузер не попадают.
@@ -36,7 +36,9 @@ html,body,#map{margin:0;height:100%;width:100%;background:#EEEDF1;font-family:On
 .pp.sel span{background:#fff}
 .pp:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(238,29,116,.18),0 4px 12px rgba(23,21,26,.18)}
 #ctl{position:absolute;right:12px;bottom:28px;display:flex;flex-direction:column;gap:8px;z-index:600}
-body.compact #ctl{bottom:12px;gap:6px}
+body.compact #ctl{bottom:32px;gap:6px}
+/* Mobile: панель модалки заходит на карту на 20px — логотип и атрибуция Mapbox должны оставаться видны. */
+body.compact .mapboxgl-ctrl-bottom-left,body.compact .mapboxgl-ctrl-bottom-right{bottom:20px}
 body.compact #ctl button{width:40px;height:40px}
 body.compact #zin,body.compact #zout{display:none}
 #ctl button{position:relative;width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:0 4px 12px rgba(23,21,26,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background .15s ease}
@@ -108,14 +110,22 @@ body.compact #zin,body.compact #zout{display:none}
       markers.push(new mapboxgl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(map));
     });
   }
-  var t, req = 0, quiet = false;
-  map.on('movestart', function () { pin.classList.add('lift'); if (state.mode === 'delivery' && !quiet) busy(true); });
+  var t, req = 0, quiet = false, lastKey = '';
+  // Изменение размера карты (панель модалки стала выше/ниже) — не перемещение: адрес по пину заново не определяем.
+  var resizing = false;
+  map.on('resize', function () { resizing = true; });
+  map.on('movestart', function () { if (resizing) return; pin.classList.add('lift'); if (state.mode === 'delivery' && !quiet) busy(true); });
   map.on('moveend', function () {
     pin.classList.remove('lift');
+    if (resizing) { resizing = false; return; }
     if (state.mode !== 'delivery') return;
     var c = map.getCenter();
     // Выбор подсказки: пин ставится без повторного геокодирования.
-    if (quiet) { quiet = false; busy(false); return; }
+    // Та же точка, что в прошлый раз (повторный moveend без сдвига) — адрес уже известен, DaData не дёргаем.
+    var key = c.lat.toFixed(5) + ',' + c.lng.toFixed(5);
+    if (quiet) { quiet = false; lastKey = key; busy(false); return; }
+    if (key === lastKey) { busy(false); return; }
+    lastKey = key;
     clearTimeout(t); post({ type: 'moving' });
     t = setTimeout(function () { reverse(c); }, 400);
   });
@@ -127,10 +137,11 @@ body.compact #zin,body.compact #zout{display:none}
         if (my !== req) return;
         var street = (a && a.address) || '';
         busy(false);
-        post({ type: 'address', lat: c.lat, lng: c.lng, street: street, city: (a && a.city) || '' });
+        post({ type: 'address', lat: c.lat, lng: c.lng, street: street, city: (a && a.city) || '', hasHouse: !!(a && a.hasHouse) });
       })
       .catch(function () {
         if (my !== req) return;
+        lastKey = ''; // ошибка — при следующем движении на ту же точку попробуем снова
         busy(false);
         post({ type: 'address', lat: c.lat, lng: c.lng, street: '', city: '', failed: true });
       });
@@ -141,7 +152,7 @@ body.compact #zin,body.compact #zout{display:none}
     if (m.mode) state.mode = m.mode;
     if (m.points) state.points = m.points;
     if ('selected' in m) state.selected = m.selected;
-    if (m.quiet) { quiet = true; setTimeout(function () { quiet = false; }, 1500); }
+    if (m.quiet) { quiet = true; setTimeout(function () { quiet = false; }, 4000); }
     if (m.lat && m.lng) map.flyTo({ center: [m.lng, m.lat], zoom: m.zoom || map.getZoom(), speed: 1.6 });
     if (m.locate) loc.click();
     if (m.fit && state.points.length) fitPoints();
@@ -164,7 +175,11 @@ body.compact #zin,body.compact #zout{display:none}
   // ?quiet=<адрес> — стартовый адрес уже известен (initial), обратное геокодирование при загрузке не делаем.
   var initial = q.get('quiet') || '';
   
-  map.on('load', function () { post({ type: 'ready' }); if (state.mode === 'delivery' && !initial) { busy(true); post({ type: 'moving' }); reverse(map.getCenter()); } });
+  map.on('load', function () {
+    post({ type: 'ready' });
+    var c = map.getCenter(); lastKey = c.lat.toFixed(5) + ',' + c.lng.toFixed(5); // стартовая точка — её адрес определяем один раз (или он уже известен)
+    if (state.mode === 'delivery' && !initial) { busy(true); post({ type: 'moving' }); reverse(c); }
+  });
 })();
 </script>
 </body></html>

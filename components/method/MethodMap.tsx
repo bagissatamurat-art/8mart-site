@@ -23,12 +23,14 @@ export interface MethodMapProps {
   selected: string | null;
   /** Стартовая точка и подпись (initial из стора) */
   start?: { lat: number; lng: number; label?: string } | null;
+  /** Адрес уже известен (сохранённый, даже без координат) — при загрузке не определять его по центру карты. */
+  keepAddress?: boolean;
   compact?: boolean;
   /** Без iframe — только заглушка (витрина). */
   staticMap?: boolean;
   geo?: LatLng | null;
   onMoving?: () => void;
-  onAddress?: (a: { lat: number; lng: number; street: string; failed?: boolean }) => void;
+  onAddress?: (a: { lat: number; lng: number; street: string; hasHouse: boolean; failed?: boolean }) => void;
   onPick?: (id: string) => void;
   onGeo?: (g: LatLng) => void;
   children?: React.ReactNode;
@@ -36,10 +38,10 @@ export interface MethodMapProps {
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 
-type MapMsg = { src?: string; id?: string; type?: string; pointId?: string; lat?: number; lng?: number; street?: string; failed?: boolean };
+type MapMsg = { src?: string; id?: string; type?: string; pointId?: string; lat?: number; lng?: number; street?: string; hasHouse?: boolean; failed?: boolean };
 
 export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function MethodMap(
-  { mode, city, points, selected, start, compact, staticMap, geo, onMoving, onAddress, onPick, onGeo, children }, ref,
+  { mode, city, points, selected, start, keepAddress, compact, staticMap, geo, onMoving, onAddress, onPick, onGeo, children }, ref,
 ) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [failed, setFailed] = useState(!TOKEN);
@@ -51,7 +53,7 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
     const c = start ?? city;
     const q = new URLSearchParams({ token: TOKEN, mode, lat: String(c.lat), lng: String(c.lng), zoom: '15', id: mapId });
     if (compact) q.set('compact', '1');
-    if (start?.label) q.set('quiet', start.label);
+    if (start?.label || keepAddress) q.set('quiet', start?.label || '1');
     if (selected) q.set('selected', selected);
     return asset('/map.html') + '?' + q;
   });
@@ -73,7 +75,7 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
       if (m.type === 'ready') setReady(true);
       else if (m.type === 'error') setFailed(true);
       else if (m.type === 'moving') cb.current.onMoving?.();
-      else if (m.type === 'address' && m.lat != null && m.lng != null) cb.current.onAddress?.({ lat: m.lat, lng: m.lng, street: m.street || '', failed: m.failed });
+      else if (m.type === 'address' && m.lat != null && m.lng != null) cb.current.onAddress?.({ lat: m.lat, lng: m.lng, street: m.street || '', hasHouse: !!m.hasHouse, failed: m.failed });
       else if (m.type === 'pick' && m.pointId) cb.current.onPick?.(m.pointId);
       else if (m.type === 'geo' && m.lat != null && m.lng != null) cb.current.onGeo?.({ lat: m.lat, lng: m.lng });
     };
@@ -105,8 +107,18 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
+  // Перелёт, запрошенный до загрузки карты (координаты сохранённого адреса), — выполняем, как только карта готова.
+  const pendingFly = useRef<Record<string, unknown> | null>(null);
+  useEffect(() => {
+    if (live && ready && pendingFly.current) { post(pendingFly.current); pendingFly.current = null; }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live, ready]);
+
   useImperativeHandle(ref, () => ({
-    flyTo(lat, lng, zoom, quiet) { if (live && ready) post({ lat, lng, zoom, quiet }); },
+    flyTo(lat, lng, zoom, quiet) {
+      if (live && ready) post({ lat, lng, zoom, quiet });
+      else if (live) pendingFly.current = { lat, lng, zoom, quiet };
+    },
     locate() {
       if (live && ready) { post({ locate: true }); return; }
       navigator.geolocation?.getCurrentPosition(p => cb.current.onGeo?.({ lat: p.coords.latitude, lng: p.coords.longitude }));

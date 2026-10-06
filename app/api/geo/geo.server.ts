@@ -100,27 +100,28 @@ export async function suggestAddress(q: string, city: City): Promise<SuggestRow[
 }
 
 /** Адрес по точке → {address, city}. DaData geolocate; если пусто или ошибка — обратное геокодирование Mapbox. */
-export async function reverseGeocode(lat: number, lng: number): Promise<{ address: string; city: string }> {
+/** hasHouse — в адресе есть номер дома (иначе пин стоит на улице/в парке — доставить некуда). */
+export async function reverseGeocode(lat: number, lng: number): Promise<{ address: string; city: string; hasHouse: boolean }> {
   if (hasDadata()) {
     try {
       const s = (await dd('geolocate/address', { lat, lon: lng, count: 1, radius_meters: 100, language: 'ru' }))[0];
       const d = s?.data;
       if (d && (d.street || d.house)) {
-        return { address: [d.street_with_type || d.street, d.house].filter(Boolean).join(', '), city: d.city || d.settlement || '' };
+        return { address: [d.street_with_type || d.street, d.house].filter(Boolean).join(', '), city: d.city || d.settlement || '', hasHouse: !!d.house };
       }
     } catch { /* падаем на Mapbox */ }
   }
   if (!hasMapbox()) {
-    if (hasDadata()) return { address: '', city: '' };
+    if (hasDadata()) return { address: '', city: '', hasHouse: false };
     throw new UpstreamError('no providers');
   }
   const f = (await mb('reverse', { longitude: String(lng), latitude: String(lat), language: 'ru', types: 'address,street', limit: '1' }))[0];
-  if (!f) return { address: '', city: '' };
+  if (!f) return { address: '', city: '', hasHouse: false };
   const p = f.properties || {}, ctx = p.context || {};
   const address = p.feature_type === 'address'
     ? [ctx.street?.name, ctx.address?.address_number].filter(Boolean).join(', ') || p.name
     : p.name;
-  return { address: address || '', city: ctx.place?.name || '' };
+  return { address: address || '', city: ctx.place?.name || '', hasHouse: p.feature_type === 'address' && !!ctx.address?.address_number };
 }
 
 /** Ответ «сервис недоступен» — UI показывает «поставьте пин». */

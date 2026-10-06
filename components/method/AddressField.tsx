@@ -10,15 +10,17 @@ export interface AddressFieldProps {
   /** Пин двигают — адрес определяется. */
   busy?: boolean;
   error?: string;
+  /** id подсказки рядом с полем (нет номера дома) — для aria-describedby. */
+  hintId?: string;
   onOpen: () => void;
 }
 
-export const AddressField = forwardRef<HTMLButtonElement, AddressFieldProps>(function AddressField({ value, busy, error, onOpen }, ref) {
+export const AddressField = forwardRef<HTMLButtonElement, AddressFieldProps>(function AddressField({ value, busy, error, hintId, onOpen }, ref) {
   const filled = !!value.trim();
   return (
     <div className={s.field}>
       <button ref={ref} type="button" className={`${s.addr} ${filled ? s.addrFilled : ''} ${error ? s.addrError : ''}`}
-        aria-haspopup="dialog" aria-label={filled ? `Улица, дом: ${value}. Изменить` : 'Улица, дом — найти адрес'} onClick={onOpen}>
+        aria-haspopup="dialog" aria-label={filled ? `Улица, дом: ${value}. Изменить` : 'Улица, дом — найти адрес'} aria-describedby={hintId} onClick={onOpen}>
         <span className={s.addrText}>
           <span className={s.addrLabel}>Улица, дом<span className={s.addrReq}>*</span></span>
           {filled && <span className={s.addrValue}>{value}</span>}

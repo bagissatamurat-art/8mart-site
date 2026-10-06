@@ -182,7 +182,8 @@
 .addrMsg { font-size: var(--fs-caption); color: var(--danger); padding: 0 4px; }
 .field { display: flex; flex-direction: column; gap: 6px; flex: none; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
-.fee { font-size: var(--fs-13); color: var(--ink-2); line-height: 1.4; }
+.fee { font-size: var(--fs-13); color: var(--ink-2); line-height: 1.4; min-height: calc(2 * 1.4em); } /* 2 строки — подсказка «нет дома» встаёт на то же место */
+.feeWarn { color: var(--warning-ink); }
 
 
 /* Самовывоз */

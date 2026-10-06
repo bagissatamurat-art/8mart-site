@@ -7,9 +7,10 @@
 // Закрыть можно всегда: крестик, Esc, клик по фону. addressOnly — режим для кабинета (без свича, с полем «Название»).
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getCities, getPickupPoints } from '@/lib/api';
+import { geoSuggest, getCities, getPickupPoints } from '@/lib/api';
 import { DELIVERY } from '@/lib/config';
 import { tg } from '@/lib/domain/format';
+import { GEO } from '@/lib/copy';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useModal } from '@/lib/hooks/useModal';
 import { useMounted } from '@/lib/hooks/useMounted';
@@ -50,6 +51,8 @@ export interface MartMethodModalProps {
 }
 
 const NO_POINTS: PickupPoint[] = [];
+/** В сохранённом адресе есть номер дома: «улица Кенесары, 40». Подсказки и пин сообщают это точно (hasHouse). */
+const looksLikeHouse = (a: string) => /,\s*\S*\d/.test(a);
 
 export function MartMethodModal(props: MartMethodModalProps) {
   if (!props.open) return null;
@@ -63,7 +66,7 @@ function MethodDialog({
   const autoMobile = useIsMobile();
   const mounted = useMounted();
   const mobile = mode === 'mobile' || (mode === 'auto' && autoMobile);
-  const titleId = useId(), subId = useId();
+  const titleId = useId(), subId = useId(), noteId = useId();
   const card = useRef<HTMLDivElement>(null);
   const map = useRef<MethodMapHandle>(null);
 
@@ -71,6 +74,8 @@ function MethodDialog({
   const [tab, setTab] = useState<Method>(addressOnly ? 'delivery' : initial?.method ?? 'delivery');
   const [cityId, setCityId] = useState(initial?.city || 'astana');
   const [street, setStreet] = useState(initial?.method !== 'pickup' ? initial?.address ?? '' : '');
+  /** В адресе есть номер дома — без него доставить некуда. */
+  const [house, setHouse] = useState(() => looksLikeHouse(street));
   const [entrance, setEntrance] = useState(initial?.entrance ?? '');
   const [flat, setFlat] = useState(initial?.flat ?? '');
   const [addrTitle, setAddrTitle] = useState(initial?.title ?? '');
@@ -105,18 +110,35 @@ function MethodDialog({
   const addrBtn = useRef<HTMLButtonElement>(null);
 
   const pickCity = (id: string) => {
-    setCityId(id); setStore(null); setStreet(''); setPos(null);
+    setCityId(id); setStore(null); setStreet(''); setHouse(false); setPos(null);
   };
 
-  const onAddress = useCallback((a: { lat: number; lng: number; street: string }) => {
+  // Сохранённый адрес без координат (адресная книга кабинета): находим дом подсказками и ставим туда пин.
+  // Карта при этом не определяет адрес по центру города — иначе сохранённый адрес затёрся бы чужим.
+  const keepAddress = !!street && !pos;
+  const geocoded = useRef(false);
+  useEffect(() => {
+    if (geocoded.current || !keepAddress || !cid || staticMap) return;
+    geocoded.current = true;
+    geoSuggest(street.trim(), cid).then(list => {
+      const hit = list.find(x => x.hasHouse && x.lat != null && x.lng != null) ?? list.find(x => x.lat != null && x.lng != null);
+      if (!hit || hit.lat == null || hit.lng == null) return;
+      setPos({ lat: hit.lat, lng: hit.lng });
+      map.current?.flyTo(hit.lat, hit.lng, 17, street);
+    }, () => { /* подсказки недоступны — пин остаётся в центре, адрес сохранён */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cid]);
+
+  const onAddress = useCallback((a: { lat: number; lng: number; street: string; hasHouse: boolean }) => {
     setLocating(false);
     setPos({ lat: a.lat, lng: a.lng });
-    if (a.street) setStreet(a.street);
+    if (a.street) { setStreet(a.street); setHouse(a.hasHouse); }
   }, []);
 
   // Дом выбран в поиске: адрес — в поле, карта летит к дому без повторного определения адреса по пину.
   const onSuggest = (sg: Suggestion) => {
     setStreet(sg.title);
+    setHouse(true);
     setSearchOpen(false);
     if (sg.lat == null || sg.lng == null) return;
     setPos({ lat: sg.lat, lng: sg.lng });
@@ -126,7 +148,8 @@ function MethodDialog({
 
   const isD = tab === 'delivery';
   const point = points.find(p => p.id === store) ?? null;
-  const ok = isD ? street.trim().length > 2 : !!point;
+  const ok = isD ? street.trim().length > 2 && house : !!point;
+  const needHouse = isD && street.trim().length > 2 && !house && !locating;
 
   const confirm = () => {
     if (!ok || !city) return;
@@ -142,7 +165,7 @@ function MethodDialog({
       <button type="button" className={s.close} aria-label="Закрыть" onClick={onClose}><Cross size={14} color="var(--ink-1)" /></button>
 
       {city ? (
-        <MethodMap ref={map} mode={tab} city={city} points={tab === 'pickup' ? points : NO_POINTS} selected={store} start={start}
+        <MethodMap ref={map} mode={tab} city={city} points={tab === 'pickup' ? points : NO_POINTS} selected={store} start={start} keepAddress={keepAddress}
           compact={mobile} staticMap={staticMap} geo={geo}
           onMoving={() => setLocating(true)} onAddress={onAddress} onPick={setStore} onGeo={setGeo}>
           <div className={s.mapTools}><CitySelect cities={cities} value={city} onChange={pickCity} /></div>
@@ -167,14 +190,17 @@ function MethodDialog({
 
         {isD ? (
           <div className={s.scroll}>
-            <AddressField ref={addrBtn} value={street} busy={locating} onOpen={() => setSearchOpen(true)} />
+            <AddressField ref={addrBtn} value={street} busy={locating} hintId={needHouse ? noteId : undefined} onOpen={() => setSearchOpen(true)} />
             {addressOnly && (
               <div className={s.pair}>
                 <MartInput label="Подъезд" value={entrance} onChange={setEntrance} />
                 <MartInput label="Квартира, офис" value={flat} onChange={setFlat} />
               </div>
             )}
-            <div className={s.fee}>Доставка {tg(DELIVERY.fee)}, бесплатно от {tg(DELIVERY.freeFrom)} · {DELIVERY.etaMin}–{DELIVERY.etaMax} мин</div>
+            {/* Нет номера дома — подсказка на месте строки о доставке: высота панели не меняется, карта и пин не сдвигаются. */}
+            {needHouse
+              ? <div id={noteId} className={`${s.fee} ${s.feeWarn}`} role="status">{GEO.needHouse}</div>
+              : <div className={s.fee}>Доставка {tg(DELIVERY.fee)}, бесплатно от {tg(DELIVERY.freeFrom)} · {DELIVERY.etaMin}–{DELIVERY.etaMax} мин</div>}
           </div>
         ) : (
           <PickupList points={points} selected={store} geo={geo} cityName={city?.name ?? ''} loaded={pointsLoaded}
@@ -183,7 +209,7 @@ function MethodDialog({
 
         <div className={s.cta}>
           <MartButton label={ctaLabel ?? (isD ? 'Доставить сюда' : 'Заберу здесь')} size={56} full disabled={!ok}
-            reason={isD ? 'Укажите улицу и дом' : 'Выберите точку на карте или в списке'} onClick={confirm} />
+            reason={isD ? (street.trim() ? GEO.needHouse : 'Укажите улицу и дом') : 'Выберите точку на карте или в списке'} onClick={confirm} />
         </div>
       </div>
       <AddressSearch open={searchOpen} mobile={mobile} value={street} cities={cities} city={city}
