@@ -13,7 +13,7 @@ import { tg } from '@/lib/domain/format';
 import { GEO } from '@/lib/copy';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useNow } from '@/lib/hooks/useNow';
-import { isClosedNow } from '@/lib/domain/hours';
+import { isPointClosed } from '@/lib/domain/hours';
 import { useModal } from '@/lib/hooks/useModal';
 import { useMounted } from '@/lib/hooks/useMounted';
 import type { City, Method, PickupPoint } from '@/lib/types';
@@ -149,7 +149,7 @@ function MethodDialog({
   const closeSearch = () => { setSearchOpen(false); };
 
   const now = useNow();
-  const closedIds = tab === 'pickup' ? points.filter(p => isClosedNow(p.hours, now)).map(p => p.id) : [];
+  const closedIds = tab === 'pickup' ? points.filter(p => isPointClosed(p, now)).map(p => p.id) : [];
   const isD = tab === 'delivery';
   const point = points.find(p => p.id === store) ?? null;
   const ok = isD ? street.trim().length > 2 && house : !!point;

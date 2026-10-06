@@ -22,8 +22,14 @@ const distText = (d: number) => (d < 1 ? Math.round(d * 1000) + ' м' : d.toFixe
 
 type Tone = 'open' | 'soon' | 'closed';
 /** Понятный статус вместо голого графика: «Открыто до 22:00», «Закроется через 10 мин», «Закрыто до 09:00 завтра». */
-function storeStatus(hours: string, now: Date): { text: string; tone: Tone } | null {
-  const st = openState(hours, now);
+function storeStatus(p: PickupPoint, now: Date): { text: string; tone: Tone } | null {
+  // Графика нет (в API филиалов его нет) — живой статус: открыт / принимает заказы.
+  if (!p.hours) {
+    if (p.isOpen === undefined) return null;
+    if (!p.isOpen) return { text: STORE_STATUS.closedNow, tone: 'closed' };
+    return p.acceptingOrders === false ? { text: STORE_STATUS.notAccepting, tone: 'soon' } : { text: STORE_STATUS.openNow, tone: 'open' };
+  }
+  const st = openState(p.hours, now);
   if (!st) return null;
   if (st.kind === 'always') return { text: STORE_STATUS.always, tone: 'open' };
   if (st.kind === 'open') return st.inMin < SOON_MIN
@@ -76,17 +82,17 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
       <div ref={list} className={s.stores} role="radiogroup" aria-label="Точки самовывоза">
         {rows.map((p, i) => {
           const sel = p.id === selected;
-          const status = storeStatus(p.hours, now);
+          const status = storeStatus(p, now);
           return (
             <button key={p.id} type="button" role="radio" aria-checked={sel} data-store={p.id}
               className={`${s.store} ${sel ? s.sel : ''} ${status ? s['tone_' + status.tone] : ''}`} onClick={() => onPick(p.id)}>
               <span className={s.storeIco} aria-hidden><span className={s.storePin} /></span>
               <span className={s.storeText}>
-                <span className={s.storeName}><span>{p.name}</span>{geo && i === 0 && <span className={s.nearest}>Ближайшая</span>}</span>
+                <span className={s.storeName}><span>{p.name}</span>{p.brand && <span className={s.brand}>{p.brand}</span>}{geo && i === 0 && <span className={s.nearest}>Ближайшая</span>}</span>
                 <span className={s.storeMeta}>
                   {p.d != null && <span className={s.storeDist}>{distText(p.d)}</span>}
                   {status && <span className={`${s.storeStatus} ${s['status_' + status.tone]}`}>{status.text}</span>}
-                  <span className={s.storeHours}>{status ? shortHours(p.hours) : p.hours}</span>
+                  {p.hours && <span className={s.storeHours}>{status ? shortHours(p.hours) : p.hours}</span>}
                 </span>
               </span>
               <RadioMark on={sel} />

@@ -45,7 +45,20 @@ export interface CartProduct extends Product { variant?: string; color?: string 
 
 export interface Category { slug: string; name: string; img: string; sub: { slug: string; name: string }[] }
 export interface City { id: string; name: string; lat: number; lng: number }
-export interface PickupPoint { id: string; city: string; name: string; hours: string; lat: number; lng: number; acceptsCargo?: boolean }
+export interface PickupPoint {
+  id: string; city: string;
+  /** Адрес для списка: «пр. Абылай хана, 32». */
+  name: string;
+  /** График («Ежедневно 09:00–22:00») — если известен; статус «Открыто до …» считается по нему. */
+  hours?: string;
+  lat: number; lng: number; acceptsCargo?: boolean;
+  /** Живой статус филиала из API: открыт сейчас / принимает заказы. */
+  isOpen?: boolean; acceptingOrders?: boolean;
+  /** Вывеска, если не 8MART (например, ROMANTIC). */
+  brand?: string;
+  /** Kaspi Pay подключён автоматически (иначе — счёт в Kaspi). */
+  kaspiIntegrated?: boolean;
+}
 
 export interface StoryCta { label: string; href?: string; copy?: string }
 export interface StorySlide { img: string; title: string; text: string; cta?: StoryCta }

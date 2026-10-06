@@ -140,7 +140,21 @@ export const getUpsell = (cartKeys: string[]): Promise<Product[]> =>
 /** GET /cities */
 export const getCities = (): Promise<City[]> => reply(M.CITIES, 0);
 /** GET /pickup-points?city */
-export const getPickupPoints = (city: string): Promise<PickupPoint[]> => reply(M.PICKUP_POINTS.filter(p => p.city === city), 0);
+/** GET /pickup-points?city — настоящие филиалы 8mart.kz. В браузере — живой статус через /api/branches (кэш 60 с),
+ *  на сервере и при сбое — снимок (lib/branches.snapshot.json). */
+let live: { at: number; points: Promise<PickupPoint[]> } | null = null;
+export function getPickupPoints(city: string): Promise<PickupPoint[]> {
+  const inCity = (ps: PickupPoint[]) => ps.filter(p => p.city === city);
+  if (typeof window === 'undefined') return reply(inCity(M.PICKUP_POINTS), 0);
+  if (!live || Date.now() - live.at > 60_000) {
+    live = {
+      at: Date.now(),
+      points: fetch('/api/branches').then(r => (r.ok ? r.json() : Promise.reject(r.status))).then((d: { points: PickupPoint[] }) => d.points)
+        .catch(() => { live = null; return M.PICKUP_POINTS; }),
+    };
+  }
+  return live.points.then(inCity);
+}
 
 /** lat/lng могут отсутствовать (у DaData координаты есть не у всех подсказок). */
 export interface GeoSuggestion { title: string; subtitle: string; lat: number | null; lng: number | null; hasHouse: boolean }

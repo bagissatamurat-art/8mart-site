@@ -75,6 +75,10 @@ export function openState(hours: string, now: Date): OpenState | null {
 /** Точка сейчас закрыта (по графику). Нераспознанный график — не закрыта: не прячем то, чего не знаем. */
 export const isClosedNow = (hours: string, now: Date) => openState(hours, now)?.kind === 'closed';
 
+/** Точка закрыта: по графику, если он есть, иначе по живому статусу филиала из API (isOpen). */
+export const isPointClosed = (p: { hours?: string; isOpen?: boolean }, now: Date) =>
+  p.hours ? isClosedNow(p.hours, now) : p.isOpen === false;
+
 /** «09:00» из минуты недели. */
 export const hhmm = (weekMin: number) => {
   const m = ((weekMin % 1440) + 1440) % 1440;

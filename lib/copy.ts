@@ -73,6 +73,10 @@ export const STORE_STATUS = {
   closedUntil: (time: string) => `Закрыто до ${time}`,
   closedUntilTomorrow: (time: string) => `Закрыто до ${time} завтра`,
   closedUntilDay: (day: string, time: string) => `Закрыто до ${day} ${time}`,
+  /** Графика нет — живой статус филиала из API. */
+  openNow: 'Открыто · принимаем заказы',
+  notAccepting: 'Открыто · заказы не принимаем',
+  closedNow: 'Сейчас закрыто',
 };
 
 /** Корзина (02). */

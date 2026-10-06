@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MartButton } from '@/components/MartButton';
 import { MartMethodModal, type MethodValue, type Suggestion } from '@/components/MartMethodModal';
 import { AddressSearch } from '@/components/method/AddressSearch';
-import { CITIES } from '@/lib/mock';
+import { CITIES, PICKUP_POINTS } from '@/lib/mock';
 import { KitItem, KitPanel, KitSection } from '../Kit';
 
 // Демо-подсказки (форма ответа /api/geo/suggest)
@@ -64,7 +64,7 @@ export default function MethodModalSection() {
         <KitItem label="Самовывоз · выбрана точка, геолокация известна">
           <Frame w={962}>
             <MartMethodModal open inline staticMap mode="desktop" userGeo={GEO} onClose={noop} onConfirm={noop}
-              initial={{ method: 'pickup', city: 'astana', pickupPointId: 'ast-5' }} />
+              initial={{ method: 'pickup', city: 'astana', pickupPointId: PICKUP_POINTS[1].id }} />
           </Frame>
         </KitItem>
       </KitPanel>
@@ -91,7 +91,7 @@ export default function MethodModalSection() {
         <KitItem label="Mobile 390 · самовывоз">
           <Frame w={390} h={844} page>
             <MartMethodModal open inline staticMap mode="mobile" onClose={noop} onConfirm={noop}
-              initial={{ method: 'pickup', city: 'astana', pickupPointId: 'ast-1' }} />
+              initial={{ method: 'pickup', city: 'astana', pickupPointId: PICKUP_POINTS[1].id }} />
           </Frame>
         </KitItem>
       </KitPanel>

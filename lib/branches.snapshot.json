@@ -1,0 +1,97 @@
+{
+  "source": "https://dukenfy-api.8mart.kz/api/v1/public/branches",
+  "date": "2026-10-06",
+  "branches": [
+    {
+      "id": "0ccf7ed8-913a-419a-853f-059a6277e075",
+      "name": "8MART - Абилкайыр-хана 65 ",
+      "city": "Актобе",
+      "address": "проспект Абилкайыр Хана 65",
+      "latitude": 50.29212392252808,
+      "longitude": 57.161272466182716,
+      "isOpen": true,
+      "isAcceptingOrders": true,
+      "estimatedDeliveryTime": 45,
+      "statusMessage": "Принимаем заказы",
+      "kaspiIntegrated": false
+    },
+    {
+      "id": "d45c8fea-de8a-497c-866e-e28e71e4b4a8",
+      "name": "8MART - Абылай хана 32",
+      "city": "Астана",
+      "address": "проспект Абылай Хана 32",
+      "latitude": 51.15423903492818,
+      "longitude": 71.48532271385194,
+      "isOpen": true,
+      "isAcceptingOrders": true,
+      "estimatedDeliveryTime": 45,
+      "statusMessage": "Принимаем заказы",
+      "kaspiIntegrated": false
+    },
+    {
+      "id": "ae9a4bb2-32da-4018-a5e1-f67c0bf3ed88",
+      "name": "8MART - Сыганак 13",
+      "city": "Астана",
+      "address": "улица Сыганак 13",
+      "latitude": 51.13032326223226,
+      "longitude": 71.38206303119661,
+      "isOpen": true,
+      "isAcceptingOrders": true,
+      "estimatedDeliveryTime": 45,
+      "statusMessage": "Принимаем заказы",
+      "kaspiIntegrated": false
+    },
+    {
+      "id": "730d98ec-f28f-4922-a1a9-17ebf1a73313",
+      "name": "ROMANTIC - Мангилик Ел 45",
+      "city": "Астана",
+      "address": "проспект Мангилик Ел 45кG",
+      "latitude": 51.09926745779235,
+      "longitude": 71.42763644456865,
+      "isOpen": true,
+      "isAcceptingOrders": true,
+      "estimatedDeliveryTime": 30,
+      "statusMessage": "Принимаем заказы",
+      "kaspiIntegrated": false
+    },
+    {
+      "id": "731658e3-604d-49f1-93e3-0a2d0e4c24c0",
+      "name": "8MART - Сабатаева 130",
+      "city": "Кокшетау Г.А.",
+      "address": "улица Сабатаева 130",
+      "latitude": 53.28001769623048,
+      "longitude": 69.38920050859453,
+      "isOpen": true,
+      "isAcceptingOrders": true,
+      "estimatedDeliveryTime": 45,
+      "statusMessage": "Принимаем заказы",
+      "kaspiIntegrated": false
+    },
+    {
+      "id": "e64539d8-2b4e-4398-8a0f-25846636beb5",
+      "name": "8MART - Тауелсыздык 37",
+      "city": "Костанай",
+      "address": "улица Тауелсиздик 37",
+      "latitude": 53.2120757045302,
+      "longitude": 63.64054262638093,
+      "isOpen": true,
+      "isAcceptingOrders": true,
+      "estimatedDeliveryTime": 45,
+      "statusMessage": "Принимаем заказы",
+      "kaspiIntegrated": false
+    },
+    {
+      "id": "12e15cdf-1678-44ad-a297-6881617a697f",
+      "name": "8MART - Строитель 1/3",
+      "city": "Уральск",
+      "address": "проспект Абулхаир хана 1/3",
+      "latitude": 51.24495126406298,
+      "longitude": 51.42003625631333,
+      "isOpen": true,
+      "isAcceptingOrders": true,
+      "estimatedDeliveryTime": 45,
+      "statusMessage": "Принимаем заказы",
+      "kaspiIntegrated": false
+    }
+  ]
+}

@@ -8,35 +8,15 @@ import { BASE_PATH as A } from './basePath';
 import { bonusFor, cartItem } from './domain/catalog';
 import { orderTotals } from './domain/order';
 import { FLOWERS } from './flowers';
+import { SNAPSHOT_CITIES, SNAPSHOT_POINTS } from './branches';
 import type {
   Address, Banner, Bonus, Card, Category, City, Order, PickupPoint, Product, Story, User, UserPromo,
 } from './types';
 
-export const CITIES: City[] = [
-  { id: 'astana', name: 'Астана', lat: 51.1282, lng: 71.4307 },
-  { id: 'almaty', name: 'Алматы', lat: 43.2389, lng: 76.8897 },
-  { id: 'shymkent', name: 'Шымкент', lat: 42.3417, lng: 69.5901 },
-  { id: 'karaganda', name: 'Караганда', lat: 49.8047, lng: 73.1094 },
-  { id: 'aktobe', name: 'Актобе', lat: 50.2839, lng: 57.1670 },
-  { id: 'pavlodar', name: 'Павлодар', lat: 52.2873, lng: 76.9674 },
-  { id: 'oskemen', name: 'Усть-Каменогорск', lat: 49.9483, lng: 82.6275 },
-  { id: 'atyrau', name: 'Атырау', lat: 47.0945, lng: 51.9238 },
-];
-
-// Точки самовывоза — демо-адреса, заменить на данные из API. acceptsCargo — точка выдаёт тяжёлое (в моке только склад).
-export const PICKUP_POINTS: PickupPoint[] = [
-  { id: 'ast-1', city: 'astana', name: 'ул. Кабанбай батыра, 11', hours: 'Ежедневно 08:00–23:00', lat: 51.1166, lng: 71.4398 },
-  { id: 'ast-2', city: 'astana', name: 'пр. Мангилик Ел, 55', hours: 'Ежедневно 09:00–22:00', lat: 51.0905, lng: 71.4180 },
-  { id: 'ast-3', city: 'astana', name: 'ул. Бейбитшилик, 33', hours: 'Пн–Сб 09:00–21:00', lat: 51.1694, lng: 71.4249 },
-  { id: 'ast-4', city: 'astana', name: 'пр. Туран, 37', hours: 'Ежедневно 09:00–22:00', lat: 51.1105, lng: 71.4090 },
-  { id: 'ast-5', city: 'astana', name: 'ул. Сарайшык, 5', hours: 'Ежедневно 08:00–22:00', lat: 51.1350, lng: 71.4310 },
-  { id: 'ast-6', city: 'astana', name: 'пр. Республики, 68', hours: 'Пн–Сб 09:00–20:00', lat: 51.1800, lng: 71.4160 },
-  { id: 'ast-7', city: 'astana', name: 'ул. Кенесары, 40', hours: 'Ежедневно 09:00–22:00', lat: 51.1610, lng: 71.4460 },
-  { id: 'ast-8', city: 'astana', name: 'ш. Коргалжын, 3', hours: 'Ежедневно 09:00–21:00', lat: 51.1140, lng: 71.3720, acceptsCargo: true },
-  { id: 'ast-9', city: 'astana', name: 'ул. Улы Дала, 27', hours: 'Ежедневно 10:00–22:00', lat: 51.0980, lng: 71.4420 },
-  { id: 'alm-1', city: 'almaty', name: 'пр. Абая, 150', hours: 'Ежедневно 08:00–23:00', lat: 43.2380, lng: 76.9010 },
-  { id: 'alm-2', city: 'almaty', name: 'ул. Розыбакиева, 247', hours: 'Ежедневно 09:00–22:00', lat: 43.2120, lng: 76.8920 },
-];
+// Города и точки самовывоза — настоящие филиалы 8mart.kz (lib/branches.ts; снимок — scripts/import-branches.mjs).
+// В браузере getPickupPoints берёт живые статусы через /api/branches; снимок — запасной вариант.
+export const CITIES: City[] = SNAPSHOT_CITIES;
+export const PICKUP_POINTS: PickupPoint[] = SNAPSHOT_POINTS;
 
 export const CATEGORIES: Category[] = [
   { slug: 'tsvety', name: 'Цветы', img: `${A}/assets/cat-flowers.png`, sub: [ { slug: 'gortenzii', name: 'Гортензии' }, { slug: 'rozy', name: 'Розы' }, { slug: 'hrizantemy', name: 'Хризантемы' } ] },
