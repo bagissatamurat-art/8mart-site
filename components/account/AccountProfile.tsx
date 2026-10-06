@@ -57,7 +57,7 @@ export function AccountProfile({ user, mobile, onChangePhone, onSaveName, onDele
   return (
     <>
       <div className={`${s.card} ${s.form}`}>
-        <MartInput label="Имя" required value={name} autoComplete="given-name" onChange={v => { setName(v); setSaved(false); }}
+        <MartInput label="Имя" value={name} autoComplete="given-name" onChange={v => { setName(v); setSaved(false); }}
           error={dirty && !name.trim() ? true : undefined} />
         <div className={s.phoneRow}>
           <span className={s.col}>

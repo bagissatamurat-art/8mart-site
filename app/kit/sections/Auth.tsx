@@ -22,15 +22,12 @@ const STATES: [AuthStep, AuthViewState, string][] = [
   ['tg', 'idle', 'Telegram · desktop, QR'],
   ['tg', 'waiting', 'Telegram · ждём бота'],
   ['tg', 'ok', 'Telegram · номер подтверждён'],
-  ['name', 'empty', 'Имя · пусто'],
-  ['name', 'filled', 'Имя · заполнено'],
 ];
 
 const MOBILE: [AuthStep, AuthViewState, string][] = [
   ['phone', 'filled', 'mobile · телефон'],
   ['code', 'partial', 'mobile · код'],
   ['tg', 'waiting', 'mobile · Telegram (без QR)'],
-  ['name', 'empty', 'mobile · имя'],
 ];
 
 const CHANGE: [AuthStep, AuthViewState, string][] = [

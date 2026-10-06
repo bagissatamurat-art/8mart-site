@@ -61,8 +61,9 @@ export function AccountScreen({ categories, section }: AccountScreenProps) {
   if (!authUser) return <LoginScreen categories={categories} />;
 
   // Профиль: имя и телефон — из входа (они свежее мока GET /me), остальное — из getMe()
-  const user: User | undefined = d.me && { ...d.me, name: authUser.name || d.me.name, phone: authUser.phone || d.me.phone };
-  const navUser = { name: authUser.name || d.me?.name || '', phone: authUser.phone };
+  // Имя — из входа (стор авторизации), без подстановки из профиля: новый пользователь имени не указывал — «Профиль», пока не укажет сам.
+  const user: User | undefined = d.me && { ...d.me, name: authUser.name, phone: authUser.phone || d.me.phone };
+  const navUser = { name: authUser.name, phone: authUser.phone };
 
   // ── Действия ──
   const onRepeat = async (o: Order) => {

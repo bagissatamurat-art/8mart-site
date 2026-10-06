@@ -52,7 +52,7 @@ export function SiteHeader({ categories, mobile = true, query }: { categories: C
       <div className={s.desktopOnly}>
         <div className={s.headerWrap}>
           <MartHeader mode="desktop" method={method} address={label} methodLoading={!hydrated} categories={categories} query={q}
-            userName={user ? user.name || 'Профиль' : ''} userPhone={user?.phone} onLogout={() => { logout(); router.push('/'); }}
+            userName={user?.name ?? ''} signedIn={!!user} userPhone={user?.phone} onLogout={() => { logout(); router.push('/'); }}
             orders={user ? menuData.orders : []} accountBadges={{ ...menuData.badges, favorites: favorites.length }}
             loginHref={`/login?next=${encodeURIComponent(pathname || '/')}`}
             onMethod={openMethod} onQuery={setQ} onSubmit={submit}

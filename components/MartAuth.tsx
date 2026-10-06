@@ -2,7 +2,7 @@
 // MartAuth — COMPONENTS.md → MartAuth, DESIGN_RULES «Авторизация»; референс site/MartAuth.dc.html.
 // Встраиваемый блок без своей оболочки: в оформлении (03) лежит в белой карточке, в кабинете (06) —
 // в модалке / sheet (см. components/auth/MartAuthDialog.tsx).
-// Шаги: телефон → код из WhatsApp (4 ячейки, проверка на 4-й цифре) → «Как вас зовут?» (новый пользователь).
+// Шаги: телефон → код из WhatsApp (4 ячейки, проверка на 4-й цифре) → готово. Имя не спрашиваем: его можно указать в профиле.
 // Альтернатива — Telegram-бот: desktop — QR + кнопка, mobile — только кнопка; ждём подтверждения от бэкенда.
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { MartButton } from './MartButton';
@@ -18,10 +18,10 @@ import { Spinner } from './ui/Spinner';
 
 export type AuthMode = 'desktop' | 'mobile';
 export type AuthPurpose = 'login' | 'changePhone';
-export type AuthStep = 'phone' | 'code' | 'tg' | 'name';
+export type AuthStep = 'phone' | 'code' | 'tg';
 /** Принудительные состояния для витрины (по шагам):
  *  phone — empty | filled | error | loading; code — empty | partial | verifying | error | expired | success;
- *  tg — idle | waiting | ok; name — empty | filled. */
+ *  tg — idle | waiting | ok. */
 export type AuthViewState =
   | 'empty' | 'filled' | 'error' | 'loading'
   | 'partial' | 'verifying' | 'success' | 'expired'
@@ -80,7 +80,6 @@ function seed(step: AuthStep, st: AuthViewState | undefined, phoneProp: string |
     codeErr: step === 'code' && st === 'error' ? FORM_ERRORS.code : step === 'code' && st === 'expired' ? FORM_ERRORS.codeExpired : '',
     timer: step === 'code' && st === 'expired' ? 0 : RESEND_SEC,
     tg: (step === 'tg' && (st === 'waiting' || st === 'ok') ? st : 'idle') as TgState,
-    name: step === 'name' && st === 'filled' ? 'Айгерим' : '',
   };
 }
 
@@ -107,8 +106,6 @@ export function MartAuth({
   const [tg, setTg] = useState<TgState>(init.tg);
   const [tgToken, setTgToken] = useState<string | null>(frozen ? 'kit_demo' : null);
   const [qr, setQr] = useState<string | null>(null);
-  const [name, setName] = useState(init.name);
-  const [token, setToken] = useState<string | undefined>();
 
   const codeRef = useRef<HTMLInputElement>(null);
   const seq = useRef(0); // отменяет устаревшие ответы API после «Изменить» / повторной отправки
@@ -136,12 +133,10 @@ export function MartAuth({
     return () => clearTimeout(id);
   }, [frozen, step, timer]);
 
-  /** Подтвердили номер: новый пользователь → «Как вас зовут?», иначе — готово. */
+  /** Подтвердили номер — готово. Нового пользователя об имени не спрашиваем (пустое имя; укажет в профиле, если захочет). */
   const complete = useCallback((ph: string, knownName: string | null | undefined, accessToken?: string) => {
     if (purpose === 'changePhone') { onDoneRef.current?.({ phone: ph, name: knownName ?? null }); return; }
-    if (knownName) { onDoneRef.current?.({ phone: ph, name: knownName, accessToken }); return; }
-    setToken(accessToken);
-    setPhase('idle'); setTg('idle'); setStep('name');
+    onDoneRef.current?.({ phone: ph, name: knownName ?? null, accessToken });
   }, [purpose]);
 
   // ── Шаг «Телефон»
@@ -251,8 +246,6 @@ export function MartAuth({
   }, [step, desktop, tgLink]);
 
   // ── Шаг «Имя»
-  const nameOk = name.trim().length >= 2;
-  const finish = () => { if (nameOk) onDoneRef.current?.({ phone, name: name.trim(), accessToken: token }); };
 
   const busy = phase !== 'idle';
   const codeStatus: CodeStatus = phase === 'ok' ? 'ok' : codeErr && !busy ? 'error' : 'idle';
@@ -349,13 +342,6 @@ export function MartAuth({
         <button type="button" className={`${s.linkBtn} ${s.linkMuted}`} onClick={back}>Войти по коду в WhatsApp</button>
       </>}
 
-      {step === 'name' && (
-        <form className={s.contents} noValidate onSubmit={e => { e.preventDefault(); finish(); }}>
-          {head('Как вас зовут?', 'Чтобы курьер знал, к кому обращаться')}
-          <MartInput label="Имя" required value={name} onChange={setName} autoComplete="given-name" />
-          <MartButton type="submit" label="Продолжить" size={56} full disabled={!nameOk} reason={FORM_ERRORS.nameRequired} />
-        </form>
-      )}
     </div>
   );
 }

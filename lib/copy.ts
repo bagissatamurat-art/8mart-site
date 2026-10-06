@@ -138,6 +138,8 @@ export const SEARCH = {
 
 /** Вход и личный кабинет (06 Личный кабинет.dc.html, MartAccount.dc.html). */
 export const ACCOUNT_PAGE = {
+  /** Имя не указано (при входе не спрашиваем) — подпись в меню и кабинете вместо имени. */
+  nameFallback: 'Профиль',
   /** Действие в тосте «Повторить» — из 06 */
   toastToCart: 'В корзину',
   /** Модалка адреса — из MartAccount.dc.html */

@@ -7,6 +7,8 @@ import type { Bonus, Order, User, UserPromo } from '@/lib/types';
 import { Chevron } from '../ui/Cross';
 import { ACCOUNT_SECTIONS, defaultOrderHref, isActiveOrder, navBadges, orderSteps, statusLabel, type AccountSection } from './sections';
 import s from './MartAccountNav.module.css';
+import { ACCOUNT_PAGE } from '@/lib/copy';
+import { PersonIcon } from '../ui/PersonIcon';
 
 export interface MartAccountNavProps {
   mode?: 'desktop' | 'mobile';
@@ -28,7 +30,9 @@ export interface MartAccountNavProps {
 export function MartAccountNav({ mode = 'desktop', section, user, orders, promos, bonus, hrefFor, onSelect, orderHref = defaultOrderHref, onLogout, className }: MartAccountNavProps) {
   const m = mode === 'mobile';
   const badges = navBadges({ orders, promos, bonus });
-  const initial = (user.name || '?').trim().charAt(0).toUpperCase() || '?';
+  const name = user.name.trim();
+  // Имя не указано (при входе не спрашиваем) — значок человека и «Профиль».
+  const initial = name ? name.charAt(0).toUpperCase() : <PersonIcon size={m ? 24 : 20} />;
 
   const rows = ACCOUNT_SECTIONS.map(([id, label]) => {
     const cur = !m && id === section;
@@ -58,7 +62,7 @@ export function MartAccountNav({ mode = 'desktop', section, user, orders, promos
       <nav className={`${s.aside} ${className || ''}`} aria-label="Разделы кабинета">
         <div className={s.profile}>
           <span className={s.avatar} aria-hidden>{initial}</span>
-          <span className={s.who}><b className={s.name}>{user.name}</b><span className={s.phone}>{user.phone}</span></span>
+          <span className={s.who}><b className={s.name}>{name || ACCOUNT_PAGE.nameFallback}</b><span className={s.phone}>{user.phone}</span></span>
         </div>
         <ul className={s.list}>{rows}</ul>
         <div className={s.divider} />
@@ -72,7 +76,7 @@ export function MartAccountNav({ mode = 'desktop', section, user, orders, promos
     <div className={`${s.mRoot} ${className || ''}`}>
       <div className={s.mHead}>
         <span className={`${s.avatar} ${s.avatarM}`} aria-hidden>{initial}</span>
-        <span className={s.who}><b className={s.nameM}>{user.name}</b><span className={s.phoneM}>{user.phone}</span></span>
+        <span className={s.who}><b className={s.nameM}>{name || ACCOUNT_PAGE.nameFallback}</b><span className={s.phoneM}>{user.phone}</span></span>
       </div>
       <div className={s.mBody}>
         {active && (

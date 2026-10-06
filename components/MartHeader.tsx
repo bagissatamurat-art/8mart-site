@@ -17,6 +17,8 @@ import { asset } from '@/lib/basePath';
 import { Img } from '@/components/ui/Img';
 import { Skeleton } from './ui/Spinner';
 import { useModal } from '@/lib/hooks/useModal';
+import { PersonIcon } from './ui/PersonIcon';
+import { ACCOUNT_PAGE } from '@/lib/copy';
 
 /** Разделы кабинета: /account/<section> (ids — как в маршрутах /account/[section]). */
 export type AccountSection = 'orders' | 'favorites' | 'addresses' | 'payments' | 'promos' | 'bonus' | 'profile';
@@ -35,6 +37,8 @@ export interface MartHeaderProps {
   methodLoading?: boolean;
   /** Пусто — гость («Войти»). */
   userName?: string;
+  /** Вошёл (имя может быть пустым — при входе его не спрашиваем). По умолчанию — есть имя. */
+  signedIn?: boolean;
   userPhone?: string;
   query?: string;
   /** Принудительный фокус поиска (витрина); иначе — реальный фокус поля. */
@@ -65,7 +69,7 @@ export interface MartHeaderProps {
 
 export function MartHeader(props: MartHeaderProps) {
   const {
-    mode = 'desktop', method = null, address = '', methodLoading, userName = '', query = '', searchFocused, searchPanel, menuOpen = false, contained,
+    mode = 'desktop', method = null, address = '', methodLoading, userName = '', signedIn, query = '', searchFocused, searchPanel, menuOpen = false, contained,
     homeHref = '/', onMethod, onQuery, onSearchFocus, onSearchClose, onSubmit, onMenuOpenChange,
   } = props;
   const router = useRouter();
@@ -106,7 +110,7 @@ export function MartHeader(props: MartHeaderProps) {
 
   const open = !!searchPanel && (searchFocused ?? focus);
   const closeSearch = () => { setFocus(false); onSearchClose?.(); };
-  const user = !!userName;
+  const user = signedIn ?? !!userName;
 
   return (
     <>
@@ -135,9 +139,9 @@ export function MartHeader(props: MartHeaderProps) {
         </div>
 
         <button ref={menuBtn} type="button" className={`${s.menuBtn} ${user ? s.menuBtnUser : ''}`} onClick={() => openMenu(true)}
-          aria-haspopup="dialog" aria-expanded={menu} aria-label={user ? `Меню, ${userName}` : 'Меню, войти'}>
+          aria-haspopup="dialog" aria-expanded={menu} aria-label={user ? `Меню, ${userName || ACCOUNT_PAGE.nameFallback}` : 'Меню, войти'}>
           <span className={s.burger} aria-hidden><span /><span /><span /></span>
-          {user ? <span className={s.avatar} aria-hidden>{userName[0]}</span> : <span className={s.login}>Войти</span>}
+          {user ? <span className={s.avatar} aria-hidden>{userName ? userName[0] : <PersonIcon size={16} />}</span> : <span className={s.login}>Войти</span>}
         </button>
       </header>
       {menu && <MartSideMenu {...props} contained={contained} onClose={() => openMenu(false)} />}
@@ -148,17 +152,17 @@ export function MartHeader(props: MartHeaderProps) {
 // ─────────────────────────── Боковое меню ───────────────────────────
 
 export interface MartSideMenuProps extends Pick<MartHeaderProps,
-  'userName' | 'userPhone' | 'orders' | 'accountBadges' | 'categories' | 'loginHref' | 'contained' | 'onLogout'> {
+  'userName' | 'signedIn' | 'userPhone' | 'orders' | 'accountBadges' | 'categories' | 'loginHref' | 'contained' | 'onLogout'> {
   onClose: () => void;
   /** Фокус на крестик при открытии (по умолчанию да; статичные образцы витрины — нет). */
   autoFocus?: boolean;
 }
 
 /** Панель справа 420: гость — плашка «Войдите»; пользователь — профиль, активный заказ, разделы кабинета, «Выйти». */
-export function MartSideMenu({ userName = '', userPhone = '', orders = [], accountBadges = {}, categories = [], loginHref = '/account', contained, onLogout, onClose, autoFocus = true }: MartSideMenuProps) {
+export function MartSideMenu({ userName = '', signedIn, userPhone = '', orders = [], accountBadges = {}, categories = [], loginHref = '/account', contained, onLogout, onClose, autoFocus = true }: MartSideMenuProps) {
   const closeBtn = useRef<HTMLButtonElement>(null);
   const asideRef = useRef<HTMLElement>(null);
-  const user = !!userName;
+  const user = signedIn ?? !!userName;
   const active = orders.find(o => ACTIVE_STATUSES.includes(o.status));
 
   // Esc закрывает; фокус — на крестик; на весь экран — блокируем прокрутку страницы.
@@ -172,8 +176,8 @@ export function MartSideMenu({ userName = '', userPhone = '', orders = [], accou
         <div className={s.asideHead}>
           {user
             ? <Link href="/account" className={s.profile} onClick={onClose}>
-                <span className={s.avatar48} aria-hidden>{userName[0]}</span>
-                <span className={s.profileText}><b className={s.userName}>{userName}</b><span className={s.userPhone}>{userPhone}</span></span>
+                <span className={s.avatar48} aria-hidden>{userName ? userName[0] : <PersonIcon size={22} />}</span>
+                <span className={s.profileText}><b className={s.userName}>{userName || ACCOUNT_PAGE.nameFallback}</b><span className={s.userPhone}>{userPhone}</span></span>
               </Link>
             : <b className={s.menuTitle}>Меню</b>}
           <button ref={closeBtn} type="button" className={s.close} aria-label="Закрыть" onClick={onClose}><Cross size={14} color="var(--ink-1)" /></button>
