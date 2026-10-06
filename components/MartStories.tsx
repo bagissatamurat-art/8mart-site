@@ -2,7 +2,7 @@
 // MartStories — COMPONENTS.md → MartStories; референс site/MartStories.dc.html.
 // Ряд миниатюр + просмотрщик (desktop — карточка 400×711 на затемнении со стрелками, mobile — на весь экран).
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { MartButton } from './MartButton';
 import { Chevron, Cross } from './ui/Cross';
@@ -26,7 +26,12 @@ const DRAG_START = 8;
 /** Перелистывание: слайд — смена фото и текста, история — въезд карточки сбоку. */
 const EASE = 'cubic-bezier(.2,.8,.2,1)';
 const SLIDE_MS = 280;
-const STORY_MS = 320;
+/** Смена истории — лента едет на ширину карточки; с середины свайпа — пропорционально оставшемуся пути. */
+const STORY_MS = 340;
+/** Зазор между соседними историями в ленте (px) — как --story-gap в CSS. */
+const STORY_GAP = 12;
+/** Флик: быстрый короткий свайп тоже листает (px/мс). */
+const FLICK_V = 0.45;
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** Сколько держим «Код скопирован» (мс), таймер на паузе. */
@@ -103,6 +108,8 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   const [held, setHeld] = useState(false);
   /** Фото прошлого слайда под новым, пока новое проявляется. */
   const [under, setUnder] = useState<string | null>(null);
+  /** Какой слайд показывает соседняя история слева: «назад» тапом попадает на её последний слайд, свайпом — на первый. */
+  const [ghostPrevSl, setGhostPrevSl] = useState(0);
 
   // Актуальные значения для rAF и обработчиков без пересоздания.
   const posRef = useRef(pos); posRef.current = pos;
@@ -114,11 +121,15 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const dialogRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  /** Лента едет к соседней истории — таймер слайда стоит, повторные переходы ждут. */
+  const sliding = useRef<Animation | null>(null);
   const layerRef = useRef<HTMLSpanElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const trans = useRef<{ story: boolean; dir: number } | null>(null);
   const anims = useRef<Animation[]>([]);
-  const drag = useRef<{ axis: 'x' | 'y' | null; dx: number; dy: number }>({ axis: null, dx: 0, dy: 0 });
+  const drag = useRef<{ axis: 'x' | 'y' | null; dx: number; dy: number; t: number; v: number }>({ axis: null, dx: 0, dy: 0, t: 0, v: 0 });
   const closeRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose;
 
@@ -135,29 +146,46 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     setPos({ si, sl });
   }, [stories]);
 
+  /** Переход к соседней истории: лента с текущей и соседними карточками едет на ширину карточки
+   *  (со свайпа — от места, где отпустили палец), потом состояние переключается без мигания. */
+  const switchStory = useCallback((si: number, sl: number, fromPx = 0) => {
+    if (sliding.current) return;
+    const dir = si > posRef.current.si ? 1 : -1;
+    const track = trackRef.current, stage = stageRef.current;
+    if (!track || !stage || reducedMotion()) { if (track) track.style.transform = ''; go(si, sl); return; }
+    if (dir < 0) flushSync(() => setGhostPrevSl(sl));
+    const w = stage.clientWidth + STORY_GAP;
+    const to = -dir * w;
+    track.style.transform = '';
+    const a = track.animate([{ transform: `translateX(${fromPx}px)` }, { transform: `translateX(${to}px)` }],
+      { duration: Math.max(160, STORY_MS * Math.abs(to - fromPx) / w), easing: EASE, fill: 'forwards' });
+    sliding.current = a;
+    a.finished.then(() => go(si, sl), () => { /* закрыли во время перехода */ });
+  }, [go]);
+
   const next = useCallback(() => {
     const { si, sl } = posRef.current;
     if (sl < stories[si].slides.length - 1) go(si, sl + 1);
-    else if (si < stories.length - 1) go(si + 1, 0);
+    else if (si < stories.length - 1) switchStory(si + 1, 0);
     else close(); // после последней — закрыть
-  }, [stories, go, close]);
+  }, [stories, go, switchStory, close]);
 
   const prev = useCallback(() => {
     const { si, sl } = posRef.current;
     if (sl > 0) go(si, sl - 1);
-    else if (si > 0) go(si - 1, stories[si - 1].slides.length - 1);
+    else if (si > 0) switchStory(si - 1, stories[si - 1].slides.length - 1);
     else go(0, 0);
-  }, [stories, go]);
+  }, [stories, go, switchStory]);
 
-  const nextStory = useCallback(() => {
+  const nextStory = useCallback((fromPx = 0) => {
     const { si } = posRef.current;
-    if (si < stories.length - 1) go(si + 1, 0); else close();
-  }, [stories, go, close]);
+    if (si < stories.length - 1) switchStory(si + 1, 0, fromPx); else close();
+  }, [stories, switchStory, close]);
 
-  const prevStory = useCallback(() => {
+  const prevStory = useCallback((fromPx = 0) => {
     const { si } = posRef.current;
-    if (si > 0) go(si - 1, 0);
-  }, [go]);
+    if (si > 0) switchStory(si - 1, 0, fromPx);
+  }, [switchStory]);
 
   // Автопереход: STORY_DURATION на слайд; пауза — Пробел, удержание, «Код скопирован».
   useEffect(() => {
@@ -166,7 +194,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     let last = performance.now();
     const tick = (now: number) => {
       const dt = now - last; last = now;
-      if (!pausedRef.current && !holdingRef.current) {
+      if (!pausedRef.current && !holdingRef.current && !sliding.current) {
         const p = progRef.current + dt / STORY_DURATION;
         if (p >= 1) { next(); return; }
         progRef.current = p;
@@ -181,6 +209,9 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   // Перелистывание. Слайд: новое фото проявляется поверх прошлого (crossfade), текст всплывает на 8px.
   // История: карточка въезжает со стороны направления (вперёд — справа). Без анимации при reduced motion.
   useLayoutEffect(() => {
+    // Лента доехала до соседней истории: состояние переключено — снимаем сдвиг в том же кадре, без мигания.
+    if (sliding.current) { sliding.current.cancel(); sliding.current = null; setGhostPrevSl(0); }
+    if (trackRef.current) trackRef.current.style.transform = '';
     const t = trans.current;
     trans.current = null;
     if (!t) return;
@@ -188,19 +219,13 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     anims.current = [];
     if (reducedMotion()) { setUnder(null); return; }
     const opts = { duration: t.story ? STORY_MS : SLIDE_MS, easing: EASE };
-    if (t.story) {
-      const shift = desktop ? `${t.dir * 56}px` : `${t.dir * 35}%`;
-      const a = cardRef.current?.animate([{ transform: `translateX(${shift}) scale(.96)`, opacity: 0 }, { transform: 'none', opacity: 1 }], opts);
-      if (a) anims.current.push(a);
-      setUnder(null);
-      return;
-    }
+    if (t.story) { setUnder(null); return; } // лента уже доехала — новая история стоит на месте
     const img = layerRef.current?.animate([{ opacity: 0, transform: 'scale(1.03)' }, { opacity: 1, transform: 'none' }], opts);
     const txt = textRef.current?.animate([{ opacity: 0, transform: `translateY(8px)` }, { opacity: 1, transform: 'none' }], opts);
     anims.current = [img, txt].filter((a): a is Animation => !!a);
     if (img) img.finished.then(() => setUnder(null), () => { /* прервано следующим перелистыванием */ });
     else setUnder(null);
-  }, [pos, desktop]);
+  }, [pos]);
 
   // Открытая история — просмотрена.
   const storyId = stories[pos.si]?.id;
@@ -220,7 +245,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     return () => window.removeEventListener('keydown', onKey);
   }, [isPreview, next, prev]);
 
-  useEffect(() => () => { clearTimeout(copyTimer.current); clearTimeout(holdTimer.current); }, []);
+  useEffect(() => () => { clearTimeout(copyTimer.current); clearTimeout(holdTimer.current); sliding.current?.cancel(); }, []);
 
   const story = stories[pos.si];
   if (!story) return null;
@@ -244,19 +269,26 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     }
   };
 
-  // Тап / удержание / свайпы — на слое поверх картинки. Карточка идёт за пальцем:
-  // вбок — к соседней истории, вниз — закрыть; не дотянул до порога — пружинит обратно.
+  // Тап / удержание / свайпы — на слое поверх картинки.
+  // Вбок: лента идёт за пальцем, соседняя история въезжает рядом; дальше порога или флик — доезжает к ней.
+  // Вниз: вся сцена уходит вниз и закрывается. Не дотянул — пружинит обратно.
   const onDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (sliding.current) return;
     holdingRef.current = true;
     downRef.current = { t: performance.now(), x: e.clientX, y: e.clientY };
-    drag.current = { axis: null, dx: 0, dy: 0 };
+    drag.current = { axis: null, dx: 0, dy: 0, t: performance.now(), v: 0 };
     e.currentTarget.setPointerCapture?.(e.pointerId);
     clearTimeout(holdTimer.current);
     holdTimer.current = setTimeout(() => { if (holdingRef.current) setHeld(true); }, HOLD_MS);
   };
+  /** Свайп за край (назад с первой истории): тянется туго. */
+  const resist = (dx: number) => {
+    const { si } = posRef.current;
+    return dx > 0 && si === 0 ? dx / 3 : dx < 0 && si === stories.length - 1 ? dx / 3 : dx;
+  };
   const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const card = cardRef.current;
-    if (!holdingRef.current || !card) return;
+    const track = trackRef.current, stage = stageRef.current;
+    if (!holdingRef.current || !track || !stage) return;
     const d = downRef.current, g = drag.current;
     const dx = e.clientX - d.x, dy = e.clientY - d.y;
     if (!g.axis) {
@@ -267,25 +299,24 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
       setHeld(false);
       anims.current.forEach(a => a.cancel());
     }
+    const now = performance.now();
+    g.v = (dx - g.dx) / Math.max(1, now - g.t); g.t = now;
     g.dx = dx; g.dy = dy;
-    if (g.axis === 'x') {
-      const edge = (dx > 0 && posRef.current.si === 0); // назад некуда — тянется с сопротивлением
-      card.style.transform = `translateX(${edge ? dx / 3 : dx}px)`;
-    } else {
+    if (g.axis === 'x') track.style.transform = `translateX(${resist(dx)}px)`;
+    else {
       const y = Math.max(0, dy);
-      card.style.transform = `translateY(${y}px) scale(${1 - Math.min(y, 400) / 2000})`;
+      stage.style.transform = `translateY(${y}px) scale(${1 - Math.min(y, 400) / 2000})`;
     }
   };
-  const springBack = () => {
-    const card = cardRef.current;
-    if (!card || !card.style.transform) return;
-    const from = card.style.transform;
-    card.style.transform = '';
-    if (!reducedMotion()) card.animate([{ transform: from }, { transform: 'none' }], { duration: 200, easing: EASE });
+  const springBack = (el: HTMLElement | null) => {
+    if (!el || !el.style.transform) return;
+    const from = el.style.transform;
+    el.style.transform = '';
+    if (!reducedMotion()) el.animate([{ transform: from }, { transform: 'none' }], { duration: 220, easing: EASE });
   };
   const onCancel = () => {
     holdingRef.current = false; clearTimeout(holdTimer.current); setHeld(false);
-    if (drag.current.axis) { drag.current.axis = null; springBack(); }
+    if (drag.current.axis) { drag.current.axis = null; springBack(trackRef.current); springBack(stageRef.current); }
   };
   const onUp = (e: React.PointerEvent<HTMLDivElement>) => {
     const wasHold = holdingRef.current;
@@ -293,23 +324,26 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     drag.current.axis = null;
     holdingRef.current = false; clearTimeout(holdTimer.current); setHeld(false);
     if (!wasHold) return;
-    const card = cardRef.current;
+    const stage = stageRef.current;
     if (g.axis === 'y') {
-      if (g.dy > SWIPE_CLOSE && card && !reducedMotion()) {
-        const from = card.style.transform;
-        card.style.transform = '';
-        card.animate([{ transform: from }, { transform: 'translateY(100%)', opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' })
+      if (g.dy > SWIPE_CLOSE && stage && !reducedMotion()) {
+        const from = stage.style.transform;
+        stage.style.transform = '';
+        stage.animate([{ transform: from }, { transform: 'translateY(100%)', opacity: 0 }], { duration: 220, easing: 'ease-in', fill: 'forwards' })
           .finished.then(close, close);
       } else if (g.dy > SWIPE_CLOSE) close();
-      else springBack();
+      else springBack(stage);
       return;
     }
     if (g.axis === 'x') {
-      const canPrev = posRef.current.si > 0;
-      if (Math.abs(g.dx) > SWIPE_SIDE && (g.dx < 0 || canPrev)) {
-        if (card) card.style.transform = '';
-        if (g.dx < 0) nextStory(); else prevStory();
-      } else springBack();
+      const { si } = posRef.current;
+      const flick = Math.abs(g.v) > FLICK_V && Math.sign(g.v) === Math.sign(g.dx);
+      const pass = Math.abs(g.dx) > SWIPE_SIDE || flick;
+      const from = resist(g.dx);
+      if (pass && g.dx < 0 && si < stories.length - 1) nextStory(from);
+      else if (pass && g.dx > 0 && si > 0) prevStory(from);
+      else if (pass && g.dx < 0) close(); // влево с последней истории — закрыть
+      else springBack(trackRef.current);
       return;
     }
     const d = downRef.current;
@@ -333,11 +367,15 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
       aria-hidden={isPreview || undefined}
     >
       {desktop && (
-        <button type="button" className={[s.arrow, s.arrowPrev].join(' ')} aria-label="Предыдущая история" disabled={noPrev} onClick={prevStory}>
+        <button type="button" className={[s.arrow, s.arrowPrev].join(' ')} aria-label="Предыдущая история" disabled={noPrev} onClick={() => prevStory()}>
           <Chevron size={10} color="var(--ink-1)" direction="left" />
         </button>
       )}
-      <div ref={cardRef} className={[s.card, desktop ? s.cardDesktop : s.cardMobile].join(' ')}>
+      <div ref={stageRef} className={[s.stage, desktop ? s.cardDesktop : s.cardMobile].join(' ')}>
+      <div ref={trackRef} className={s.track}>
+      {!isPreview && stories[pos.si - 1] && <Ghost story={stories[pos.si - 1]} sl={ghostPrevSl} side="prev" />}
+      {!isPreview && stories[pos.si + 1] && <Ghost story={stories[pos.si + 1]} sl={0} side="next" />}
+      <div ref={cardRef} className={s.card}>
         {under && <span className={s.layer} aria-hidden><Img src={under} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} /></span>}
         <span ref={layerRef} className={s.layer}><Img src={slide.img} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} priority /></span>
         {nextImg && <span className={s.preload} aria-hidden><Img src={nextImg} fill sizes="(max-width: 1023px) 100vw, 400px" /></span>}
@@ -369,8 +407,10 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
           </div>
         )}
       </div>
+      </div>
+      </div>
       {desktop && (
-        <button type="button" className={[s.arrow, s.arrowNext].join(' ')} aria-label={pos.si < stories.length - 1 ? 'Следующая история' : 'Закрыть сторис'} onClick={nextStory}>
+        <button type="button" className={[s.arrow, s.arrowNext].join(' ')} aria-label={pos.si < stories.length - 1 ? 'Следующая история' : 'Закрыть сторис'} onClick={() => nextStory()}>
           <Chevron size={10} color="var(--ink-1)" direction="right" />
         </button>
       )}
@@ -378,4 +418,29 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   );
 
   return isPreview ? view : createPortal(view, document.body);
+}
+
+/** Соседняя история в ленте: та же карточка без событий — видна, пока свайпаешь или лента едет к ней. */
+function Ghost({ story, sl, side }: { story: Story; sl: number; side: 'prev' | 'next' }) {
+  const slide = story.slides[sl] ?? story.slides[0];
+  return (
+    <div className={`${s.card} ${side === 'prev' ? s.ghostPrev : s.ghostNext}`} aria-hidden inert>
+      <span className={s.layer}><Img src={slide.img} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} eager /></span>
+      <div className={s.top}>
+        <div className={s.bars}>
+          {story.slides.map((_, i) => <span key={i} className={s.bar}><span className={s.barFill} style={{ width: i < sl ? '100%' : '0%' }} /></span>)}
+        </div>
+        <div className={s.head}>
+          <Img src={story.cover} w={32} h={32} className={s.avatar} />
+          <b className={s.storyTitle}>{story.title}</b>
+          <span className={s.close}><Cross size={14} color="var(--ink-1)" /></span>
+        </div>
+        <div className={s.text}>
+          <h2 className={s.title}>{slide.title}</h2>
+          <p className={s.body}>{slide.text}</p>
+        </div>
+      </div>
+      {slide.cta && <div className={s.cta}><MartButton label={slide.cta.label} variant="primary" size={56} full /></div>}
+    </div>
+  );
 }
