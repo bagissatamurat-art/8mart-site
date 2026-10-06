@@ -17,17 +17,17 @@
 html,body,#map{margin:0;height:100%;width:100%;background:#EEEDF1;font-family:Onest,system-ui,sans-serif}
 .mapboxgl-ctrl-attrib{font-size:10px}
 .me{width:14px;height:14px;border-radius:50%;background:#2F80ED;border:2px solid #fff;box-shadow:0 0 0 6px rgba(47,128,237,.2)}
-#pin[hidden],#tip[hidden],#shadow[hidden],#fail[hidden]{display:none}
+#pin[hidden],#shadow[hidden],#fail[hidden]{display:none}
 #pin{position:absolute;left:50%;top:50%;width:32px;height:44px;margin:-44px 0 0 -16px;pointer-events:none;z-index:500;transition:transform .15s ease;display:flex;flex-direction:column;align-items:center}
 #pin.lift{transform:translateY(-8px)}
 #pin .head{width:28px;height:28px;border-radius:50%;background:#EE1D74;border:3px solid #fff;box-sizing:border-box;box-shadow:0 4px 12px rgba(238,29,116,.35);position:relative}
 #pin .head:after{content:"";position:absolute;left:8px;top:8px;width:6px;height:6px;border-radius:50%;background:#fff}
 #pin .leg{width:2.5px;height:16px;background:#17151A;border-radius:0 0 2px 2px;opacity:.75}
-#tip{position:absolute;left:50%;top:50%;transform:translate(-50%,calc(-100% - 50px));max-width:260px;padding:8px 14px;border-radius:14px;background:#fff;color:#17151A;font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 6px 20px rgba(23,21,26,.18);z-index:501;pointer-events:none;display:flex;align-items:center;gap:8px;transition:transform .15s ease}
-#tip:after{content:"";position:absolute;left:50%;bottom:-5px;width:10px;height:10px;background:#fff;transform:translateX(-50%) rotate(45deg);border-radius:2px}
-#tip.lift{transform:translate(-50%,calc(-100% - 58px))}
-#tip.muted{color:#6B6873;font-weight:500}
-#tip .sp{width:14px;height:14px;border-radius:50%;border:2px solid #EE1D74;border-right-color:transparent;animation:spin .7s linear infinite;flex:none;box-sizing:border-box}
+/* Пока определяем адрес по пину — кольцо-лоадер вокруг головки (подписи над пином нет: адрес — в поле под картой). */
+#pin .ring{position:absolute;left:-5px;top:-5px;width:38px;height:38px;border-radius:50%;box-sizing:border-box;border:2.5px solid rgba(238,29,116,.2);border-top-color:#EE1D74;opacity:0;transition:opacity .15s ease;pointer-events:none}
+#pin.busy .ring{opacity:1;animation:spin .7s linear infinite}
+#pin .head{position:relative}
+@media (prefers-reduced-motion: reduce){#pin.busy .ring{animation-duration:1.4s}}
 @keyframes spin{to{transform:rotate(360deg)}}
 #shadow{position:absolute;left:50%;top:50%;width:10px;height:4px;margin:-2px 0 0 -5px;border-radius:50%;background:rgba(23,21,26,.3);z-index:499;pointer-events:none}
 .pp{width:36px;height:36px;border-radius:50%;background:#fff;border:2.5px solid #EE1D74;box-sizing:border-box;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(23,21,26,.18);cursor:pointer;transition:transform .15s ease;padding:0}
@@ -60,8 +60,7 @@ body.compact #zin,body.compact #zout{display:none}
 </style></head>
 <body>
 <div id="map"></div>
-<div id="pin" hidden><div class="head"></div><div class="leg"></div></div>
-<div id="tip" hidden></div>
+<div id="pin" hidden><div class="head"><i class="ring"></i></div><div class="leg"></div></div>
 <div id="shadow" hidden></div>
 <div id="fail" hidden>Карта недоступна — укажите адрес вручную</div>
 <div id="ctl"><button type="button" id="zin" aria-label="Приблизить"><span class="h"></span><span class="v"></span></button><button type="button" id="zout" aria-label="Отдалить"><span class="h"></span></button><button type="button" id="locate" aria-label="Моё местоположение" title="Моё местоположение"><i></i><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></button></div>
@@ -87,13 +86,9 @@ body.compact #zin,body.compact #zout{display:none}
   map.on('error', function (e) { if (e && e.error && (e.error.status === 401 || e.error.status === 403)) fail(); });
   map.touchZoomRotate.disableRotation();
 
-  var pin = document.getElementById('pin'), shadow = document.getElementById('shadow'), tip = document.getElementById('tip');
-  function setTip(kind, text) {
-    tip.className = kind === 'muted' ? 'muted' : '';
-    tip.textContent = '';
-    if (kind === 'loading') { var sp = document.createElement('span'); sp.className = 'sp'; tip.appendChild(sp); tip.appendChild(document.createTextNode('Определяем адрес…')); }
-    else tip.textContent = text;
-  }
+  var pin = document.getElementById('pin'), shadow = document.getElementById('shadow');
+  // Лоадер в пине — пока определяем адрес; сам адрес показывает поле под картой.
+  function busy(on) { pin.classList.toggle('busy', !!on); }
   var markers = [];
   function fitPoints() {
     var pts = state.points.map(function (p) { return [p.lng, p.lat]; });
@@ -103,7 +98,7 @@ body.compact #zin,body.compact #zout{display:none}
   }
   function applyMode() {
     var d = state.mode === 'delivery';
-    pin.hidden = !d; shadow.hidden = !d; tip.hidden = !d;
+    pin.hidden = !d; shadow.hidden = !d;
     markers.forEach(function (m) { m.remove(); }); markers = [];
     if (!d) state.points.forEach(function (p) {
       var el = document.createElement('button'); el.type = 'button';
@@ -113,14 +108,14 @@ body.compact #zin,body.compact #zout{display:none}
       markers.push(new mapboxgl.Marker({ element: el }).setLngLat([p.lng, p.lat]).addTo(map));
     });
   }
-  var t, req = 0, quiet = false, quietLabel = '';
-  map.on('movestart', function () { pin.classList.add('lift'); tip.classList.add('lift'); if (state.mode === 'delivery' && !quiet) setTip('loading'); });
+  var t, req = 0, quiet = false;
+  map.on('movestart', function () { pin.classList.add('lift'); if (state.mode === 'delivery' && !quiet) busy(true); });
   map.on('moveend', function () {
-    pin.classList.remove('lift'); tip.classList.remove('lift');
+    pin.classList.remove('lift');
     if (state.mode !== 'delivery') return;
     var c = map.getCenter();
     // Выбор подсказки: пин ставится без повторного геокодирования.
-    if (quiet) { quiet = false; setTip('ok', quietLabel); return; }
+    if (quiet) { quiet = false; busy(false); return; }
     clearTimeout(t); post({ type: 'moving' });
     t = setTimeout(function () { reverse(c); }, 400);
   });
@@ -131,12 +126,12 @@ body.compact #zin,body.compact #zout{display:none}
       .then(function (a) {
         if (my !== req) return;
         var street = (a && a.address) || '';
-        if (street) setTip('ok', street); else setTip('muted', 'Уточните адрес — двигайте карту');
+        busy(false);
         post({ type: 'address', lat: c.lat, lng: c.lng, street: street, city: (a && a.city) || '' });
       })
       .catch(function () {
         if (my !== req) return;
-        setTip('muted', 'Не удалось определить адрес');
+        busy(false);
         post({ type: 'address', lat: c.lat, lng: c.lng, street: '', city: '', failed: true });
       });
   }
@@ -146,7 +141,7 @@ body.compact #zin,body.compact #zout{display:none}
     if (m.mode) state.mode = m.mode;
     if (m.points) state.points = m.points;
     if ('selected' in m) state.selected = m.selected;
-    if (m.quiet) { quiet = true; quietLabel = m.quiet; setTimeout(function () { quiet = false; }, 1500); }
+    if (m.quiet) { quiet = true; setTimeout(function () { quiet = false; }, 1500); }
     if (m.lat && m.lng) map.flyTo({ center: [m.lng, m.lat], zoom: m.zoom || map.getZoom(), speed: 1.6 });
     if (m.locate) loc.click();
     if (m.fit && state.points.length) fitPoints();
@@ -168,8 +163,8 @@ body.compact #zin,body.compact #zout{display:none}
   applyMode();
   // ?quiet=<адрес> — стартовый адрес уже известен (initial), обратное геокодирование при загрузке не делаем.
   var initial = q.get('quiet') || '';
-  if (initial) setTip('ok', initial); else setTip('muted', 'Двигайте карту, чтобы указать дом');
-  map.on('load', function () { post({ type: 'ready' }); if (state.mode === 'delivery' && !initial) reverse(map.getCenter()); });
+  
+  map.on('load', function () { post({ type: 'ready' }); if (state.mode === 'delivery' && !initial) { busy(true); post({ type: 'moving' }); reverse(map.getCenter()); } });
 })();
 </script>
 </body></html>

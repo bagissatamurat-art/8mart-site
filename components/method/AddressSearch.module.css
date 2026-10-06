@@ -1,0 +1,113 @@
+/* Окно поиска адреса (поверх выбора способа). Значения — из токенов и поля/подсказок MartMethodModal. */
+.overlay {
+  position: fixed; inset: 0; z-index: var(--z-modal-search); background: var(--overlay);
+  display: flex; align-items: flex-start; justify-content: center; padding: 80px var(--s-6) var(--s-6);
+  font-family: var(--font); color: var(--ink-1);
+}
+.overlay.mobile { padding: 0; background: var(--surface-card); }
+
+.dialog {
+  width: 100%; max-width: 560px; max-height: 100%; display: flex; flex-direction: column; gap: var(--s-3);
+  background: var(--surface-card); border-radius: var(--r-24); padding: var(--s-6); box-shadow: var(--shadow-menu);
+  font-family: var(--font); color: var(--ink-1);
+}
+.dialog.mobile {
+  max-width: none; height: 100%; border-radius: 0; box-shadow: none;
+  padding: max(8px, env(safe-area-inset-top)) 16px 0;
+}
+.dialog.inline { max-height: none; height: 100%; }
+
+.head { display: flex; align-items: center; gap: var(--s-2); min-height: var(--h-44); flex: none; }
+.title { flex: 1; margin: 0; font-size: var(--fs-h3); font-weight: 700; }
+.mobile .title { font-size: 17px; /* как заголовки mobile-экранов */ }
+.iconBtn {
+  position: relative; flex: none; width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  background: var(--surface-subtle); display: flex; align-items: center; justify-content: center; transition: background var(--dur) var(--ease);
+}
+.iconBtn::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; } /* зона касания 44 */
+.iconBtn:hover { background: var(--surface-disabled); }
+
+/* Поле поиска: 56, r16, рамка primary (в фокусе всегда — окно открыто для ввода) */
+.field {
+  position: relative; flex: none; display: flex; align-items: center; gap: var(--s-2); height: var(--h-56); padding: 0 var(--s-2) 0 var(--s-4);
+  border-radius: var(--r-16); border: 1.5px solid var(--primary); background: var(--surface-card); box-shadow: var(--focus-ring);
+}
+.fieldPin {
+  width: 14px; height: 14px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); flex: none; position: relative;
+  border: 2px solid var(--primary); margin-top: -2px;
+}
+.fieldPin::after { content: ''; position: absolute; left: 3px; top: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
+.input {
+  flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; padding: 0;
+  font: inherit; font-size: 16px; /* ≥16 — iOS не приближает страницу при фокусе */ color: var(--ink-1);
+}
+.input::placeholder { color: var(--ink-3); }
+.input:focus-visible { box-shadow: none; }
+.fieldEnd { flex: none; width: var(--h-36); height: var(--h-36); display: flex; align-items: center; justify-content: center; }
+.clear { position: relative; border: 0; padding: 0; cursor: pointer; background: transparent; }
+.clear::before { content: ''; position: absolute; left: 50%; top: 50%; width: 20px; height: 20px; margin: -10px; border-radius: 50%; background: var(--ink-3); }
+.clear > * { position: relative; }
+.clear::after { content: ''; position: absolute; inset: -4px; } /* зона касания 44 */
+
+/* Город — чипсы одной строкой (на mobile — горизонтальная прокрутка) */
+.cities {
+  display: flex; gap: var(--s-2); flex: none; overflow-x: auto; scrollbar-width: none;
+  margin: 0 calc(-1 * var(--s-6)); padding: 2px var(--s-6);
+}
+.dialog:not(.mobile) .cities { flex-wrap: wrap; overflow: visible; margin: 0; padding: 2px 0; } /* desktop: все города видны, переносом */
+.mobile .cities {
+  margin: 0 -16px; padding: 2px 16px;
+  mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); /* край ленты — затухает: видно, что можно листать */
+}
+.cities::-webkit-scrollbar { display: none; }
+.cities > * { flex: none; }
+
+.body { flex: 1; min-height: 120px; overflow-y: auto; overscroll-behavior: contain; margin: 0 -8px; padding: 0 8px; }
+.mobile .body { padding-bottom: 8px; }
+.hint { margin: 8px 4px; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--ink-2); }
+
+.list { display: flex; flex-direction: column; transition: opacity var(--dur) var(--ease); }
+.stale { opacity: .55; } /* старые подсказки, пока грузятся новые */
+.opt {
+  position: relative; display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: var(--h-56); padding: 8px; border: 0;
+  border-radius: var(--r-14); background: transparent; color: var(--ink-1); cursor: pointer; text-align: left; flex: none;
+}
+.opt + .opt::before { content: ''; position: absolute; left: 52px; right: 8px; top: 0; height: 1px; background: var(--divider); } /* разделитель — от текста */
+.opt.active, .opt:hover { background: var(--surface-subtle); }
+.opt.active::before, .opt:hover::before, .opt.active + .opt::before, .opt:hover + .opt::before { display: none; }
+.optPin {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--surface-subtle); flex: none; position: relative;
+}
+.optPin::before {
+  content: ''; position: absolute; left: 10px; top: 8px; width: 12px; height: 12px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  border: 2px solid var(--ink-3); box-sizing: border-box;
+}
+.opt.active .optPin, .opt:hover .optPin { background: var(--surface-card); }
+.optText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.optTitle { font-size: var(--fs-15); font-weight: 500; line-height: 1.3; }
+.optSub { font-size: var(--fs-13); color: var(--ink-2); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Совпадение с введённым текстом */
+.mark { background: transparent; color: var(--ink-1); font-weight: 700; }
+
+.skeleton { display: flex; flex-direction: column; }
+.skelRow { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-height: var(--h-56); padding: 8px 8px 8px 52px; animation: var(--anim-pulse); }
+.skelRow > span { display: block; height: 12px; border-radius: 6px; background: var(--surface-disabled); }
+.skelRow > span:first-child { width: 62%; height: 14px; }
+.skelRow > span:last-child { width: 38%; }
+
+.foot { flex: none; border-top: 1px solid var(--divider); padding-top: var(--s-3); }
+.mobile .foot { padding: var(--s-2) 0 max(12px, env(safe-area-inset-bottom)); margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
+.mapBtn {
+  display: flex; align-items: center; gap: var(--s-2); height: var(--h-44); padding: 0 var(--s-2); border: 0; border-radius: var(--r-14);
+  background: transparent; font: inherit; font-size: var(--fs-15); font-weight: 600; color: var(--primary); cursor: pointer;
+}
+.mapBtn:hover { background: var(--primary-50); }
+.mapIco {
+  width: 14px; height: 14px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); flex: none; position: relative; border: 2px solid currentColor;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .overlay:not(.mobile) { animation: var(--anim-fade); }
+  .overlay:not(.mobile) .dialog { animation: var(--anim-rise); }
+  .overlay.mobile .dialog { animation: var(--anim-fade); animation-duration: 160ms; }
+}

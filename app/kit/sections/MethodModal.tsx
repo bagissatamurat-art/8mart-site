@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { MartButton } from '@/components/MartButton';
 import { MartMethodModal, type MethodValue, type Suggestion } from '@/components/MartMethodModal';
-import { AddressField } from '@/components/method/AddressField';
+import { AddressSearch } from '@/components/method/AddressSearch';
+import { CITIES } from '@/lib/mock';
 import { KitItem, KitPanel, KitSection } from '../Kit';
 
 // Демо-подсказки (форма ответа /api/geo/suggest)
@@ -43,7 +44,7 @@ export default function MethodModalSection() {
         <MartButton label="Доставка" variant="ghost" size={44} onClick={() => setLive('delivery')} />
         <MartButton label="Самовывоз" variant="ghost" size={44} onClick={() => setLive('pickup')} />
         <MartButton label="Адрес (кабинет)" variant="ghost" size={44} onClick={() => setLive('addressOnly')} />
-        <MartButton label="Mobile sheet" variant="ghost" size={44} onClick={() => setLive('mobile')} />
+        <MartButton label="Mobile" variant="ghost" size={44} onClick={() => setLive('mobile')} />
         {last && <code style={{ fontSize: 'var(--fs-13)', color: 'var(--ink-2)', wordBreak: 'break-all' }}>onConfirm → {JSON.stringify(last)}</code>}
       </KitPanel>
 
@@ -54,10 +55,10 @@ export default function MethodModalSection() {
       <MartMethodModal open={live === 'mobile'} mode="mobile" onClose={close} onConfirm={done} />
 
       <KitPanel>
-        <KitItem label="Доставка · адрес по пину, desktop 960×600">
+        <KitItem label="Доставка · адрес по пину, desktop (на весь экран — здесь в рамке 960×600)">
           <Frame w={962}>
             <MartMethodModal open inline staticMap mode="desktop" onClose={noop} onConfirm={noop}
-              initial={{ method: 'delivery', city: 'astana', address: 'улица Кабанбай батыра, 11', lat: 51.1166, lng: 71.4398, entrance: '2', flat: '45' }} />
+              initial={{ method: 'delivery', city: 'astana', address: 'улица Кабанбай батыра, 11', lat: 51.1166, lng: 71.4398 }} />
           </Frame>
         </KitItem>
         <KitItem label="Самовывоз · выбрана точка, геолокация известна">
@@ -68,35 +69,23 @@ export default function MethodModalSection() {
         </KitItem>
       </KitPanel>
 
-      <KitPanel layout="grid" min={380}>
-        <KitItem label="Подсказки · строка 48, активная — ↑↓">
-          <Frame w={380}><div style={{ padding: 24 }}>
-            <AddressField value="Кабанбай" onChange={noop} city="astana" demoState="suggestOpen" demoSuggestions={DEMO_SUGGESTIONS} />
-          </div></Frame>
-        </KitItem>
-        <KitItem label="Подсказки · загрузка">
-          <Frame w={380}><div style={{ padding: 24 }}>
-            <AddressField value="Кабанбай" onChange={noop} city="astana" demoState="suggestLoading" />
-          </div></Frame>
-        </KitItem>
-        <KitItem label="Подсказки · ничего не нашли">
-          <Frame w={380}><div style={{ padding: 24 }}>
-            <AddressField value="Кабанбаааай" onChange={noop} city="astana" demoState="suggestEmpty" />
-          </div></Frame>
-        </KitItem>
-        <KitItem label="Подсказки · сервис недоступен (503)">
-          <Frame w={380}><div style={{ padding: 24 }}>
-            <AddressField value="Кабанбай" onChange={noop} city="astana" demoState="suggestError" />
-          </div></Frame>
-        </KitItem>
+      <KitPanel layout="grid" min={390}>
+        {([['suggestOpen', 'Поиск адреса · подсказки, совпадение выделено'], ['suggestLoading', 'Поиск адреса · загрузка'],
+          ['suggestEmpty', 'Поиск адреса · ничего не нашли'], ['suggestError', 'Поиск адреса · сервис недоступен (503)']] as const).map(([st, label]) => (
+          <KitItem key={st} label={label}>
+            <Frame w={390} h={560}>
+              <AddressSearch open inline mobile value="Кабанбай 1" cities={CITIES} city={CITIES[0]} onCity={noop} onPick={noop} onClose={noop}
+                demoState={st} demoSuggestions={DEMO_SUGGESTIONS} />
+            </Frame>
+          </KitItem>
+        ))}
       </KitPanel>
 
       <KitPanel layout="row" style={{ alignItems: 'flex-start' }}>
-        <KitItem label="Mobile 390 · sheet, подсказки 56">
+        <KitItem label="Mobile 390 · доставка, на весь экран">
           <Frame w={390} h={844} page>
             <MartMethodModal open inline staticMap mode="mobile" onClose={noop} onConfirm={noop}
-              initial={{ method: 'delivery', city: 'astana', address: 'Кабанбай' }}
-              demoState="suggestOpen" demoSuggestions={DEMO_SUGGESTIONS.slice(0, 3)} />
+              initial={{ method: 'delivery', city: 'astana', address: 'улица Кабанбай батыра, 11' }} />
           </Frame>
         </KitItem>
         <KitItem label="Mobile 390 · самовывоз">

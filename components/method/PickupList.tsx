@@ -47,17 +47,15 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
       {loaded && points.length === 0 && (
         <div className={s.warn}>{GEO.noPickupPoints(cityName)}</div>
       )}
-      {points.length > 4 && (
+      {points.length > 0 && (
         <div className={s.count}>
-          <span>{rows.length} {plural(rows.length, 'точка', 'точки', 'точек')}</span>
-          <span>{geo ? 'сначала ближние' : 'по алфавиту'}</span>
+          <span>{rows.length} {plural(rows.length, 'точка', 'точки', 'точек')} · {geo ? 'сначала ближние' : 'по алфавиту'}</span>
+          {!geo && (
+            <button type="button" className={s.nearBtn} onClick={onAskGeo}>
+              <span className={s.geoIcon} aria-hidden />{GEO.nearest}
+            </button>
+          )}
         </div>
-      )}
-      {!geo && points.length > 0 && (
-        <button type="button" className={s.geoBtn} onClick={onAskGeo}>
-          <span className={s.geoIcon} aria-hidden />
-          <span><b>Показать ближайшие</b><span className={s.muted}> — разрешите геолокацию</span></span>
-        </button>
       )}
       <div ref={list} className={s.stores} role="radiogroup" aria-label="Точки самовывоза">
         {rows.map((p, i) => {
@@ -65,9 +63,13 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
           return (
             <button key={p.id} type="button" role="radio" aria-checked={sel} data-store={p.id}
               className={`${s.store} ${sel ? s.sel : ''}`} onClick={() => onPick(p.id)}>
+              <span className={s.storeIco} aria-hidden><span className={s.storePin} /></span>
               <span className={s.storeText}>
-                <span className={s.storeName}>{p.name}{geo && i === 0 && <span className={s.nearest}>Ближайшая</span>}</span>
-                <span className={s.storeMeta}>{p.d != null ? `${distText(p.d)} · ${p.hours}` : p.hours}</span>
+                <span className={s.storeName}><span>{p.name}</span>{geo && i === 0 && <span className={s.nearest}>Ближайшая</span>}</span>
+                <span className={s.storeMeta}>
+                  {p.d != null && <span className={s.storeDist}>{distText(p.d)}</span>}
+                  <span>{p.hours}</span>
+                </span>
               </span>
               <RadioMark on={sel} />
             </button>

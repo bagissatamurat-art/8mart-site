@@ -10,7 +10,7 @@ import { GEO } from '@/lib/copy';
 import { asset } from '@/lib/basePath';
 
 export interface MethodMapHandle {
-  /** Перелёт к точке; quiet — подпись над пином без повторного геокодирования. */
+  /** Перелёт к точке; quiet — адрес уже известен (выбран в поиске), повторно по пину не определяем. */
   flyTo(lat: number, lng: number, zoom?: number, quiet?: string): void;
   /** Запросить геолокацию (кнопка «Показать ближайшие»). */
   locate(): void;
@@ -26,8 +26,6 @@ export interface MethodMapProps {
   compact?: boolean;
   /** Без iframe — только заглушка (витрина). */
   staticMap?: boolean;
-  /** Подпись над пином в заглушке (адрес) */
-  label?: string;
   geo?: LatLng | null;
   onMoving?: () => void;
   onAddress?: (a: { lat: number; lng: number; street: string; failed?: boolean }) => void;
@@ -41,7 +39,7 @@ const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 type MapMsg = { src?: string; id?: string; type?: string; pointId?: string; lat?: number; lng?: number; street?: string; failed?: boolean };
 
 export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function MethodMap(
-  { mode, city, points, selected, start, compact, staticMap, label, geo, onMoving, onAddress, onPick, onGeo, children }, ref,
+  { mode, city, points, selected, start, compact, staticMap, geo, onMoving, onAddress, onPick, onGeo, children }, ref,
 ) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [failed, setFailed] = useState(!TOKEN);
@@ -120,15 +118,15 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
       {live
         ? <iframe ref={frame} src={src} title="Карта" className={s.frame} allow="geolocation" />
         : <MapFallback mode={mode} points={points} selected={selected} geo={geo} onPick={onPick}
-            label={label} note={staticMap ? undefined : GEO.mapUnavailable} />}
+            note={staticMap ? undefined : GEO.mapUnavailable} />}
       {children}
     </div>
   );
 });
 
 /** Заглушка карты: «кварталы», пин по центру / точки, спроецированные в рамку по их координатам. */
-function MapFallback({ mode, points, selected, geo, onPick, label, note }: {
-  mode: Method; points: PickupPoint[]; selected: string | null; geo?: LatLng | null; onPick?: (id: string) => void; label?: string; note?: string;
+function MapFallback({ mode, points, selected, geo, onPick, note }: {
+  mode: Method; points: PickupPoint[]; selected: string | null; geo?: LatLng | null; onPick?: (id: string) => void; note?: string;
 }) {
   const all = [...points, ...(geo && mode === 'pickup' ? [geo] : [])];
   const lats = all.map(p => p.lat), lngs = all.map(p => p.lng);
@@ -142,7 +140,6 @@ function MapFallback({ mode, points, selected, geo, onPick, label, note }: {
     <div className={s.fallback}>
       {mode === 'delivery' ? (
         <>
-          <div className={`${s.tip} ${label ? '' : s.muted}`}>{label || 'Двигайте карту, чтобы указать дом'}</div>
           <div className={s.pin} aria-hidden><div className={s.pinHead} /><div className={s.pinLeg} /></div>
           <div className={s.pinShadow} aria-hidden />
         </>

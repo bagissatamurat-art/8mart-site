@@ -142,8 +142,8 @@ export const getPickupPoints = (city: string): Promise<PickupPoint[]> => reply(M
 /** lat/lng могут отсутствовать (у DaData координаты есть не у всех подсказок). */
 export interface GeoSuggestion { title: string; subtitle: string; lat: number | null; lng: number | null; hasHouse: boolean }
 /** GET /geo/suggest?q&city — прокси DaData на нашем сервере (app/api/geo/suggest). Ключ — только на сервере. */
-export async function geoSuggest(q: string, city: string): Promise<GeoSuggestion[]> {
-  const r = await fetch(`/api/geo/suggest?${new URLSearchParams({ q, city })}`);
+export async function geoSuggest(q: string, city: string, signal?: AbortSignal): Promise<GeoSuggestion[]> {
+  const r = await fetch(`/api/geo/suggest?${new URLSearchParams({ q, city })}`, { signal });
   if (!r.ok) throw new ApiError(r.status, 'Сервис подсказок недоступен');
   return r.json();
 }
