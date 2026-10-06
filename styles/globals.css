@@ -1,7 +1,7 @@
 @import url('./tokens.css');
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; /* модалка блокирует прокрутку — место под полосу остаётся, страница не сдвигается вбок */ }
 body { min-height: 100dvh; -webkit-font-smoothing: antialiased; }
 button, input, textarea, select { font: inherit; color: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
