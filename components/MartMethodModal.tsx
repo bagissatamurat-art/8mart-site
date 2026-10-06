@@ -204,7 +204,7 @@ function MethodDialog({
           </div>
         ) : (
           <PickupList points={points} selected={store} geo={geo} cityName={city?.name ?? ''} loaded={pointsLoaded}
-            onPick={setStore} onAskGeo={() => map.current?.locate()} />
+            onPick={setStore} />
         )}
 
         <div className={s.cta}>

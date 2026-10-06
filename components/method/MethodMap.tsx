@@ -12,8 +12,6 @@ import { asset } from '@/lib/basePath';
 export interface MethodMapHandle {
   /** Перелёт к точке; quiet — адрес уже известен (выбран в поиске), повторно по пину не определяем. */
   flyTo(lat: number, lng: number, zoom?: number, quiet?: string): void;
-  /** Запросить геолокацию (кнопка «Показать ближайшие»). */
-  locate(): void;
 }
 
 export interface MethodMapProps {
@@ -118,10 +116,6 @@ export const MethodMap = forwardRef<MethodMapHandle, MethodMapProps>(function Me
     flyTo(lat, lng, zoom, quiet) {
       if (live && ready) post({ lat, lng, zoom, quiet });
       else if (live) pendingFly.current = { lat, lng, zoom, quiet };
-    },
-    locate() {
-      if (live && ready) { post({ locate: true }); return; }
-      navigator.geolocation?.getCurrentPosition(p => cb.current.onGeo?.({ lat: p.coords.latitude, lng: p.coords.longitude }));
     },
   }));
 

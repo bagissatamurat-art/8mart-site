@@ -18,7 +18,7 @@ const km = (a: LatLng, b: LatLng) => {
 };
 const distText = (d: number) => (d < 1 ? Math.round(d * 1000) + ' м' : d.toFixed(1).replace('.', ',') + ' км');
 
-export function PickupList({ points, selected, geo, cityName, loaded = true, onPick, onAskGeo }: {
+export function PickupList({ points, selected, geo, cityName, loaded = true, onPick }: {
   points: PickupPoint[];
   selected: string | null;
   geo: LatLng | null;
@@ -26,7 +26,6 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
   /** false — точки ещё грузятся (не показываем «нет точек»). */
   loaded?: boolean;
   onPick: (id: string) => void;
-  onAskGeo: () => void;
 }) {
   const list = useRef<HTMLDivElement>(null);
   const rows = points
@@ -50,11 +49,6 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
       {points.length > 0 && (
         <div className={s.count}>
           <span>{rows.length} {plural(rows.length, 'точка', 'точки', 'точек')} · {geo ? 'сначала ближние' : 'по алфавиту'}</span>
-          {!geo && (
-            <button type="button" className={s.nearBtn} onClick={onAskGeo}>
-              <span className={s.geoIcon} aria-hidden />{GEO.nearest}
-            </button>
-          )}
         </div>
       )}
       <div ref={list} className={s.stores} role="radiogroup" aria-label="Точки самовывоза">

@@ -32,13 +32,12 @@
 
 /* ── Карта ── */
 .map { position: relative; flex: 1; min-height: 0; min-width: 0; background: var(--surface-disabled); }
-.mobile .map, .card.mobile .map { flex: 1; height: auto; min-height: 200px; }
-/* Самовывоз на mobile: карта — четверть экрана (маркеры видны), остальное — список точек. */
-.mobile .pickupMode .map, .card.mobile.pickupMode .map { flex: none; height: 26%; min-height: 0; }
+/* Mobile: карта одной высоты в доставке и самовывозе — 40% экрана; панель забирает остальное. */
+.mobile .map, .card.mobile .map { flex: none; height: 40%; min-height: 0; }
 /* В самовывозе на mobile место — списку: подзаголовок прячем (заголовок остаётся). */
 .mobile .pickupMode .subtitle, .card.mobile.pickupMode .subtitle { display: none; }
 .frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
-.mapTools { position: absolute; left: 16px; top: max(16px, env(safe-area-inset-top)); display: flex; gap: var(--s-2); z-index: 4; }
+.mapTools { position: absolute; left: 16px; top: max(16px, env(safe-area-inset-top)); display: flex; gap: var(--s-2); z-index: 6; } /* выше панели (4): список городов не перекрывается */
 
 /* Город */
 .cityWrap { position: relative; }
@@ -53,7 +52,7 @@
 .cityBtn:focus-visible { box-shadow: var(--focus-ring), 0 4px 12px rgba(23, 21, 26, .15); }
 .cityDot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); flex: none; }
 .cityMenu {
-  position: absolute; left: 0; top: 52px; width: 240px; max-height: 320px; overflow: auto; z-index: 6;
+  position: absolute; left: 0; top: 52px; width: 240px; max-height: min(320px, calc(100dvh - 140px)); overflow: auto; z-index: 6;
   background: var(--surface-card); border-radius: var(--r-16); box-shadow: var(--shadow-menu); padding: 6px;
   display: flex; flex-direction: column; gap: 2px; margin: 0; list-style: none;
 }
@@ -132,13 +131,13 @@
   width: 420px; flex: none; min-height: 0; display: flex; flex-direction: column; gap: var(--s-4); padding: var(--s-6);
   background: var(--surface-card); overflow: hidden; box-shadow: -1px 0 0 var(--divider);
 }
-/* Mobile: доставка — панель по содержимому, карта забирает остальное; самовывоз — панель растягивается под список. */
+/* Mobile: панель — всё, что ниже карты; кнопка прижата к низу. */
 .mobile .panel, .card.mobile .panel {
   width: 100%; flex: none; padding: 16px 16px max(16px, env(safe-area-inset-bottom));
   border-radius: var(--r-24) var(--r-24) 0 0; margin-top: -20px; position: relative; z-index: 4; /* лист поверх края карты */
   box-shadow: 0 -6px 20px rgba(23, 21, 26, .08); /* из референса (тень листа), нет в tokens.css */
 }
-.mobile .pickupMode .panel, .card.mobile.pickupMode .panel { flex: 1; }
+.mobile .panel, .card.mobile .panel { flex: 1; min-height: 0; }
 .head { display: flex; flex-direction: column; gap: var(--s-1); padding-right: 48px; }
 .mobile .head, .card.mobile .head { padding-right: 0; }
 .title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: var(--tracking-tight); } /* 22 — из референса (= mobile h1) */
@@ -190,15 +189,6 @@
 .pickup { display: flex; flex-direction: column; gap: var(--s-2); flex: 1; min-height: 0; }
 .warn { padding: 14px 16px; border-radius: var(--r-16); background: var(--warning-bg); font-size: var(--fs-small); line-height: var(--lh-small); }
 .count { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); min-height: 32px; font-size: var(--fs-13); color: var(--ink-2); padding: 0 2px; flex: none; }
-.nearBtn {
-  position: relative; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r-pill);
-  background: var(--primary-50); color: var(--primary); font: inherit; font-size: var(--fs-13); font-weight: 600; cursor: pointer;
-}
-.nearBtn::after { content: ''; position: absolute; inset: -6px 0; } /* зона касания 44 */
-.nearBtn .geoIcon { width: 12px; height: 12px; border-width: 1.5px; }
-.nearBtn .geoIcon::after { left: 2px; top: 2px; width: 5px; height: 5px; }
-.geoIcon { width: 16px; height: 16px; border: 2px solid var(--primary); border-radius: 50%; position: relative; flex: none; }
-.geoIcon::after { content: ''; position: absolute; left: 3px; top: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
 .stores { display: flex; flex-direction: column; overflow: auto; flex: 1; min-height: 0; margin: 0 -8px; padding: 0 8px; overscroll-behavior: contain; }
 /* Строка точки: компактно (≈60), без рамок — на экран помещается вдвое больше точек; разделитель между строками. */
 .store {
