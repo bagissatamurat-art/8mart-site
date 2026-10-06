@@ -1,0 +1,67 @@
+/* Вопросы и ответы + футер. Белые карточки r24, как остальные блоки сайта; токены из tokens.css. */
+
+/* ── Вопросы и ответы ── */
+.faq { background: var(--surface-card); border-radius: var(--r-24); padding: 24px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px; }
+.faqTitle { margin: 0; font-size: var(--fs-h2); font-weight: 700; }
+.faqList { display: flex; flex-direction: column; }
+.qa { border-top: 1px solid var(--divider); }
+.qa:first-child { border-top: 0; }
+.qHead { margin: 0; font: inherit; }
+.q {
+  position: relative; width: 100%; min-height: 56px; padding: 14px 0; border: 0; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; text-align: left;
+  font: inherit; font-size: var(--fs-body); font-weight: 600; color: var(--ink-1);
+}
+.q:focus-visible { box-shadow: var(--focus-ring); border-radius: var(--r-14); }
+/* Плюс → минус */
+.qIcon { position: relative; flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-subtle); transition: background var(--dur) var(--ease); }
+.qIcon::before, .qIcon::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; margin: -1px 0 0 -6px; border-radius: 1px; background: var(--ink-1); transition: transform var(--dur-enter) var(--ease-out); }
+.qIcon::after { transform: rotate(90deg); }
+.qaOpen .qIcon { background: var(--primary-50); }
+.qaOpen .qIcon::before, .qaOpen .qIcon::after { background: var(--primary); }
+.qaOpen .qIcon::after { transform: rotate(0deg); }
+.q:hover .qIcon { background: var(--surface-disabled); }
+.qaOpen .q:hover .qIcon { background: var(--primary-100); }
+/* Ответ: высота 0 → по содержимому */
+.aWrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-enter) var(--ease-out); }
+.qaOpen .aWrap { grid-template-rows: 1fr; }
+.aInner { overflow: hidden; min-height: 0; }
+.a { margin: 0; padding: 0 48px 16px 0; font-size: var(--fs-15); line-height: 1.5; color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .aWrap, .qIcon::after { transition: none; } }
+
+/* ── Футер ── */
+.footer { background: var(--surface-card); border-radius: var(--r-24) var(--r-24) 0 0; margin-top: 8px; font-size: var(--fs-15); color: var(--ink-1); }
+.inner {
+  max-width: 1440px; margin: 0 auto; padding: 40px var(--page-pad-desktop) 32px;
+  display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 32px;
+}
+.about { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.tagline { margin: 0; max-width: 320px; font-size: var(--fs-small); line-height: 1.5; color: var(--ink-2); }
+.social { display: flex; gap: 8px; }
+.socialBtn {
+  width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--surface-subtle); color: var(--ink-1); transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.socialBtn:hover { background: var(--primary-50); color: var(--primary); }
+.socialBtn:focus-visible { box-shadow: var(--focus-ring); }
+.col { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; min-width: 0; }
+.colTitle { font-size: var(--fs-small); font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.col a { color: var(--ink-1); text-decoration: none; transition: color var(--dur) var(--ease); }
+.col a:hover { color: var(--primary); }
+.col a:focus-visible { box-shadow: var(--focus-ring); border-radius: 6px; }
+.phone { font-size: var(--fs-h3); font-weight: 700; }
+.cities { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; font-size: var(--fs-small); color: var(--ink-2); line-height: 1.45; }
+.citiesTitle { font-size: var(--fs-caption); color: var(--ink-3); }
+.bottom { max-width: 1440px; margin: 0 auto; padding: 16px var(--page-pad-desktop) 24px; border-top: 1px solid var(--divider); font-size: var(--fs-13); color: var(--ink-3); }
+
+@media (max-width: 1023.98px) {
+  .faq { padding: 16px; border-radius: var(--r-20); }
+  .faqTitle { font-size: 20px; }
+  .q { font-size: var(--fs-15); }
+  .a { padding-right: 0; font-size: var(--fs-small); }
+  .footer { border-radius: var(--r-24) var(--r-24) 0 0; margin-top: 16px; }
+  .inner { grid-template-columns: 1fr 1fr; gap: 24px 16px; padding: 24px var(--page-pad-mobile) 20px; }
+  .about { grid-column: 1 / -1; }
+  .col:last-child { grid-column: 1 / -1; }
+  .bottom { padding: 14px var(--page-pad-mobile) 20px; }
+}

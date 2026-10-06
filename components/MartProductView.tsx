@@ -44,6 +44,8 @@ export interface MartProductViewProps {
   /** Витрина: оверлей position:absolute внутри родителя, без портала, блокировки скролла и ловушки фокуса. */
   contained?: boolean;
   cartHref?: string;
+  /** Страница товара (mobile): блоки под описанием в той же прокрутке — вопросы и ответы, футер. */
+  after?: React.ReactNode;
   /** Высота окна, которое модалка подменяет (скелетон): высота плавно перейдёт к своей, без скачка. */
   fromHeight?: number;
 }
@@ -62,7 +64,7 @@ const productUrl = (id: string) => `/product/${encodeURIComponent(id)}`;
 
 function View({
   product: pr, group, categories, method = null, qtyFor, onQty, onClose, onPickGroup, page = false, contained = false, appear = 'enter',
-  cartHref = '/cart', mobile, fromHeight, onHeight,
+  cartHref = '/cart', mobile, fromHeight, onHeight, after,
 }: MartProductViewProps & { mobile: boolean; onHeight?: (h: number) => void }) {
   const [vid, setVid] = useState<string | null>(null);
   const [colorSel, setColorSel] = useState<string | null>(null);
@@ -209,6 +211,7 @@ function View({
         <div className={s.body}>
           <Gallery slides={imgs} idx={cur} name={pr.name} mobile={mobile} fav={fav} onFav={toggleFav} onIdx={setIdx} resetKey={v?.id} />
           {info}
+          {after && <div className={s.after}>{after}</div>}
         </div>
         {mobile && <div className={s.footer}>{cta}</div>}
       </div>

@@ -1,7 +1,8 @@
 import { HomeScreen } from '@/components/screens/HomeScreen';
 import { getBanners, getCategories, getProducts, getStories } from '@/lib/api';
 import { JsonLd } from '@/components/ui/JsonLd';
-import { organizationLd, websiteLd } from '@/lib/seo';
+import { faqLd, organizationLd, websiteLd } from '@/lib/seo';
+import { FAQ } from '@/lib/faq';
 
 /** Полки главной — подкатегории основной категории (цветы): «Розы», «Гортензии», «Хризантемы». */
 const MAIN_CATEGORY = 'tsvety';
@@ -16,7 +17,7 @@ export default async function Home() {
   })));
   return (
     <>
-      <JsonLd data={[organizationLd(), websiteLd()]} />
+      <JsonLd data={[organizationLd(), websiteLd(), faqLd(FAQ)]} />
       <HomeScreen categories={categories} stories={stories} banner={banners[0]} shelves={shelves.filter(sh => sh.products.length)} />
     </>
   );

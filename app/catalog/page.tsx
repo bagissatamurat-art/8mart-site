@@ -5,7 +5,8 @@ import { JsonLd } from '@/components/ui/JsonLd';
 import { catalogLevel, parseCatalog } from '@/components/catalog/catalogUrl';
 import { CATALOG } from '@/lib/copy';
 import { getCategories, getProducts } from '@/lib/api';
-import { breadcrumbsLd, catalogPath } from '@/lib/seo';
+import { breadcrumbsLd, catalogPath, faqLd } from '@/lib/seo';
+import { FAQ } from '@/lib/faq';
 import type { Category } from '@/lib/types';
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -57,7 +58,7 @@ export default async function CatalogPage({ searchParams }: Props) {
     ...(c ? [{ name: c.name, path: catalogPath(c.slug) }] : []), ...(s ? [{ name: s.name, path: catalogPath(c!.slug, s.slug) }] : [])];
   return (
     <>
-      <JsonLd data={breadcrumbsLd(crumbs)} />
+      <JsonLd data={[breadcrumbsLd(crumbs), faqLd(FAQ)]} />
       {/* useSearchParams в экране — граница Suspense обязательна. */}
       <Suspense><CatalogScreen categories={categories} stats={stats} initial={initial} /></Suspense>
     </>

@@ -1,6 +1,7 @@
 /* 8a: padding 0 40 40, gap 16, крошки 14 #6B6873 */
 .wrap { padding: 0 var(--page-pad-desktop) 40px; display: flex; flex-direction: column; gap: 16px; max-width: 1440px; width: 100%; margin: 0 auto; }
 .min0 { min-width: 0; }
+.stack { display: flex; flex-direction: column; gap: 16px; } /* товар, под ним — вопросы и ответы */
 
 /* 8b: белый экран, панель 4 12 8 с кнопками 44, ниже — MartProductView page на всю высоту */
 .mPage { height: 100dvh; display: flex; flex-direction: column; background: var(--surface-card); max-width: var(--mobile-max); margin: 0 auto; }

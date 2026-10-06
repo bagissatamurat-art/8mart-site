@@ -17,6 +17,12 @@ export const catalogPath = (cat?: string | null, sub?: string | null) =>
   !cat ? '/catalog' : sub ? `/catalog?cat=${cat}&sub=${sub}` : `/catalog?cat=${cat}`;
 
 type Crumb = { name: string; path: string };
+/** FAQPage — те же вопросы, что в блоке «Вопросы и ответы» (lib/faq.ts). */
+export const faqLd = (items: [string, string][]) => ({
+  '@context': 'https://schema.org', '@type': 'FAQPage',
+  mainEntity: items.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+});
+
 export const breadcrumbsLd = (items: Crumb[]) => ({
   '@context': 'https://schema.org', '@type': 'BreadcrumbList',
   itemListElement: items.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: abs(c.path) })),

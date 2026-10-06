@@ -28,6 +28,8 @@ import k from './CatalogScreen.module.css';
 import l from '@/components/site/page.module.css';
 import { CardSkeleton } from '@/components/ui/Spinner';
 import { Breadcrumbs } from '@/components/site/Breadcrumbs';
+import { SiteFaq } from '@/components/site/SiteFaq';
+import { SiteFooter } from '@/components/site/SiteFooter';
 
 export type { CatalogStats };
 
@@ -207,11 +209,13 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
               {listBody()}
             </>
           )}
+          <SiteFaq />
         </main>
 
         <div className={k.aside}><SiteMiniCart /></div>
       </div>
 
+      <SiteFooter categories={categories} />
       <SiteTabBar active="catalog" />
 
       {level === 'list' && (

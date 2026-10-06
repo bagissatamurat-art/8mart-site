@@ -17,6 +17,8 @@ import type { Banner, Category, Product, Story } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import h from './HomeScreen.module.css';
 import { TOASTS } from '@/lib/copy';
+import { SiteFaq } from '@/components/site/SiteFaq';
+import { SiteFooter } from '@/components/site/SiteFooter';
 
 export interface HomeShelf { title: string; href: string; products: Product[] }
 export interface HomeData { categories: Category[]; stories: Story[]; banner: Banner; shelves: HomeShelf[] }
@@ -53,9 +55,11 @@ export function HomeScreen({ categories, stories, banner, shelves }: HomeData) {
             <div className={s.mobileOnly}><MartBanner banner={banner} mode="mobile" /></div>
           </div>
           {shelves.map(sh => <ProductShelf key={sh.href} title={sh.title} href={sh.href} products={sh.products} />)}
+          <SiteFaq />
         </main>
         <div className={s.aside}><SiteMiniCart /></div>
       </div>
+      <SiteFooter categories={categories} />
       <SiteTabBar active="home" />
     </div>
   );

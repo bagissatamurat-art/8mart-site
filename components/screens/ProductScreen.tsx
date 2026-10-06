@@ -14,6 +14,8 @@ import type { Category, Product, ProductDetail } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import p from './ProductScreen.module.css';
 import { Breadcrumbs } from '@/components/site/Breadcrumbs';
+import { SiteFaq } from '@/components/site/SiteFaq';
+import { SiteFooter } from '@/components/site/SiteFooter';
 
 export interface ProductData { product: ProductDetail; group: Product[]; categories: Category[] }
 
@@ -27,7 +29,8 @@ export function ProductScreen({ product, group, categories }: ProductData) {
   const sub = cat?.sub.find(x => x.slug === product.cat);
   const view = (
     <MartProductView page product={product} group={group} categories={categories} method={method} mode={mobile ? 'mobile' : 'desktop'}
-      qtyFor={k => lines[k] || 0} onQty={setCartQty} onPickGroup={id => router.push(`/product/${id}`)} />
+      qtyFor={k => lines[k] || 0} onQty={setCartQty} onPickGroup={id => router.push(`/product/${id}`)}
+      after={mobile ? <><SiteFaq /><SiteFooter categories={categories} /></> : undefined} />
   );
 
   if (mobile) {
@@ -55,10 +58,11 @@ export function ProductScreen({ product, group, categories }: ProductData) {
         <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Каталог', href: '/catalog' },
           ...(cat ? [{ label: cat.name, href: `/catalog?cat=${cat.slug}` }] : []), { label: sub?.name ?? '' }]} />
         <div className={s.grid2}>
-          <div className={p.min0}>{view}</div>
+          <div className={`${p.min0} ${p.stack}`}>{view}<SiteFaq /></div>
           <div className={s.aside}><SiteMiniCart /></div>
         </div>
       </div>
+      <SiteFooter categories={categories} />
     </div>
   );
 }

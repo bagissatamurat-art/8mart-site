@@ -4,7 +4,8 @@ import { ProductScreen } from '@/components/screens/ProductScreen';
 import { ApiError, getAllProductIds, getCategories, getGroup, getProduct } from '@/lib/api';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { money } from '@/lib/domain';
-import { breadcrumbsLd, catalogPath, productLd } from '@/lib/seo';
+import { breadcrumbsLd, catalogPath, productLd, faqLd } from '@/lib/seo';
+import { FAQ } from '@/lib/faq';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -39,7 +40,7 @@ export default async function ProductPage({ params }: Params) {
     { name: product.name, path: `/product/${product.id}` }];
   return (
     <>
-      <JsonLd data={[productLd(product, cat), breadcrumbsLd(crumbs)]} />
+      <JsonLd data={[productLd(product, cat), breadcrumbsLd(crumbs), faqLd(FAQ)]} />
       <ProductScreen product={product} group={group} categories={categories} />
     </>
   );
