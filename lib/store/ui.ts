@@ -24,6 +24,12 @@ export const useUi = create<UiState>()(set => ({
   closeQuickView: () => set({ quickViewId: null }),
 }));
 
+/** Переход на другую страницу (ссылка, «Назад», таб-бар): глобальные модалки закрываются вместе со старой страницей. */
+export function closeOverlays() {
+  const s = useUi.getState();
+  if (s.quickViewId || s.methodOpen) useUi.setState({ quickViewId: null, methodOpen: false, pending: null });
+}
+
 /** Изменение количества с проверкой способа получения: без него «В корзину» открывает модалку. */
 export function setCartQty(key: string, qty: number) {
   if (qty > 0 && !useMethod.getState().method) {

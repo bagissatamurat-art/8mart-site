@@ -1,6 +1,7 @@
 'use client';
 // Глобальные оверлеи: гидрация сторов, модалка способа получения, быстрый просмотр.
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { QuickViewSkeleton } from './QuickViewSkeleton';
 
@@ -11,7 +12,7 @@ import { loadQuickView, loadQuickViewComponent, peekQuickView, peekQuickViewComp
 import { useCart } from '@/lib/store/cart';
 import { useAuth } from '@/lib/store/auth';
 import { methodValue, useMethod } from '@/lib/store/method';
-import { flushPending, setCartQty, useUi } from '@/lib/store/ui';
+import { closeOverlays, flushPending, setCartQty, useUi } from '@/lib/store/ui';
 import type { Category, City } from '@/lib/types';
 import type { MethodValue } from '@/components/method/types';
 
@@ -113,6 +114,19 @@ function QuickViewHost({ categories }: { categories: Category[] }) {
   );
 }
 
+/** Смена адреса (путь или query) — закрыть модалки: иначе они остаются поверх новой страницы с заблокированной прокруткой.
+ *  useSearchParams — внутри Suspense, чтобы статические страницы не уходили в клиентский рендер. */
+function RouteWatcher() {
+  const route = usePathname() + '?' + useSearchParams().toString();
+  const first = useRef(route);
+  useEffect(() => {
+    if (route === first.current) return;
+    first.current = route;
+    closeOverlays();
+  }, [route]);
+  return null;
+}
+
 export function SiteOverlays({ categories }: { categories: Category[] }) {
-  return <><StoreHydrator /><MethodModalHost /><QuickViewHost categories={categories} /></>;
+  return <><StoreHydrator /><Suspense fallback={null}><RouteWatcher /></Suspense><MethodModalHost /><QuickViewHost categories={categories} /></>;
 }
