@@ -70,6 +70,10 @@ export interface Order {
   shipments: OrderShipment[]; total: number; bonus: number;
   // ── Сверх README (итоги и получатель на статусной странице 03): ──
   recipient?: { name: string; phone: string };
+  /** Курьер оставит у двери. */
+  leaveAtDoor?: boolean;
+  /** Счёт Kaspi выставлен на этот номер. */
+  kaspiPhone?: string;
   goods?: number; discount?: number; promoPct?: number;
   /** Строки стоимости по отправлениям + подъём на этаж. */
   fees?: { label: string; amount: number }[];
@@ -81,7 +85,12 @@ export interface Order {
 export interface OrderDraft {
   cart: Record<string, number>; method: Method; city: string; address: string; pickupPointId: string | null;
   entrance?: string; floor?: string; flat?: string; comment?: string;
+  /** Получатель: телефон — из профиля (можно поменять), имя — из профиля, может быть пустым. */
   recipient: { name: string; phone: string };
+  /** Доставка: курьер оставит у двери. */
+  leaveAtDoor?: boolean;
+  /** Kaspi Pay счётом: номер, на который выставить счёт в Kaspi. */
+  kaspiPhone?: string;
   together: boolean; courierSlot: string; cargoDay: number; cargoInterval: number; lift: boolean;
   promo?: string; useBonus: boolean; payment: 'kaspi' | 'card'; cardId?: string | null;
 }

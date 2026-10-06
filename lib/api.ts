@@ -229,7 +229,8 @@ export function createOrder(d: OrderDraft): Promise<{ id: string; payUrl?: strin
         ? (pk ? 'завтра с 9:00' : `${SHIPPING.cargo.days[d.cargoDay].replace(/^[^,]+, /, '')}, ${SHIPPING.cargo.intervals[d.cargoInterval]}`)
         : pk ? hhmm(plusMin(now, 40)) : !slot || slot[0] === 'asap' ? `${hhmm(plusMin(now, 60))}–${hhmm(plusMin(now, 90))}` : slot[1],
     })),
-    recipient: d.recipient, goods: t.goods, discount: t.discount, fees: t.fees.map(f => ({ label: f.label, amount: f.amount })),
+    recipient: d.recipient, leaveAtDoor: d.method === 'delivery' ? d.leaveAtDoor : undefined, kaspiPhone: d.payment === 'kaspi' ? d.kaspiPhone : undefined,
+    goods: t.goods, discount: t.discount, fees: t.fees.map(f => ({ label: f.label, amount: f.amount })),
     spend: t.spend, total: t.total, bonus: t.earn,
   };
   writeMock({ ...m, placed: [order, ...m.placed] });

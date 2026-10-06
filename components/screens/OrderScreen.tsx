@@ -10,7 +10,7 @@ import { SiteHeader } from '@/components/site/SiteHeader';
 import { Skeleton } from '@/components/ui/Spinner';
 import { cancelOrder, getOrder, resolveCartItem } from '@/lib/api';
 import { CANCEL_BEFORE, REFUND_DAYS, SUPPORT_WA } from '@/lib/config';
-import { CART, ORDER_PAGE } from '@/lib/copy';
+import { CART, ORDER_PAGE, CHECKOUT } from '@/lib/copy';
 import { bonusText, itemsTitle, money } from '@/lib/domain';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { Category, Order } from '@/lib/types';
@@ -61,7 +61,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   const info = (
     <div className={c.info}>
       <div className={c.infoRow}><span className={c.infoLabel}>{pk ? 'Самовывоз' : 'Доставка'}</span><span className={c.infoStrong}>{order.address}</span></div>
-      {order.recipient && <div className={c.infoRow}><span className={c.infoLabel}>Получатель</span><span>{order.recipient.name} · {order.recipient.phone}</span></div>}
+      {order.recipient && <div className={c.infoRow}><span className={c.infoLabel}>Получатель</span><span>{[order.recipient.name, order.recipient.phone].filter(Boolean).join(' · ')}{order.leaveAtDoor ? ` · ${CHECKOUT.leftAtDoor.toLowerCase()}` : ''}</span></div>}
     </div>
   );
   const summaryBody = (

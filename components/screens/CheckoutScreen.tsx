@@ -1,5 +1,7 @@
 'use client';
-// Оформление — 03 Оформление.dc.html: 3a (1440) и 3b (390). Вход → получатель → способ и отправления → оплата → оферта → CTA.
+// Оформление — 03 Оформление.dc.html: 3a (1440) и 3b (390). Вход → способ (адрес, телефон получателя, комментарий, «у двери»)
+// → как доставим (отправления, газель) → оплата (Kaspi — номер для счёта) → оферта (включена) → CTA.
+// Блока «Получатель» нет: телефон подставляется из профиля, имя — из профиля (может быть пустым).
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -19,7 +21,7 @@ import { Skeleton } from '@/components/ui/Spinner';
 import { createOrder, getBonus, getCards } from '@/lib/api';
 import { SHIPPING } from '@/lib/config';
 import { CART, CHECKOUT, CTA_BLOCKED } from '@/lib/copy';
-import { bonusText, groupDigits, itemsTitle, money, orderTotals, splitOptions, tg } from '@/lib/domain';
+import { bonusText, groupDigits, itemsTitle, money, orderTotals, phoneComplete, splitOptions, tg } from '@/lib/domain';
 import { useCartLines } from '@/lib/hooks/useCartLines';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { usePromo } from '@/lib/hooks/usePromo';
@@ -48,8 +50,11 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const user = useAuth(st => st.user);
   const login = useAuth(st => st.login);
 
-  const [name, setName] = useState('');
-  const [nameTouched, setNameTouched] = useState(false);
+  /** Телефон получателя и номер для счёта Kaspi — из профиля, можно поменять. */
+  const [phone, setPhone] = useState('');
+  const [kaspiPhone, setKaspiPhone] = useState('');
+  const [touched, setTouched] = useState(false);
+  const [leaveAtDoor, setLeaveAtDoor] = useState(false);
   const [entrance, setEntrance] = useState(''), [floor, setFloor] = useState(''), [flat, setFlat] = useState('');
   const [comment, setComment] = useState('');
   const [slot, setSlot] = useState('asap');
@@ -57,7 +62,8 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const [lift, setLift] = useState(false);
   const [useBonus, setUseBonus] = useState(false);
   const [pay, setPay] = useState('kaspi');
-  const [offer, setOffer] = useState(false);
+  /** Согласие с офертой и возвратом — включено по умолчанию. */
+  const [offer, setOffer] = useState(true);
   const [placing, setPlacing] = useState(false);
   const [cards, setCards] = useState<Card[]>([]);
   const [bonus, setBonus] = useState<Bonus | null>(null);
@@ -69,7 +75,8 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   useEffect(() => { setEntrance(e => e || m.entrance || ''); setFlat(f => f || m.flat || ''); }, [m.entrance, m.flat]);
   useEffect(() => {
     if (!user) return;
-    setName(n => n || user.name);
+    setPhone(p => p || user.phone);
+    setKaspiPhone(p => p || user.phone);
     getCards().then(cs => setCards(cs));
     getBonus().then(setBonus);
   }, [user]);
@@ -78,8 +85,10 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const planOpts = { method, together, pickupPoint: pk ? m.label : '', floor, lift };
   const t = orderTotals({ lines, plan: planOpts, promoPct: promo?.pct ?? 0, useBonus: !!user && useBonus, balance: bonus?.balance ?? 0, maxPart: bonus?.maxPart ?? 0 });
   const promoField = usePromo(t.goods, t.discount);
-  const reason = !name.trim() ? CHECKOUT.nameRequired : !offer ? CTA_BLOCKED.offer : t.hasSoldOut ? CTA_BLOCKED.soldOut : '';
   const kaspi = pay === 'kaspi';
+  const phoneOk = phoneComplete(phone), kaspiOk = !kaspi || phoneComplete(kaspiPhone);
+  const reason = !phoneOk ? CHECKOUT.phoneRequired : !kaspiOk ? CHECKOUT.kaspiPhoneRequired
+    : !offer ? CTA_BLOCKED.offer : t.hasSoldOut ? CTA_BLOCKED.soldOut : '';
   const cargo = t.plan.list.find(x => x.isCargo);
   const floorN = parseInt(floor, 10) || 0;
   const liftSub = !cargo ? '' : floorN > 1
@@ -87,12 +96,12 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
     : floorN === 1 ? CHECKOUT.liftSub.firstFloor : CHECKOUT.liftSub.noFloor;
 
   const place = async () => {
-    if (reason || !user) { setNameTouched(true); return; }
+    if (reason || !user) { setTouched(true); return; }
     setPlacing(true);
     try {
       const { id } = await createOrder({
         cart, method, city: m.city, address: m.address, pickupPointId: m.pickupPointId, entrance, floor, flat, comment,
-        recipient: { name: name.trim(), phone: user.phone }, together, courierSlot: slot, cargoDay, cargoInterval: cargoInt, lift,
+        recipient: { name: user.name, phone }, leaveAtDoor: !pk && leaveAtDoor, kaspiPhone: kaspi ? kaspiPhone : undefined, together, courierSlot: slot, cargoDay, cargoInterval: cargoInt, lift,
         promo: promo?.code, useBonus, payment: kaspi ? 'kaspi' : 'card', cardId: kaspi || pay === 'card' ? null : pay,
       });
       placed.current = true;
@@ -118,21 +127,8 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
 
   const auth = (
     <div className={mobile ? c.authM : c.authCard}>
-      <MartAuth mode={mobile ? 'mobile' : 'desktop'} onDone={r => { login({ phone: r.phone, name: r.name ?? '' }, r.accessToken); setName(r.name ?? ''); }} />
+      <MartAuth mode={mobile ? 'mobile' : 'desktop'} onDone={r => login({ phone: r.phone, name: r.name ?? '' }, r.accessToken)} />
     </div>
-  );
-
-  const recipient = (
-    <section className={mobile ? c.cardM : c.card}>
-      <div className={c.cardHead}>
-        {mobile ? <b className={c.h16}>Получатель</b> : <h2 className={c.h2}>Получатель</h2>}
-        {!mobile && user && <span className={c.muted13}>Вы вошли как {user.phone}</span>}
-      </div>
-      <div className={mobile ? c.stack12 : c.grid2}>
-        <MartInput label="Имя" required value={name} onChange={setName} onBlur={() => setNameTouched(true)} error={nameTouched && !name.trim() ? true : undefined} />
-        <MartInput label="Телефон" type="phone" required value={user?.phone ?? ''} />
-      </div>
-    </section>
   );
 
   const methodSection = (
@@ -149,6 +145,17 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
           <MartInput label={mobile ? 'Кв.' : 'Квартира, офис'} value={flat} onChange={setFlat} />
         </div>
       )}
+      <MartInput label={CHECKOUT.recipientPhone} type="phone" required value={phone} onChange={setPhone} onBlur={() => setTouched(true)}
+        hint={CHECKOUT.recipientHint(pk)} error={touched && !phoneOk ? CHECKOUT.phoneRequired : undefined} />
+      <MartInput label={CHECKOUT.comment(pk)} type="textarea" value={comment} onChange={setComment} />
+      {!pk && <MartToggleRow title={CHECKOUT.leaveAtDoor.title} sub={CHECKOUT.leaveAtDoor.sub} on={leaveAtDoor} onToggle={() => setLeaveAtDoor(v => !v)} />}
+    </section>
+  );
+
+  // Как доставим: вместе/раздельно, отправления — курьер (когда), газель (день, интервал, подъём).
+  const shipSection = (
+    <section className={mobile ? c.cardM : c.card}>
+      {mobile ? <b className={c.h16}>{CHECKOUT.shipTitle(pk)}</b> : <h2 className={c.h2}>{CHECKOUT.shipTitle(pk)}</h2>}
       {t.plan.canSplit && <MartSplitChoice compact={mobile} method={method} onPick={setTogether} options={splitOptions(lines, { ...planOpts, goodsTotal: t.afterDiscount })} />}
       {t.plan.list.map(sh => (
         <div key={sh.id} className={mobile ? c.shipM : c.ship}>
@@ -170,7 +177,6 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
           )}
         </div>
       ))}
-      {!mobile && <MartInput label="Комментарий" type="textarea" value={comment} onChange={setComment} />}
     </section>
   );
 
@@ -178,6 +184,11 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
     <section className={mobile ? c.cardM : c.card}>
       {mobile ? <b className={c.h16}>Оплата</b> : <h2 className={c.h2}>Оплата</h2>}
       <MartPayment value={pay} cards={cards} mobile={mobile} onChange={setPay} />
+      {/* Kaspi Pay не всегда автоматический — выставляем счёт в Kaspi на номер (из профиля, можно поменять). */}
+      {kaspi && (
+        <MartInput label={CHECKOUT.kaspiPhone} type="phone" required value={kaspiPhone} onChange={setKaspiPhone} onBlur={() => setTouched(true)}
+          hint={CHECKOUT.kaspiHint} error={touched && !kaspiOk ? CHECKOUT.kaspiPhoneRequired : undefined} />
+      )}
     </section>
   );
 
@@ -198,8 +209,8 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
         {!user ? <div className={c.mAuthWrap}>{auth}</div> : (
           <>
             <div className={c.mBody}>
-              {recipient}
               {methodSection}
+              {shipSection}
               {payment}
               <section className={`${c.cardM} ${c.stack12}`}>
                 <div className={c.cardHead}><b className={c.h16}>{title}</b><Link href="/cart" className={c.linkSm}>Изменить</Link></div>
@@ -229,7 +240,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
         <div className={l.split}>
           <main className={l.main}>
             <h1 className={l.h1}>Оформление</h1>
-            {!user ? auth : <>{recipient}{methodSection}{payment}{offerBox}</>}
+            {!user ? auth : <>{methodSection}{shipSection}{payment}{offerBox}</>}
           </main>
           <aside className={l.aside}>
             <div className={c.asideHead}><b className={c.h18}>{title}</b><Link href="/cart" className={c.link}>Изменить</Link></div>
