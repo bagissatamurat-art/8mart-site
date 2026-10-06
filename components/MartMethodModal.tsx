@@ -160,7 +160,7 @@ function MethodDialog({
   };
 
   const body = (
-    <div ref={card} role={inline ? 'group' : 'dialog'} aria-modal={inline ? undefined : true} aria-labelledby={titleId} aria-describedby={subId} tabIndex={-1}
+    <div ref={card} role={inline ? 'group' : 'dialog'} aria-modal={inline ? undefined : true} aria-labelledby={titleId} aria-describedby={subtitle ? subId : undefined} tabIndex={-1}
       className={`${s.card} ${inline ? s.inline : ''} ${inline && mobile ? s.mobile : ''} ${tab === 'pickup' ? s.pickupMode : ''}`}>
       <button type="button" className={s.close} aria-label="Закрыть" onClick={onClose}><Cross size={14} color="var(--ink-1)" /></button>
 
@@ -175,7 +175,7 @@ function MethodDialog({
       <div className={s.panel}>
         <div className={s.head}>
           <h2 id={titleId} className={s.title}>{title ?? 'Как получить заказ?'}</h2>
-          <p id={subId} className={s.subtitle}>{subtitle ?? 'Цены и наличие зависят от филиала'}</p>
+          {subtitle && <p id={subId} className={s.subtitle}>{subtitle}</p>}
         </div>
 
         {!addressOnly && (

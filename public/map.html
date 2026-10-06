@@ -41,28 +41,29 @@ html,body,#map{margin:0;height:100%;width:100%;background:#EEEDF1;font-family:On
 .pp.sel{background:#EE1D74;transform:scale(1.15)}
 .pp.sel span{background:#fff}
 .pp:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(238,29,116,.18),0 4px 12px rgba(23,21,26,.18)}
-#ctl{position:absolute;right:12px;bottom:28px;display:flex;flex-direction:column;gap:8px;z-index:600}
-body.compact #ctl{bottom:32px;gap:6px}
+/* Кнопки карты справа снизу: зум — одна капсула 44×88 (+ / разделитель / −), под ней «Моё местоположение» — круг 44.
+   Белые, тень как у плашки города; иконки — SVG 20, штрих 2. На пределе масштаба кнопка гаснет. */
+#ctl{position:absolute;right:12px;bottom:28px;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:600}
+body.compact #ctl{bottom:56px} /* над атрибуцией Mapbox (она поднята на 20px над панелью) */
 /* Mobile: панель модалки заходит на карту на 20px — логотип и атрибуция Mapbox должны оставаться видны. */
 body.compact .mapboxgl-ctrl-bottom-left,body.compact .mapboxgl-ctrl-bottom-right{bottom:20px}
-body.compact #ctl button{width:40px;height:40px}
-body.compact #zin,body.compact #zout{display:none}
-#ctl button{position:relative;width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:0 4px 12px rgba(23,21,26,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background .15s ease}
+#zoom{display:flex;flex-direction:column;width:44px;border-radius:22px;background:#fff;box-shadow:0 4px 12px rgba(23,21,26,.15);overflow:hidden}
+#zoom button+button{border-top:1px solid #EEEDF1}
+#ctl button{position:relative;width:44px;height:44px;border:0;margin:0;padding:0;background:#fff;color:#17151A;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease,color .15s ease;-webkit-tap-highlight-color:transparent}
 #ctl button:hover{background:#F7F7F8}
+#ctl button:active{background:#EEEDF1}
 #ctl button:focus{outline:none}
-#ctl button:focus-visible{box-shadow:0 0 0 3px rgba(238,29,116,.18),0 4px 12px rgba(23,21,26,.15)}
-#ctl .h{width:14px;height:2.5px;background:#17151A;border-radius:1px}
-#ctl .v{position:absolute;width:2.5px;height:14px;background:#17151A;border-radius:1px}
-#locate i{width:16px;height:16px;border:2.5px solid #17151A;border-radius:50%;box-sizing:border-box;position:relative;display:block}
-#locate i:after{content:"";position:absolute;left:3px;top:3px;width:5px;height:5px;border-radius:50%;background:#17151A}
-#locate b{position:absolute;background:#17151A;border-radius:1px}
-#locate b.n{left:50%;top:7px;width:2.5px;height:6px;margin-left:-1.25px}
-#locate b.s{left:50%;bottom:7px;width:2.5px;height:6px;margin-left:-1.25px}
-#locate b.w{left:7px;top:50%;width:6px;height:2.5px;margin-top:-1.25px}
-#locate b.e{right:7px;top:50%;width:6px;height:2.5px;margin-top:-1.25px}
-#locate.on i,#locate.on b{border-color:#EE1D74;background-color:#EE1D74}
-#locate.on i{background:transparent}
-#locate.on i:after{background:#EE1D74}
+#ctl button:focus-visible{box-shadow:inset 0 0 0 2px #EE1D74}
+#ctl button:disabled{color:#C9C7CF;cursor:default;background:#fff}
+#ctl svg{width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#locate{border-radius:50%;box-shadow:0 4px 12px rgba(23,21,26,.15)}
+#locate:focus-visible{box-shadow:inset 0 0 0 2px #EE1D74,0 4px 12px rgba(23,21,26,.15)}
+#locate .sp{display:none;width:20px;height:20px;border-radius:50%;box-sizing:border-box;border:2px solid rgba(238,29,116,.2);border-top-color:#EE1D74;animation:spin .8s linear infinite}
+#locate.busy svg{display:none}
+#locate.busy .sp{display:block}
+#locate.on{color:#EE1D74}
+#locate.on svg{fill:#EE1D74}
+@media (prefers-reduced-motion: reduce){#locate .sp{animation-duration:1.6s}}
 /* Карта не загрузилась (нет токена / сети) — родитель покажет свою заглушку, здесь только подпись. */
 #fail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:#6B6873;font-size:14px;line-height:1.4}
 </style></head>
@@ -71,7 +72,13 @@ body.compact #zin,body.compact #zout{display:none}
 <div id="pin" hidden><div class="head"><span class="dot"></span><svg class="spin" viewBox="0 0 24 24" aria-hidden="true"><circle class="track" cx="12" cy="12" r="9"/><circle class="arc" cx="12" cy="12" r="9"/></svg></div><div class="leg"></div></div>
 <div id="shadow" hidden></div>
 <div id="fail" hidden>Карта недоступна — укажите адрес вручную</div>
-<div id="ctl"><button type="button" id="zin" aria-label="Приблизить"><span class="h"></span><span class="v"></span></button><button type="button" id="zout" aria-label="Отдалить"><span class="h"></span></button><button type="button" id="locate" aria-label="Моё местоположение" title="Моё местоположение"><i></i><b class="n"></b><b class="s"></b><b class="w"></b><b class="e"></b></button></div>
+<div id="ctl">
+  <div id="zoom">
+    <button type="button" id="zin" aria-label="Приблизить"><svg viewBox="0 0 20 20"><path d="M10 4.5v11M4.5 10h11"/></svg></button>
+    <button type="button" id="zout" aria-label="Отдалить"><svg viewBox="0 0 20 20"><path d="M4.5 10h11"/></svg></button>
+  </div>
+  <button type="button" id="locate" aria-label="Моё местоположение" title="Моё местоположение"><svg viewBox="0 0 20 20"><path d="M16.8 3.2 3.6 8.6c-.6.3-.6 1.2.1 1.4l5.1 1.3 1.3 5.1c.2.7 1.1.7 1.4.1z"/></svg><span class="sp"></span></button>
+</div>
 <script>
 (function () {
   var q = new URLSearchParams(location.search);
@@ -164,18 +171,26 @@ body.compact #zin,body.compact #zout{display:none}
     if (m.fit && state.points.length) fitPoints();
     applyMode();
   });
-  document.getElementById('zin').onclick = function () { map.zoomIn(); };
-  document.getElementById('zout').onclick = function () { map.zoomOut(); };
+  var zin = document.getElementById('zin'), zout = document.getElementById('zout');
+  zin.onclick = function () { map.zoomIn(); };
+  zout.onclick = function () { map.zoomOut(); };
+  // На пределе масштаба кнопка гаснет.
+  function zoomState() { var z = map.getZoom(); zin.disabled = z >= map.getMaxZoom() - 0.01; zout.disabled = z <= map.getMinZoom() + 0.01; }
+  map.on('zoomend', zoomState); map.on('load', zoomState);
+  // Человек сам сдвинул карту — это уже не «моё местоположение».
+  map.on('dragstart', function () { loc.classList.remove('on'); });
   var loc = document.getElementById('locate'), me = null;
+  // Пока определяем позицию — спиннер в кнопке; нашли — стрелка залита розовым; отказ/ошибка — обычный вид.
   loc.onclick = function () {
-    if (!navigator.geolocation) return;
-    loc.classList.add('on');
+    if (!navigator.geolocation || loc.classList.contains('busy')) return;
+    loc.classList.remove('on'); loc.classList.add('busy'); loc.setAttribute('aria-busy', 'true');
     navigator.geolocation.getCurrentPosition(function (p) {
+      loc.classList.remove('busy'); loc.classList.add('on'); loc.removeAttribute('aria-busy');
       var ll = [p.coords.longitude, p.coords.latitude];
       post({ type: 'geo', lat: ll[1], lng: ll[0] });
       if (state.mode === 'delivery') map.flyTo({ center: ll, zoom: 16 });
       else { if (me) me.remove(); var el = document.createElement('div'); el.className = 'me'; me = new mapboxgl.Marker({ element: el }).setLngLat(ll).addTo(map); }
-    }, function () { loc.classList.remove('on'); });
+    }, function () { loc.classList.remove('busy', 'on'); loc.removeAttribute('aria-busy'); }, { timeout: 10000, maximumAge: 60000 });
   };
   applyMode();
   // ?quiet=<адрес> — стартовый адрес уже известен (initial), обратное геокодирование при загрузке не делаем.
