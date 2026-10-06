@@ -8,7 +8,10 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "import:flowers": "node scripts/import-flowers.mjs",
+    "import:branches": "node scripts/import-branches.mjs",
+    "import:catalog": "npm run import:flowers && npm run import:branches"
   },
   "dependencies": {
     "next": "^16.3.8",
