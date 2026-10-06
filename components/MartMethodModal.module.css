@@ -96,18 +96,20 @@
 }
 /* Пин — геометрия из site/map.html (подписи над пином нет: адрес — в поле под картой) */
 .pin {
-  position: absolute; left: 50%; top: 50%; width: 32px; height: 44px; margin: -44px 0 0 -16px; pointer-events: none; z-index: 2;
+  position: absolute; left: 50%; top: 50%; width: 46px; height: 59px; margin: -59px 0 0 -23px; pointer-events: none; z-index: 2;
   display: flex; flex-direction: column; align-items: center;
 }
+/* Головка 40: розовый круг, белая обводка 3, мягкая тень; внутри белая точка. Острие иглы — центр карты. */
 .pinHead {
-  width: 28px; height: 28px; border-radius: 50%; background: var(--primary); border: 3px solid var(--surface-card); position: relative;
-  box-shadow: 0 4px 12px rgba(238, 29, 116, .35); /* из референса, нет в tokens.css */
+  width: 40px; height: 40px; margin-top: 3px; border-radius: 50%; background: var(--primary); flex: none;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 3px var(--surface-card), 0 8px 20px rgba(238, 29, 116, .35), 0 2px 6px rgba(23, 21, 26, .18); /* как в public/map.html */
 }
-.pinHead::after { content: ''; position: absolute; left: 8px; top: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--surface-card); }
-.pinLeg { width: 2.5px; height: 16px; background: var(--ink-1); border-radius: 0 0 2px 2px; opacity: .75; }
+.pinHead::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--surface-card); }
+.pinLeg { width: 3px; height: 16px; background: var(--ink-1); border-radius: 0 0 1.5px 1.5px; }
 .pinShadow {
-  position: absolute; left: 50%; top: 50%; width: 10px; height: 4px; margin: -2px 0 0 -5px; border-radius: 50%; z-index: 1; pointer-events: none;
-  background: rgba(23, 21, 26, .3); /* из референса, нет в tokens.css */
+  position: absolute; left: 50%; top: 50%; width: 16px; height: 6px; margin: -3px 0 0 -8px; border-radius: 50%; z-index: 1; pointer-events: none;
+  background: rgba(23, 21, 26, .3); filter: blur(1.5px); /* из референса, нет в tokens.css */
 }
 /* Маркер точки самовывоза */
 .pp {
