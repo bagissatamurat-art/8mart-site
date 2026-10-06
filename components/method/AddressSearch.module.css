@@ -49,18 +49,8 @@
 .clear > * { position: relative; }
 .clear::after { content: ''; position: absolute; inset: -4px; } /* зона касания 44 */
 
-/* Город — чипсы одной строкой (на mobile — горизонтальная прокрутка) */
-.cities {
-  display: flex; gap: var(--s-2); flex: none; overflow-x: auto; scrollbar-width: none;
-  margin: 0 calc(-1 * var(--s-6)); padding: 2px var(--s-6);
-}
-.dialog:not(.mobile) .cities { flex-wrap: wrap; overflow: visible; margin: 0; padding: 2px 0; } /* desktop: все города видны, переносом */
-.mobile .cities {
-  margin: 0 -16px; padding: 2px 16px;
-  mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); /* край ленты — затухает: видно, что можно листать */
-}
-.cities::-webkit-scrollbar { display: none; }
-.cities > * { flex: none; }
+/* Город — раскрывающийся список (CitySelect variant="field") под полем */
+.city { flex: none; position: relative; z-index: 2; }
 
 .body { flex: 1; min-height: 120px; overflow-y: auto; overscroll-behavior: contain; margin: 0 -8px; padding: 0 8px; }
 .mobile .body { padding-bottom: 8px; }

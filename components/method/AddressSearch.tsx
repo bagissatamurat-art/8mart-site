@@ -1,5 +1,5 @@
 'use client';
-// Поиск адреса — отдельное окно поверх выбора способа: поле, ниже города чипсами, подсказки с подсветкой совпадения.
+// Поиск адреса — отдельное окно поверх выбора способа: поле, ниже город (раскрывающийся список), подсказки с подсветкой совпадения.
 // Подсказки — только в выбранном городе (точнее и меньше запросов к DaData), с 3 символов, debounce 300 мс,
 // кэш «город + запрос», устаревший запрос отменяется. Mobile — на весь экран, desktop — диалог 560 по центру.
 // Улица без дома → в поле «Улица, » и курсор для номера дома; с домом — окно закрывается, карта летит к дому.
@@ -10,9 +10,9 @@ import { GEO } from '@/lib/copy';
 import { useModal } from '@/lib/hooks/useModal';
 import { useMounted } from '@/lib/hooks/useMounted';
 import type { City } from '@/lib/types';
-import { MartChip } from '../MartChip';
 import { Chevron, Cross } from '../ui/Cross';
 import { Spinner } from '../ui/Spinner';
+import { CitySelect } from './CitySelect';
 import type { MethodDemoState, Suggestion } from './types';
 import s from './AddressSearch.module.css';
 
@@ -144,10 +144,8 @@ function SearchDialog({ mobile, value, cities, city, onCity, onPick, onClose, in
           )}
       </div>
 
-      {cities.length > 1 && (
-        <div className={s.cities} role="group" aria-label={GEO.searchCity}>
-          {cities.map(c => <MartChip key={c.id} label={c.name} selected={c.id === city?.id} onClick={() => { if (c.id !== city?.id) onCity(c.id); }} />)}
-        </div>
+      {city && cities.length > 1 && (
+        <div className={s.city}><CitySelect variant="field" cities={cities} value={city} onChange={onCity} /></div>
       )}
 
       <div className={s.body}>

@@ -65,6 +65,20 @@
 }
 .cityOpt:hover { background: var(--surface-subtle); }
 .cityOpt.sel { background: var(--primary-50); font-weight: 600; }
+/* Вид «поле» (окно поиска адреса): 56, r16, рамка 1.5, подпись «Город» сверху, список во всю ширину. */
+.cityField .cityBtn {
+  width: 100%; height: var(--h-56); padding: 0 var(--s-4); border-radius: var(--r-16); border: 1.5px solid var(--border);
+  box-shadow: none; justify-content: space-between; font-weight: 500; text-align: left;
+}
+.cityField .cityBtn::after { inset: 0; }
+.cityField .cityBtn:hover { background: var(--surface-card); border-color: var(--border-strong); }
+.cityField .cityBtn[aria-expanded="true"] { border-color: var(--primary); }
+.cityField .cityBtn:focus-visible { box-shadow: var(--focus-ring); border-color: var(--primary); }
+.cityText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cityLabel { font-size: var(--fs-caption); font-weight: 400; color: var(--ink-3); }
+.cityChev { display: flex; transition: transform var(--dur) var(--ease); }
+.cityChevUp { transform: rotate(180deg); }
+.cityField .cityMenu { top: 62px; width: 100%; max-height: min(320px, 50vh); z-index: 10; }
 
 /* Заглушка карты (нет токена / карта не загрузилась / витрина) */
 .fallback {
