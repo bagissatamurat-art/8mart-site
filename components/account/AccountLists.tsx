@@ -7,7 +7,7 @@ import type { Address, Bonus, Card, Product, UserPromo } from '@/lib/types';
 import { MartProductCard } from '../MartProductCard';
 import { Cross } from '../ui/Cross';
 import s from '../MartAccount.module.css';
-import { EMPTY } from '@/lib/copy';
+import { EMPTY, BONUS_PAGE } from '@/lib/copy';
 import { asset } from '@/lib/basePath';
 
 // ── Адреса ──
@@ -122,31 +122,55 @@ export function AccountPromos({ promos }: { promos: UserPromo[] }) {
 
 export function AccountBonus({ bonus }: { bonus: Bonus }) {
   const maxPart = bonus.maxPart ?? BONUS_RULES.maxPart;
+  const how: [string, string, string][] = [
+    ['+', BONUS_PAGE.earn.title, BONUS_PAGE.earn.text],
+    ['%', BONUS_PAGE.spend.title, BONUS_PAGE.spend.text(maxPart)],
+    ['∞', BONUS_PAGE.keep.title, BONUS_PAGE.keep.text],
+  ];
   return (
     <>
-      <div className={s.balance}>
-        <span className={s.balanceLabel}>Ваш баланс</span>
-        <span className={s.balanceRow}>
-          <b className={s.balanceValue}>{groupDigits(bonus.balance)}</b>
-          <span className={s.balanceWord}>{plural(bonus.balance, 'бонус', 'бонуса', 'бонусов')}</span>
+      {/* Баланс — фирменный зелёный бонусов (монетка «Б»), а не тёмная плашка из макета 06 */}
+      <section className={s.balance} aria-label={BONUS_PAGE.balance}>
+        <span className={s.balanceText}>
+          <span className={s.balanceLabel}>{BONUS_PAGE.balance}</span>
+          <span className={s.balanceRow}>
+            <b className={s.balanceValue}>{groupDigits(bonus.balance)}</b>
+            <span className={s.balanceWord}>{plural(bonus.balance, 'бонус', 'бонуса', 'бонусов')}</span>
+          </span>
+          <span className={s.balanceWorth}>{BONUS_PAGE.worth(groupDigits(bonus.balance))}</span>
         </span>
-        <p className={s.rules}>
-          1 бонус = 1 тг · за товары с отметкой <span className={s.miniBonus}><span className={s.miniCoin} aria-hidden>Б</span>+N</span> начисляем бонусы после получения заказа · оплачивайте бонусами до {maxPart}% суммы товаров
-        </p>
+        <span className={s.coins} aria-hidden><span>Б</span><span>Б</span><span>Б</span></span>
+      </section>
+
+      <div className={`${s.card} ${s.howCard}`}>
+        <h2 className={s.histTitle}>{BONUS_PAGE.howTitle}</h2>
+        <ul className={s.how}>
+          {how.map(([glyph, title, text]) => (
+            <li key={title} className={s.howItem}>
+              <span className={s.howIcon} aria-hidden>{glyph}</span>
+              <span className={s.col}><b className={s.howTitle}>{title}</b><span className={s.muted13}>{text}</span></span>
+            </li>
+          ))}
+        </ul>
       </div>
+
       <div className={`${s.card} ${s.histCard}`}>
-        <h2 className={s.histTitle}>История</h2>
+        <h2 className={s.histTitle}>{BONUS_PAGE.history}</h2>
         {bonus.history.length ? (
           <ul className={s.hist}>
-            {bonus.history.map(h => (
-              <li key={h.id} className={s.histRow}>
-                <span className={s.col}>
-                  <span className={s.histName}>{h.title}</span>
-                  <span className={s.date}>{h.date}</span>
-                </span>
-                <b className={`${s.histAmount} ${h.amount > 0 ? s.plusAmount : ''}`}>{(h.amount > 0 ? '+' : '−') + groupDigits(Math.abs(h.amount))}</b>
-              </li>
-            ))}
+            {bonus.history.map(h => {
+              const plus = h.amount > 0;
+              return (
+                <li key={h.id} className={s.histRow}>
+                  <span className={`${s.histIcon} ${plus ? s.histIconPlus : ''}`} aria-hidden>{plus ? '+' : '−'}</span>
+                  <span className={`${s.col} ${s.histText}`}>
+                    <span className={s.histName}>{h.title}</span>
+                    <span className={s.date}>{h.date}</span>
+                  </span>
+                  <b className={`${s.histAmount} ${plus ? s.plusAmount : ''}`}>{(plus ? '+' : '−') + groupDigits(Math.abs(h.amount))}</b>
+                </li>
+              );
+            })}
           </ul>
         ) : <span className={s.muted13}>{EMPTY.bonusHistory}</span>}
       </div>

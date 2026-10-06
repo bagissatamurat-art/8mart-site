@@ -137,19 +137,55 @@
 .copyBtn:hover { background: var(--surface-disabled); }
 .copied, .copied:hover { background: var(--success-bg); color: var(--success); }
 
-/* ── Бонусы ── */
-.balance { background: var(--ink-1); color: #fff; border-radius: var(--acc-r); padding: var(--acc-pad-big); display: flex; flex-direction: column; gap: var(--s-2); }
-.balanceLabel { font-size: var(--fs-small); color: var(--acc-muted-line); }
-.balanceRow { display: flex; align-items: baseline; gap: 10px; }
+/* ── Бонусы ── фирменный зелёный бонусов (монетка «Б» #1DA765), не тёмная плашка макета 06 */
+.balance {
+  position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  padding: var(--acc-pad-big); border-radius: var(--acc-r); color: #fff;
+  background: linear-gradient(135deg, var(--bonus) 0%, var(--bonus-ink) 100%);
+}
+.balanceText { position: relative; z-index: 1; display: flex; flex-direction: column; gap: var(--s-1); min-width: 0; }
+.balanceLabel { font-size: var(--fs-small); font-weight: 600; color: rgba(255, 255, 255, .8); }
+.balanceRow { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .balanceValue { font-size: var(--fs-display); font-weight: 800; letter-spacing: var(--tracking-tight); line-height: var(--lh-display); }
-.balanceWord { font-size: var(--fs-body); color: var(--acc-muted-line); }
-.rules { font-size: var(--fs-small); color: var(--acc-muted-line); line-height: 1.5; margin: 0; }
-.miniBonus { display: inline-flex; align-items: center; gap: var(--s-1); padding: 1px 6px 1px 3px; border-radius: var(--r-pill); background: var(--bonus-bg); color: var(--bonus-ink); font-size: var(--fs-caption); font-weight: 600; vertical-align: 1px; }
-.miniCoin { width: 10px; height: 10px; border-radius: 50%; background: var(--bonus); color: #fff; font-size: 6px; font-weight: 800; line-height: 1; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.balanceWord { font-size: var(--fs-body); font-weight: 600; color: rgba(255, 255, 255, .9); }
+.balanceWorth { font-size: var(--fs-small); color: rgba(255, 255, 255, .8); }
+/* Стопка монеток «Б» справа — декор */
+.coins { position: relative; flex: none; width: 112px; height: 88px; }
+.coins > span {
+  position: absolute; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: #fff; color: var(--bonus); font-size: 28px; font-weight: 800; box-shadow: 0 6px 16px rgba(15, 107, 62, .35), inset 0 0 0 4px var(--bonus-bg);
+}
+.coins > span:nth-child(1) { right: 0; top: 0; transform: rotate(12deg); }
+.coins > span:nth-child(2) { right: 34px; top: 22px; transform: rotate(-8deg); opacity: .92; }
+.coins > span:nth-child(3) { right: 64px; top: 6px; transform: scale(.72) rotate(6deg); opacity: .75; }
+.m .balance { padding: 20px; }
+.m .balanceValue { font-size: 32px; } /* как h1 mobile */
+.m .coins { width: 84px; height: 72px; }
+.m .coins > span { width: 52px; height: 52px; font-size: 22px; }
+.m .coins > span:nth-child(2) { right: 26px; top: 18px; }
+.m .coins > span:nth-child(3) { right: 46px; top: 4px; }
+
+/* Как это работает: 3 пункта (desktop — в ряд, mobile — столбиком) */
+.howCard { gap: var(--s-2); }
+.how { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); }
+.m .how { grid-template-columns: 1fr; gap: var(--s-3); }
+.howItem { display: flex; gap: var(--s-3); align-items: flex-start; min-width: 0; }
+.howIcon {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--bonus-bg); color: var(--bonus-ink); font-size: 17px; font-weight: 800;
+}
+.howTitle { font-size: var(--fs-15); font-weight: 700; }
+
 .histCard { gap: var(--s-1); }
 .histTitle { font-size: var(--fs-body); font-weight: 700; padding-bottom: var(--s-2); margin: 0; }
 .hist { list-style: none; margin: 0; padding: 0; }
-.histRow { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); padding: 10px 0; border-top: 1px solid var(--divider); }
+.histRow { display: flex; align-items: center; gap: var(--s-3); padding: 10px 0; border-top: 1px solid var(--divider); }
+.histText { flex: 1; }
+.histIcon {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--surface-subtle); color: var(--ink-2); font-size: 18px; font-weight: 700;
+}
+.histIconPlus { background: var(--bonus-bg); color: var(--bonus-ink); }
 .histName { font-size: var(--fs-small); line-height: var(--lh-small); }
 .histAmount { font-size: var(--fs-15); font-weight: 700; white-space: nowrap; }
 .plusAmount { color: var(--success); }
