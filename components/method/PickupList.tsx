@@ -1,12 +1,13 @@
 'use client';
 // Самовывоз: список точек города, синхронный с маркерами карты (site/MartMethodModal.dc.html).
 // При известной геолокации — расстояние, сортировка «сначала ближние» и метка «Ближайшая»; иначе — по алфавиту.
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { plural } from '@/lib/domain/format';
+import { dayShort, hhmm, openState, SOON_MIN } from '@/lib/domain/hours';
 import type { PickupPoint } from '@/lib/types';
 import type { LatLng } from './types';
 import s from '../MartMethodModal.module.css';
-import { GEO } from '@/lib/copy';
+import { GEO, STORE_STATUS } from '@/lib/copy';
 import { RadioMark } from '../ui/Marks';
 
 /** Расстояние по гаверсинусу, км. */
@@ -18,6 +19,30 @@ const km = (a: LatLng, b: LatLng) => {
 };
 const distText = (d: number) => (d < 1 ? Math.round(d * 1000) + ' м' : d.toFixed(1).replace('.', ',') + ' км');
 
+type Tone = 'open' | 'soon' | 'closed';
+/** Понятный статус вместо голого графика: «Открыто до 22:00», «Закроется через 10 мин», «Закрыто до 09:00 завтра». */
+function storeStatus(hours: string, now: Date): { text: string; tone: Tone } | null {
+  const st = openState(hours, now);
+  if (!st) return null;
+  if (st.kind === 'always') return { text: STORE_STATUS.always, tone: 'open' };
+  if (st.kind === 'open') return st.inMin < SOON_MIN
+    ? { text: STORE_STATUS.closesIn(Math.max(1, st.inMin)), tone: 'soon' }
+    : { text: STORE_STATUS.openUntil(hhmm(st.closeAt)), tone: 'open' };
+  if (st.inMin < SOON_MIN) return { text: STORE_STATUS.opensIn(Math.max(1, st.inMin)), tone: 'soon' };
+  const t = hhmm(st.openAt);
+  const text = st.days === 0 ? STORE_STATUS.closedUntil(t) : st.days === 1 ? STORE_STATUS.closedUntilTomorrow(t) : STORE_STATUS.closedUntilDay(dayShort(st.openAt), t);
+  return { text, tone: 'closed' };
+}
+/** График рядом со статусом — короче: «Ежедневно 09:00–22:00» → «09:00–22:00». */
+const shortHours = (h: string) => h.replace(/^ежедневно\s+/i, '');
+
+/** Текущее время, обновляется раз в 30 с — статусы «через N мин» не устаревают, пока список открыт. */
+function useNow(stepMs = 30000) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => { const t = setInterval(() => setNow(new Date()), stepMs); return () => clearInterval(t); }, [stepMs]);
+  return now;
+}
+
 export function PickupList({ points, selected, geo, cityName, loaded = true, onPick }: {
   points: PickupPoint[];
   selected: string | null;
@@ -28,6 +53,7 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
   onPick: (id: string) => void;
 }) {
   const list = useRef<HTMLDivElement>(null);
+  const now = useNow();
   const rows = points
     .map(p => ({ ...p, d: geo ? km(geo, p) : null }))
     .sort((a, b) => (a.d != null && b.d != null ? a.d - b.d : a.name.localeCompare(b.name, 'ru')));
@@ -54,6 +80,7 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
       <div ref={list} className={s.stores} role="radiogroup" aria-label="Точки самовывоза">
         {rows.map((p, i) => {
           const sel = p.id === selected;
+          const status = storeStatus(p.hours, now);
           return (
             <button key={p.id} type="button" role="radio" aria-checked={sel} data-store={p.id}
               className={`${s.store} ${sel ? s.sel : ''}`} onClick={() => onPick(p.id)}>
@@ -62,7 +89,8 @@ export function PickupList({ points, selected, geo, cityName, loaded = true, onP
                 <span className={s.storeName}><span>{p.name}</span>{geo && i === 0 && <span className={s.nearest}>Ближайшая</span>}</span>
                 <span className={s.storeMeta}>
                   {p.d != null && <span className={s.storeDist}>{distText(p.d)}</span>}
-                  <span>{p.hours}</span>
+                  {status && <span className={`${s.storeStatus} ${s['status_' + status.tone]}`}>{status.text}</span>}
+                  <span className={s.storeHours}>{status ? shortHours(p.hours) : p.hours}</span>
                 </span>
               </span>
               <RadioMark on={sel} />

@@ -64,6 +64,17 @@ export const GEO = {
   needHouse: 'Укажите номер дома — найдите адрес или сдвиньте пин к дому',
 };
 
+/** Статус точки самовывоза по графику. TODO: согласовать с бизнесом */
+export const STORE_STATUS = {
+  always: 'Круглосуточно',
+  openUntil: (time: string) => `Открыто до ${time}`,
+  closesIn: (mins: number) => `Закроется через ${mins} мин`,
+  opensIn: (mins: number) => `Откроется через ${mins} мин`,
+  closedUntil: (time: string) => `Закрыто до ${time}`,
+  closedUntilTomorrow: (time: string) => `Закрыто до ${time} завтра`,
+  closedUntilDay: (day: string, time: string) => `Закрыто до ${day} ${time}`,
+};
+
 /** Корзина (02). */
 export const CART = {
   empty: { title: 'В корзине пусто', text: 'Загляните в каталог — стройматериалы и цветы привезём за 60–90 минут', textMobile: 'Стройматериалы и цветы привезём за 60–90 минут' },
