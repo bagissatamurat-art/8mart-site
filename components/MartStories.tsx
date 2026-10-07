@@ -126,6 +126,12 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   /** Лента едет к соседней истории — таймер слайда стоит, повторные переходы ждут. */
   const sliding = useRef<Animation | null>(null);
   const layerRef = useRef<HTMLSpanElement>(null);
+  /** Видео-слайд (сторис 8mart.kz): прогресс — по времени видео, конец видео — следующий слайд. */
+  const videoRef = useRef<HTMLVideoElement>(null);
+  /** Видео не загрузилось — слайд идёт по таймеру, как фото (обложка остаётся). */
+  const [videoFailed, setVideoFailed] = useState(false);
+  /** Звук — выключен по умолчанию (автозапуск со звуком браузеры блокируют); выбор держится до закрытия. */
+  const [muted, setMuted] = useState(true);
   const textRef = useRef<HTMLDivElement>(null);
   const trans = useRef<{ story: boolean; dir: number } | null>(null);
   const anims = useRef<Animation[]>([]);
@@ -141,6 +147,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     else if (sl !== cur.sl) { trans.current = { story: false, dir: sl > cur.sl ? 1 : -1 }; setUnder(stories[cur.si].slides[cur.sl]?.img ?? null); }
     progRef.current = 0;
     setProg(0);
+    setVideoFailed(false);
     setCopied(false);
     if (copyTimer.current) { clearTimeout(copyTimer.current); copyTimer.current = undefined; setPaused(false); }
     setPos({ si, sl });
@@ -187,15 +194,21 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     if (si > 0) switchStory(si - 1, 0, fromPx);
   }, [switchStory]);
 
-  // Автопереход: STORY_DURATION на слайд; пауза — Пробел, удержание, «Код скопирован».
+  // Автопереход: STORY_DURATION на слайд (видео — его длительность); пауза — Пробел, удержание, «Код скопирован».
   useEffect(() => {
     if (isPreview) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
       const dt = now - last; last = now;
-      if (!pausedRef.current && !holdingRef.current && !sliding.current) {
-        const p = progRef.current + dt / STORY_DURATION;
+      const v = videoRef.current;
+      if (v) {
+        // Видео: прогресс — его время; пока буферизуется — стоит.
+        if (v.ended) { next(); return; }
+        if (v.duration > 0) { const p = v.currentTime / v.duration; if (p !== progRef.current) { progRef.current = p; setProg(p); } }
+      } else if (!pausedRef.current && !holdingRef.current && !sliding.current) {
+        const sec = stories[posRef.current.si]?.slides[posRef.current.sl]?.duration;
+        const p = progRef.current + dt / (sec ? sec * 1000 : STORY_DURATION);
         if (p >= 1) { next(); return; }
         progRef.current = p;
         setProg(p);
@@ -204,7 +217,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [pos, isPreview, next]);
+  }, [pos, isPreview, next, stories, videoFailed]);
 
   // Перелистывание. Слайд: новое фото проявляется поверх прошлого (crossfade), текст всплывает на 8px.
   // История: карточка въезжает со стороны направления (вперёд — справа). Без анимации при reduced motion.
@@ -246,6 +259,14 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   }, [isPreview, next, prev]);
 
   useEffect(() => () => { clearTimeout(copyTimer.current); clearTimeout(holdTimer.current); sliding.current?.cancel(); }, []);
+
+  // Видео стоит на паузе вместе со сторис (Пробел, удержание, «Код скопирован»).
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (paused || held) v.pause();
+    else v.play().catch(() => { /* автозапуск запрещён — играет по первому касанию */ });
+  }, [paused, held, pos, videoFailed]);
 
   const story = stories[pos.si];
   if (!story) return null;
@@ -353,6 +374,8 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   };
 
   const showPause = paused || held;
+  const video = !isPreview && !videoFailed ? slide.video : undefined;
+  const hasText = !!(slide.title || slide.text);
 
   const view = (
     <div
@@ -378,9 +401,13 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
       <div ref={cardRef} className={s.card}>
         {under && <span className={s.layer} aria-hidden><Img src={under} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} /></span>}
         <span ref={layerRef} className={s.layer}><Img src={slide.img} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} priority /></span>
+        {video && (
+          <video key={video} ref={videoRef} className={s.slideImg} src={video} muted={muted} playsInline autoPlay preload="auto"
+            disablePictureInPicture onError={() => setVideoFailed(true)} aria-hidden />
+        )}
         {nextImg && <span className={s.preload} aria-hidden><Img src={nextImg} fill sizes="(max-width: 1023px) 100vw, 400px" /></span>}
         <div className={s.tap} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onCancel} aria-hidden />
-        <div className={s.top}>
+        <div className={`${s.top} ${hasText ? '' : s.topBare}`}>
           <div className={s.bars}>
             {story.slides.map((_, i) => (
               <span key={i} className={s.bar}>
@@ -392,14 +419,21 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
             <Img src={story.cover} w={32} h={32} className={s.avatar} />
             <b className={s.storyTitle}>{story.title}</b>
             {showPause && <span className={s.pause} role="img" aria-label="Пауза"><span /><span /></span>}
+            {video && (
+              <button type="button" className={s.close} aria-label={muted ? 'Включить звук' : 'Выключить звук'} aria-pressed={!muted} onClick={() => setMuted(m => !m)}>
+                <SoundIcon muted={muted} />
+              </button>
+            )}
             <button ref={closeRef} type="button" className={s.close} aria-label="Закрыть" onClick={close}>
               <Cross size={14} color="var(--ink-1)" />
             </button>
           </div>
-          <div ref={textRef} className={s.text} aria-live="polite">
-            <h2 className={s.title}>{slide.title}</h2>
-            <p className={s.body}>{slide.text}</p>
-          </div>
+          {hasText && (
+            <div ref={textRef} className={s.text} aria-live="polite">
+              <h2 className={s.title}>{slide.title}</h2>
+              <p className={s.body}>{slide.text}</p>
+            </div>
+          )}
         </div>
         {cta && (
           <div className={s.cta}>
@@ -442,5 +476,15 @@ function Ghost({ story, sl, side }: { story: Story; sl: number; side: 'prev' | '
       </div>
       {slide.cta && <div className={s.cta}><MartButton label={slide.cta.label} variant="primary" size={56} full /></div>}
     </div>
+  );
+}
+
+/** Динамик: со звуком — волны, без звука — крест. */
+function SoundIcon({ muted }: { muted: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink-1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="var(--ink-1)" />
+      {muted ? <path d="M16 9.5l5 5M21 9.5l-5 5" /> : <path d="M16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" />}
+    </svg>
   );
 }

@@ -8,7 +8,11 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     // Фото товаров из API 8mart
-    remotePatterns: [{ protocol: 'https', hostname: 'dukenfy-api.8mart.kz', pathname: '/api/v1/catalog/files/**' }],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'dukenfy-api.8mart.kz', pathname: '/api/v1/catalog/files/**' },
+      // Обложки сторис 8mart.kz (PNG ~2,7 МБ → оптимизатор отдаёт WebP/AVIF нужного размера)
+      { protocol: 'https', hostname: 'dukenfy-api.8mart.kz', pathname: '/api/v1/stories/files/**' },
+    ],
   },
 };
 

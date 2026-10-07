@@ -4,6 +4,7 @@ import * as M from './mock';
 import { CANCEL_BEFORE, CAT_FILTERS, PAGE_SIZE, PROMO, SHIPPING } from './config';
 import { cartItem, orderTotals, planShipments, type PlanOptions, type ShipmentPlan } from './domain';
 import { FLOWER_COMPOSITION } from './flowers';
+import { fetchLiveStories } from './stories';
 import type {
   Address, Banner, Bonus, Card, CartProduct, Category, City, Order, OrderDraft, PickupPoint, Product, ProductDetail,
   ProductQuery, PromoCheck, Story, User, UserPromo,
@@ -106,7 +107,9 @@ export function searchSuggest(q: string): Promise<{ categories: { slug: string; 
 }
 
 /** GET /stories */
-export const getStories = (): Promise<Story[]> => reply(M.STORIES);
+/** GET /stories — настоящие сторис 8mart.kz (видео) первыми, затем сторис сайта. Настоящие — только на сервере (кэш 5 мин). */
+export const getStories = (): Promise<Story[]> =>
+  typeof window === 'undefined' ? fetchLiveStories().then(live => [...live, ...M.STORIES]) : reply(M.STORIES);
 /** GET /banners */
 export const getBanners = (): Promise<Banner[]> => reply(M.BANNERS);
 

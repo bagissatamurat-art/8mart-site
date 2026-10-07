@@ -61,7 +61,13 @@ export interface PickupPoint {
 }
 
 export interface StoryCta { label: string; href?: string; copy?: string }
-export interface StorySlide { img: string; title: string; text: string; cta?: StoryCta }
+export interface StorySlide {
+  img: string; title: string; text: string; cta?: StoryCta;
+  /** Видео (сторис 8mart.kz) — img тогда его обложка; title/text пустые: текст уже в видео. */
+  video?: string;
+  /** Длительность видео, с (из API) — пока видео не загрузилось. */
+  duration?: number;
+}
 export interface Story { id: string; title: string; cover: string; slides: StorySlide[] }
 export interface Banner { img: string; title: string; text: string; /** Подпись на mobile (в макете короче) */ textShort?: string; cta: string; href: string }
 

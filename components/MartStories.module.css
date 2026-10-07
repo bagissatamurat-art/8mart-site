@@ -58,6 +58,7 @@
   /* Светлая подложка под текст: на фото букетов верх бывает тёмным; на иллюстрациях почти незаметна. */
   background: linear-gradient(rgba(255, 255, 255, .9), rgba(255, 255, 255, .72) 65%, rgba(255, 255, 255, 0));
 }
+.topBare { padding-bottom: 20px; background: linear-gradient(rgba(255, 255, 255, .72), rgba(255, 255, 255, 0)); } /* видео: текст уже в кадре — подложка только под полосы */
 .cardMobile .top { padding-top: 52px; } /* из референса: отступ под статус-бар */
 
 .bars { display: flex; gap: 4px; }
