@@ -7,10 +7,13 @@ import { MartPromo, type PromoStatus } from '@/components/MartPromo';
 import { MartShipmentHead, MartSplitChoice } from '@/components/MartShipments';
 import { MartStepper } from '@/components/MartStepper';
 import { MartChip } from '@/components/MartChip';
+import { MartSelect } from '@/components/MartSelect';
 import { checkPromo } from '@/lib/api';
 import { money, splitOptions } from '@/lib/domain';
 import { resolveCartItem } from '@/lib/api';
 import { KitItem, KitPanel, KitSection } from '../Kit';
+
+const KIT_SLOTS = [{ id: 'asap', label: 'Ближайшее', sub: '~30 мин' }, { id: '12', label: '12:00–15:00' }, { id: '15', label: '15:00–18:00' }, { id: '18', label: '18:00–21:00' }];
 
 function LivePromo() {
   const [status, setStatus] = useState<PromoStatus>('idle');
@@ -41,6 +44,7 @@ export default function Controls() {
   const [qtyMax, setQtyMax] = useState(4);
   const [chip, setChip] = useState('Все');
   const [phone, setPhone] = useState('');
+  const [slot, setSlot] = useState('asap');
   return (
     <>
       <KitSection id="button" title="Кнопка · MartButton"
@@ -88,6 +92,15 @@ export default function Controls() {
             <MartInput label="Телефон" type="phone" required value={phone} onChange={setPhone} />
           </KitItem>
           <MartInput label="Обязательное" required error />
+        </KitPanel>
+      </KitSection>
+
+      <KitSection id="select" title="Выпадающий список · MartSelect"
+        note="Поле 56 с подписью, как MartInput. Список вниз, у нижнего края — вверх. ↑↓ по пунктам, Esc закрывает только список. Время доставки, город в поиске адреса.">
+        <KitPanel layout="grid" min={260}>
+          <KitItem label={`Живой · ${slot}`}><MartSelect label="Время" value={slot} onChange={setSlot} options={KIT_SLOTS} /></KitItem>
+          <MartSelect label="Город" value="astana" onChange={() => {}} options={[{ id: 'astana', label: 'Астана' }, { id: 'almaty', label: 'Алматы' }]} />
+          <MartSelect label="Время" value="x" onChange={() => {}} options={[{ id: 'x', label: '09:00–12:00' }]} disabled />
         </KitPanel>
       </KitSection>
 

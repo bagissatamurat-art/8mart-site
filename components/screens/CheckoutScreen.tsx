@@ -177,12 +177,12 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
           <div className={c.thumbs}>{sh.lines.filter(l => !l.soldOut).map(l => l.p.img && <Img key={l.p.id} src={l.p.img} w={40} h={40} className={c.thumb} />)}</div>
           {!pk && sh.isCourier && (
             <div className={c.slotGroup}><span className={c.slotTitle}>Когда доставить</span>
-              {slotDays ? <SlotPicker compact={mobile} label="Когда доставить курьером" days={slotDays.courier} value={slot} onChange={setSlot} /> : <Skeleton h={124} r={16} />}</div>
+              {slotDays ? <SlotPicker label="Когда доставить курьером" days={slotDays.courier} value={slot} onChange={setSlot} /> : <Skeleton h={124} r={16} />}</div>
           )}
           {!pk && sh.isCargo && (
             <>
               <div className={c.slotGroup}><span className={c.slotTitle}>Когда привезти</span>
-                {slotDays ? <SlotPicker compact={mobile} label="Когда привезти грузовым" days={slotDays.cargo} value={cargoSlot} onChange={setCargoSlot} /> : <Skeleton h={124} r={16} />}</div>
+                {slotDays ? <SlotPicker label="Когда привезти грузовым" days={slotDays.cargo} value={cargoSlot} onChange={setCargoSlot} /> : <Skeleton h={124} r={16} />}</div>
               <MartToggleRow title="Подъём на этаж" sub={liftSub} on={lift} onToggle={() => setLift(v => !v)} />
             </>
           )}

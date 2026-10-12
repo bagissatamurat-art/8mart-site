@@ -1,0 +1,37 @@
+/* Поле-список: те же размеры и рамка, что у поля города в поиске адреса (было .cityField в MartMethodModal.module.css). */
+.wrap { position: relative; }
+.btn {
+  position: relative; width: 100%; height: var(--h-56); padding: 0 var(--s-4); border-radius: var(--r-16); border: 1.5px solid var(--border);
+  background: var(--surface-card); display: flex; align-items: center; justify-content: space-between; gap: var(--s-2);
+  font: inherit; font-size: var(--fs-15); font-weight: 500; color: var(--ink-1); text-align: left; cursor: pointer; outline: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.btn:hover { border-color: var(--border-strong); }
+.btn[aria-expanded="true"] { border-color: var(--primary); }
+.btn:focus-visible { box-shadow: var(--focus-ring); border-color: var(--primary); }
+.btn:disabled { background: var(--surface-subtle); color: var(--ink-3); cursor: not-allowed; }
+.text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.label { font-size: var(--fs-caption); font-weight: 400; color: var(--ink-3); }
+.value { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.valueSub { color: var(--ink-2); font-weight: 400; }
+.chev { display: flex; flex: none; transition: transform var(--dur) var(--ease); }
+.chevUp { transform: rotate(180deg); }
+
+.menu {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); max-height: min(320px, 50vh); overflow: auto; z-index: 10;
+  background: var(--surface-card); border-radius: var(--r-16); box-shadow: var(--shadow-menu); padding: 6px;
+  display: flex; flex-direction: column; gap: 2px;
+  animation: var(--anim-fade);
+}
+.up { top: auto; bottom: calc(100% + 6px); }
+.opt {
+  display: flex; align-items: center; gap: var(--s-2); width: 100%; min-height: var(--h-44); padding: 0 12px;
+  border-radius: 10px; /* из референса (список городов), нет в tokens.css */
+  border: 0; background: transparent; font: inherit; font-size: var(--fs-15); color: var(--ink-1); cursor: pointer; text-align: left; outline: none;
+  transition: background var(--dur) var(--ease);
+}
+.opt:hover, .opt:focus-visible { background: var(--surface-subtle); }
+.opt.sel { background: var(--primary-50); font-weight: 600; }
+.optLabel { flex: 1; min-width: 0; font-variant-numeric: tabular-nums; }
+.optSub { color: var(--ink-2); font-size: var(--fs-13); font-weight: 400; }
+.optCheck { width: 16px; display: flex; justify-content: center; flex: none; }

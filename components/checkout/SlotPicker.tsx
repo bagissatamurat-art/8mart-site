@@ -1,8 +1,8 @@
 'use client';
-// Выбор времени доставки в оформлении (03): дни — ряд карточек «Сегодня / 13 окт», интервалы выбранного дня — сеткой.
-// Выбранное — розовым (primary-50 + контур primary), не чёрным. Данные — getDeliverySlots() (в проде — бэкенд).
-import { useRef } from 'react';
+// Выбор времени доставки в оформлении (03): дни — ряд карточек «Сегодня / 13 окт», время выбранного дня — выпадающим списком.
+// Выбранный день — розовым (primary-50 + контур primary). Данные — getDeliverySlots() (в проде — бэкенд).
 import type { SlotDay } from '@/lib/domain';
+import { MartSelect } from '../MartSelect';
 import s from './SlotPicker.module.css';
 
 export interface SlotPickerProps {
@@ -10,32 +10,29 @@ export interface SlotPickerProps {
   /** id выбранного слота */
   value: string;
   onChange: (id: string) => void;
-  /** Подпись группы для экранного диктора: «Когда доставить курьером». */
+  /** Подпись для экранного диктора: «Когда доставить курьером». */
   label: string;
-  compact?: boolean;
 }
 
-export function SlotPicker({ days, value, onChange, label, compact }: SlotPickerProps) {
-  const dayIdx = Math.max(0, days.findIndex(d => d.slots.some(x => x.id === value)));
-  const day = days[dayIdx];
-  const grid = useRef<HTMLDivElement>(null);
+export function SlotPicker({ days, value, onChange, label }: SlotPickerProps) {
+  const day = days.find(d => d.slots.some(x => x.id === value)) ?? days[0];
   if (!day) return null;
 
-  // Стрелки внутри группы — как у радиокнопок.
-  const arrows = (e: React.KeyboardEvent, list: string[], cur: string, pick: (id: string) => void, root: HTMLElement | null) => {
+  // Стрелки по дням — как у радиокнопок.
+  const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
     if (!step) return;
     e.preventDefault();
-    const i = (list.indexOf(cur) + step + list.length) % list.length;
-    pick(list[i]);
-    requestAnimationFrame(() => root?.querySelectorAll<HTMLElement>('[role=radio]')[i]?.focus());
+    const i = (days.indexOf(day) + step + days.length) % days.length;
+    onChange(days[i].slots[0].id);
+    const root = e.currentTarget;
+    requestAnimationFrame(() => root.querySelectorAll<HTMLElement>('[role=radio]')[i]?.focus());
   };
 
   return (
-    <div className={`${s.box} ${compact ? s.compact : ''}`}>
+    <div className={s.box}>
       {days.length > 1 && (
-        <div className={s.days} role="radiogroup" aria-label={`${label}: день`}
-          onKeyDown={e => arrows(e, days.map(d => d.id), day.id, id => onChange(days.find(d => d.id === id)!.slots[0].id), e.currentTarget)}>
+        <div className={s.days} role="radiogroup" aria-label={`${label}: день`} onKeyDown={onKey}>
           {days.map(d => {
             const on = d === day;
             return (
@@ -48,19 +45,8 @@ export function SlotPicker({ days, value, onChange, label, compact }: SlotPicker
           })}
         </div>
       )}
-      <div ref={grid} className={s.slots} role="radiogroup" aria-label={`${label}: время, ${day.title.toLowerCase()} ${day.date}`}
-        onKeyDown={e => arrows(e, day.slots.map(x => x.id), value, onChange, grid.current)}>
-        {day.slots.map(x => {
-          const on = x.id === value;
-          return (
-            <button key={x.id} type="button" role="radio" aria-checked={on} tabIndex={on || (!day.slots.some(y => y.id === value) && x === day.slots[0]) ? 0 : -1}
-              className={`${s.slot} ${on ? s.on : ''} ${x.sub ? s.asap : ''}`} onClick={() => onChange(x.id)}>
-              <span className={s.slotLabel}>{x.label}</span>
-              {x.sub && <span className={s.slotSub}>{x.sub}</span>}
-            </button>
-          );
-        })}
-      </div>
+      <MartSelect label="Время" ariaLabel={`${label}, ${day.title.toLowerCase()} ${day.date}`} value={value} onChange={onChange}
+        options={day.slots.map(x => ({ id: x.id, label: x.label, sub: x.sub }))} />
     </div>
   );
 }
