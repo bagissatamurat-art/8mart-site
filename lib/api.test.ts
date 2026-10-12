@@ -71,7 +71,7 @@ describe('заказ: оформление → статус → отмена', (
   it('создаёт заказ с отправлениями и итогами', async () => {
     const { id } = await api.createOrder(draft);
     const o = await api.getOrder(id);
-    expect(o).toMatchObject({ status: 'accepted', address: 'Астана, Кабанбай батыра, 11', total: 7970 + 1000 + 3000 });
+    expect(o).toMatchObject({ status: 'accepted', address: 'Астана, Кабанбай батыра, 11', total: 7970 + 2000 + 3000 });
     expect(o.shipments.map(s => s.kind)).toEqual(['courier', 'cargo']);
     expect(o.shipments[1].eta).toBe('28 сентября, 17:00–21:00');
     expect((await api.getOrders())[0].id).toBe(id);

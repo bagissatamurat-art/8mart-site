@@ -6,7 +6,11 @@ import { money, itemsTitle } from './format';
 import type { Method, Product, ShipmentKind } from '../types';
 
 export interface PlanLine { p: Pick<Product, 'price' | 'delivery' | 'weightKg'> & Partial<Product>; qty: number; soldOut?: boolean }
-export interface PlanOptions { method?: Method; together?: boolean; goodsTotal?: number; pickupPoint?: string; floor?: string | number; lift?: boolean }
+export interface PlanOptions {
+  method?: Method; together?: boolean; goodsTotal?: number; pickupPoint?: string; floor?: string | number; lift?: boolean;
+  /** Курьер по зоне адреса (lib/delivery): стоимость и время до двери, мин. Нет — DELIVERY.fee и SHIPPING.courier.when. */
+  courierFee?: number; courierEta?: number;
+}
 
 export interface Shipment<L extends PlanLine = PlanLine> {
   id: ShipmentKind; kind: ShipmentKind; index: number; lines: L[]; qty: number; kg: number; cargoUnits: number;
@@ -38,10 +42,10 @@ export function planShipments<L extends PlanLine>(lines: L[], opts: PlanOptions 
   const list = groups.map(([kind, ls], i): Shipment<L> => {
     const a = act(ls), kg = a.reduce((s, l) => s + (l.p.weightKg || 1) * l.qty, 0), qty = a.reduce((s, l) => s + l.qty, 0);
     const cargoUnits = a.filter(isCargo).reduce((s, l) => s + l.qty, 0);
-    const base = pk ? 0 : kind === 'cargo' ? cargoFee(kg) : gt >= DELIVERY.freeFrom ? 0 : DELIVERY.fee;
+    const base = pk ? 0 : kind === 'cargo' ? cargoFee(kg) : gt >= DELIVERY.freeFrom ? 0 : opts.courierFee ?? DELIVERY.fee;
     const floor = parseInt(String(opts.floor), 10) || 0, lift = !pk && kind === 'cargo' && opts.lift && floor > 1 ? SHIPPING.cargo.liftFee * cargoUnits * (floor - 1) : 0;
     const label = pk ? (n > 1 ? 'Самовывоз ' + (i + 1) + ' из ' + n : 'Самовывоз') : (n > 1 ? 'Доставка ' + (i + 1) + ' из ' + n : 'Доставка');
-    const when = pk ? SHIPPING[kind].pickupWhen : SHIPPING[kind].when;
+    const when = pk ? SHIPPING[kind].pickupWhen : kind === 'courier' && opts.courierEta ? `Сегодня, за ~${opts.courierEta} минут` : SHIPPING[kind].when;
     const where = pk ? (kind === 'cargo' ? SHIPPING.cargo.pickupWhere : (opts.pickupPoint || '')) : '';
     const meta = pk ? [where, kind === 'cargo' ? 'поможем погрузить' : 'храним 24 часа'].filter(Boolean).join(' · ')
       : kind === 'cargo' ? 'Газель · ' + fmtKg(kg) + ' · разгрузка у подъезда' : 'Курьер · ' + itemsTitle(qty);

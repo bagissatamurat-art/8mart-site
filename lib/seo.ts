@@ -5,10 +5,10 @@ import type { Category, Product } from './types';
 /** Боевой адрес сайта. Задаётся NEXT_PUBLIC_SITE_URL (на Vercel — домен проекта); по умолчанию — Vercel-домен. */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://8mart-site.vercel.app').replace(/\/$/, '');
 export const SITE_NAME = BRAND.name;
-export const SITE_DESCRIPTION = 'Букеты из роз, гортензий и хризантем с доставкой по Астане за 60–90 минут и самовывозом. Размеры S, M, L — соберём сегодня. Также стройматериалы и товары для дома.';
+export const SITE_DESCRIPTION = 'Букеты из роз, гортензий и хризантем с доставкой по Астане за 30–70 минут и самовывозом. Размеры S, M, L — соберём сегодня. Также стройматериалы и товары для дома.';
 
 /** Заголовок h1 главной (визуально скрыт: в макете 01 заголовка нет). */
-export const HOME_H1 = '8mart — цветы и букеты с доставкой по Астане за 60–90 минут';
+export const HOME_H1 = '8mart — цветы и букеты с доставкой по Астане за 30–70 минут';
 
 export const abs = (path: string) => (/^https?:/.test(path) ? path : SITE_URL + path);
 

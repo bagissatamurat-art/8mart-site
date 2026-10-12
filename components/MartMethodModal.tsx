@@ -7,7 +7,8 @@
 // Закрыть можно всегда: крестик, Esc, клик по фону. addressOnly — режим для кабинета (без свича, с полем «Название»).
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { geoSuggest, getCities, getPickupPoints } from '@/lib/api';
+import { geoSuggest, getCities, getPickupPoints, quoteDelivery } from '@/lib/api';
+import type { QuoteResult } from '@/lib/delivery';
 import { DELIVERY } from '@/lib/config';
 import { tg } from '@/lib/domain/format';
 import { GEO } from '@/lib/copy';
@@ -154,15 +155,19 @@ function MethodDialog({
   const closedIds = tab === 'pickup' ? points.filter(p => isPointClosed(p, now)).map(p => p.id) : [];
   const isD = tab === 'delivery';
   const point = points.find(p => p.id === store) ?? null;
-  const ok = isD ? street.trim().length > 2 && house : !!point;
   const needHouse = isD && street.trim().length > 2 && !house && !locating;
+  const quote = useQuote(isD && house && !locating ? pos : null);
+  /** Вне зон доставки — заказать сюда нельзя (адрес в кабинет сохранить можно). */
+  const outside = quote?.status === 'outside';
+  const ok = isD ? street.trim().length > 2 && house && !(outside && !addressOnly) : !!point;
+  const zone = quote?.status === 'ok' ? quote.quote : null;
 
   const confirm = () => {
     if (!ok || !city) return;
     onConfirm(isD
       ? { method: 'delivery', city: city.id, address: street.trim(), lat: pos?.lat ?? null, lng: pos?.lng ?? null, pickupPointId: null,
-          ...(addressOnly ? { entrance, flat, title: addrTitle } : {}) }
-      : { method: 'pickup', city: city.id, address: point!.name, lat: point!.lat, lng: point!.lng, pickupPointId: point!.id });
+          quote: zone, kaspiIntegrated: zone?.kaspiIntegrated, ...(addressOnly ? { entrance, flat, title: addrTitle } : {}) }
+      : { method: 'pickup', city: city.id, address: point!.name, lat: point!.lat, lng: point!.lng, pickupPointId: point!.id, kaspiIntegrated: point!.kaspiIntegrated });
   };
 
   const body = (
@@ -196,7 +201,7 @@ function MethodDialog({
 
         {isD ? (
           <div className={s.scroll}>
-            <AddressField ref={addrBtn} value={street} busy={locating} hintId={needHouse ? noteId : undefined} onOpen={() => setSearchOpen(true)} />
+            <AddressField ref={addrBtn} value={street} busy={locating} hintId={needHouse || outside ? noteId : undefined} onOpen={() => setSearchOpen(true)} />
             {addressOnly && (
               <div className={s.pair}>
                 <MartInput label="Подъезд" value={entrance} onChange={setEntrance} />
@@ -204,9 +209,13 @@ function MethodDialog({
               </div>
             )}
             {/* Нет номера дома — подсказка на месте строки о доставке: высота панели не меняется, карта и пин не сдвигаются. */}
-            {needHouse
-              ? <div id={noteId} className={`${s.fee} ${s.feeWarn}`} role="status">{GEO.needHouse}</div>
-              : <div className={s.fee}>Доставка {tg(DELIVERY.fee)}, бесплатно от {tg(DELIVERY.freeFrom)} · {DELIVERY.etaMin}–{DELIVERY.etaMax} мин</div>}
+            {needHouse || outside
+              ? <div id={noteId} className={`${s.fee} ${s.feeWarn}`} role="status">{needHouse ? GEO.needHouse : GEO.outsideZone}</div>
+              : quote?.status === 'loading'
+                ? <div className={s.fee} role="status">{GEO.quoteLoading}</div>
+                : <div className={s.fee}>{zone
+                    ? GEO.fee(tg(zone.fee), tg(DELIVERY.freeFrom), `~${zone.eta} мин`)
+                    : GEO.fee('от ' + tg(DELIVERY.fee), tg(DELIVERY.freeFrom), `${DELIVERY.etaMin}–${DELIVERY.etaMax} мин`)}</div>}
           </div>
         ) : (
           <PickupList points={points} selected={store} geo={geo} cityName={city?.name ?? ''} loaded={pointsLoaded}
@@ -215,7 +224,7 @@ function MethodDialog({
 
         <div className={s.cta}>
           <MartButton label={ctaLabel ?? (isD ? 'Доставить сюда' : 'Заберу здесь')} size={56} full disabled={!ok}
-            reason={isD ? (street.trim() ? GEO.needHouse : 'Укажите улицу и дом') : 'Выберите точку на карте или в списке'} onClick={confirm} />
+            reason={isD ? (outside ? GEO.outsideZone : street.trim() ? GEO.needHouse : 'Укажите улицу и дом') : 'Выберите точку на карте или в списке'} onClick={confirm} />
         </div>
       </div>
       <AddressSearch open={searchOpen} mobile={mobile} value={street} cities={cities} city={city}
@@ -231,4 +240,27 @@ function MethodDialog({
     </div>,
     document.body,
   );
+}
+
+/** Ответы зон доставки за сессию — по округлённым координатам (~10 м), как кэширует сервер. */
+const quotes = new Map<string, QuoteResult>();
+
+/** Зона доставки 8mart.kz для точки пина: status 'loading' — считаем; null — точки нет. Пин двигают — ждём 300 мс, старый запрос отменяется. */
+function useQuote(at: LatLng | null): QuoteResult | { status: 'loading' } | null {
+  const key = at ? `${at.lat.toFixed(4)},${at.lng.toFixed(4)}` : '';
+  const [res, setRes] = useState<{ key: string; value: QuoteResult } | null>(null);
+  useEffect(() => {
+    if (!key || quotes.has(key)) return;
+    const ctl = new AbortController();
+    const [lat, lng] = key.split(',').map(Number);
+    const t = setTimeout(() => {
+      quoteDelivery(lat, lng, ctl.signal).then(value => {
+        if (value.status !== 'unavailable') quotes.set(key, value);
+        setRes({ key, value });
+      }, () => { if (!ctl.signal.aborted) setRes({ key, value: { status: 'unavailable' } }); });
+    }, 300);
+    return () => { clearTimeout(t); ctl.abort(); };
+  }, [key]);
+  if (!key) return null;
+  return quotes.get(key) ?? (res?.key === key ? res.value : { status: 'loading' });
 }

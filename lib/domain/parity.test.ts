@@ -10,6 +10,16 @@ import { PRODUCTS as ALL } from '../mock';
 import * as C from '../config';
 import * as T from '../copy';
 
+// Курьер — настоящие тарифы 8mart.kz (зоны resolve-delivery; config.DELIVERY), в прототипе — 1 000 тг за 60–90 мин.
+// Ставим прототипу те же тарифы: его функции читают D.DELIVERY и D.SHIPPING, остальная логика сверяется как была.
+const ETA = `${C.DELIVERY.etaMin}–${C.DELIVERY.etaMax}`;
+const realTariff = (s: string) => s.replace('60–90', ETA).replace(/^1 000 тг/, 'от ' + F.tg(C.DELIVERY.fee));
+Object.assign(D.DELIVERY, C.DELIVERY);
+D.SHIPPING.courier.when = realTariff(D.SHIPPING.courier.when);
+for (const t of Object.values(D.DELIVERY_TYPES) as { delivery: { when: string; price: string } }[]) {
+  t.delivery.when = realTariff(t.delivery.when); t.delivery.price = realTariff(t.delivery.price);
+}
+
 const notFlower = (p: { delivery?: string }) => p.delivery !== 'flowers';
 const PRODUCTS = ALL.filter(notFlower);
 const D_PRODUCTS = (D.PRODUCTS as { delivery?: string }[]).filter(notFlower);

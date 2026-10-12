@@ -5,6 +5,7 @@ import { CANCEL_BEFORE, CAT_FILTERS, PAGE_SIZE, PROMO, SHIPPING } from './config
 import { cartItem, orderTotals, planShipments, type PlanOptions, type ShipmentPlan } from './domain';
 import { FLOWER_COMPOSITION } from './flowers';
 import { fetchLiveStories } from './stories';
+import type { QuoteResult } from './delivery';
 import type {
   Address, Banner, Bonus, Card, CartProduct, Category, City, Order, OrderDraft, PickupPoint, Product, ProductDetail,
   ProductQuery, PromoCheck, Story, User, UserPromo,
@@ -174,6 +175,13 @@ export async function geoReverse(lat: number, lng: number): Promise<{ address: s
   return r.json();
 }
 
+/** GET /delivery/quote?lat&lng — зона доставки 8mart.kz для точки: стоимость, время, филиал (app/api/delivery/quote). */
+export async function quoteDelivery(lat: number, lng: number, signal?: AbortSignal): Promise<QuoteResult> {
+  const r = await fetch(`/api/delivery/quote?${new URLSearchParams({ lat: lat.toFixed(4), lng: lng.toFixed(4) })}`, { signal });
+  if (!r.ok) return { status: 'unavailable' };
+  return r.json();
+}
+
 // ── Промокод ──
 
 /** POST /promo/check {code, goodsTotal} */
@@ -232,7 +240,7 @@ const plusMin = (d: Date, m: number) => { const x = new Date(d.getTime() + m * 6
 export function createOrder(d: OrderDraft): Promise<{ id: string; payUrl?: string }> {
   const lines = Object.entries(d.cart).map(([k, qty]) => ({ p: resolveCartItem(k)!, qty, soldOut: isSoldOut(k) })).filter(l => l.p);
   if (!lines.length || lines.some(l => l.soldOut)) return Promise.reject(new ApiError(409, 'Корзина изменилась'));
-  const t = orderTotals({ lines, plan: { method: d.method, together: d.together, pickupPoint: d.address, floor: d.floor, lift: d.lift },
+  const t = orderTotals({ lines, plan: { method: d.method, together: d.together, pickupPoint: d.address, floor: d.floor, lift: d.lift, courierFee: d.courierFee, courierEta: d.courierEta },
     promoPct: d.promo ? PROMO.pct : 0, useBonus: d.useBonus, balance: M.BONUS.balance, maxPart: M.BONUS.maxPart });
   const now = new Date(), m = readMock();
   const id = '8M-' + (10500 + m.placed.length);

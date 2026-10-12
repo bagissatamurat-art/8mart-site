@@ -90,7 +90,7 @@ export const STORIES: Story[] = [
   { id: 's-promo', title: 'Промокод', cover: `${A}/assets/st-gifts.jpg`, slides: [
     { img: `${A}/assets/st-gifts.jpg`, title: `−${PROMO.pct}% по коду ${PROMO.code}`, text: `На заказ от ${groupDigits(PROMO.minSum)} тг. Введите код в корзине`, cta: { label: 'Скопировать код', copy: PROMO.code } } ] },
   { id: 's-delivery', title: 'Доставка', cover: `${A}/assets/st-delivery.jpg`, slides: [
-    { img: `${A}/assets/st-delivery.jpg`, title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Привезём букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе ${groupDigits(DELIVERY.fee)} тг`, cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
+    { img: `${A}/assets/st-delivery.jpg`, title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Привезём букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе от ${groupDigits(DELIVERY.fee)} тг`, cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
 ];
 export const BANNERS: Banner[] = [
   { img: `${A}/assets/banner-flowers.jpg`, title: `Букеты за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут`, text: 'Розы, гортензии и хризантемы — соберём сегодня и привезём',

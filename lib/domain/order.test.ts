@@ -17,8 +17,8 @@ describe('orderTotals (02, 03)', () => {
   it('промокод −10%: порог бесплатной доставки считается после скидки', () => {
     const t = orderTotals({ lines: [line('b1', 2), line('b6', 1), line('b4', 1)], plan: { method: 'delivery' }, promoPct: 10 });
     expect(t.discount).toBe(2087);
-    expect(t.fee).toBe(4000);
-    expect(t.total).toBe(22783);
+    expect(t.fee).toBe(5000);
+    expect(t.total).toBe(23783);
     expect(t.progress).toEqual({ pct: 94, left: 1217, label: 'До бесплатной доставки курьером' });
   });
   it('бонусы: списать до maxPart% суммы после скидки, не больше баланса; начисление по товарам', () => {

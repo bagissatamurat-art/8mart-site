@@ -2,7 +2,7 @@
 // Мини-корзина desktop (колонка 340, sticky top 16) на сторе корзины и способа получения.
 import { MartMiniCart } from '@/components/MartMiniCart';
 import { useCart } from '@/lib/store/cart';
-import { useMethod } from '@/lib/store/method';
+import { quotePlan, useMethod } from '@/lib/store/method';
 import { setCartQty, useUi } from '@/lib/store/ui';
 import { Skeleton } from '@/components/ui/Spinner';
 import s from './site.module.css';
@@ -23,8 +23,9 @@ export function SiteMiniCart() {
   const lines = useCart(c => c.lines);
   const together = useCart(c => c.together);
   const method = useMethod(m => m.method);
+  const quote = useMethod(m => m.quote);
   const hydrated = useUi(u => u.hydrated);
   // До чтения корзины из localStorage — скелетон, а не «Корзина пуста».
   if (!hydrated) return <MiniCartSkeleton />;
-  return <MartMiniCart cart={lines} method={method || 'delivery'} together={together} onChange={setCartQty} />;
+  return <MartMiniCart cart={lines} method={method || 'delivery'} together={together} courier={quotePlan({ method, quote })} onChange={setCartQty} />;
 }

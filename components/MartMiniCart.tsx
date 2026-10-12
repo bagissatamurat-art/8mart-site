@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { DELIVERY } from '@/lib/config';
-import { itemsTitle, money, planShipments, tg } from '@/lib/domain';
+import { itemsTitle, money, planShipments, tg, type PlanOptions } from '@/lib/domain';
 import { resolveCartItem } from '@/lib/api';
 import type { Method } from '@/lib/types';
 import { MartStepper } from './MartStepper';
@@ -22,14 +22,16 @@ export interface MartMiniCartProps {
   listMax?: string;
   onChange?: (key: string, qty: number) => void;
   sticky?: boolean;
+  /** Курьер по зоне адреса — quotePlan() из стора способа. */
+  courier?: Pick<PlanOptions, 'courierFee' | 'courierEta'>;
 }
 
-export function MartMiniCart({ cart, method = 'delivery', together, cartHref = '/cart', listMax = '288px', onChange, sticky }: MartMiniCartProps) {
+export function MartMiniCart({ cart, method = 'delivery', together, cartHref = '/cart', listMax = '288px', onChange, sticky, courier }: MartMiniCartProps) {
   const lines = useMemo(() => Object.keys(cart).map(k => { const p = resolveCartItem(k); return p ? { p, qty: cart[k] } : null; })
     .filter((l): l is NonNullable<typeof l> => !!l), [cart]);
   const goods = lines.reduce((sum, l) => sum + (l.p.price || 0) * l.qty, 0);
   const count = lines.reduce((sum, l) => sum + l.qty, 0);
-  const plan = lines.length ? planShipments(lines, { method, together, goodsTotal: goods }) : null;
+  const plan = lines.length ? planShipments(lines, { method, together, goodsTotal: goods, ...courier }) : null;
   const fees = method === 'pickup' ? [{ label: 'Самовывоз', text: 'Бесплатно', free: true }]
     : (plan?.list || []).map(x => ({ label: x.feeLabel, text: x.feeText, free: x.fee === 0 }));
   const left = Math.max(0, DELIVERY.freeFrom - goods);

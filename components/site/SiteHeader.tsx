@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/store/auth';
 import { addRecentSearch, clearRecentSearches, useRecentSearches } from '@/lib/store/recentSearches';
 import { useUi } from '@/lib/store/ui';
 import { useSuggest } from '@/lib/hooks/useSuggest';
+import { beforeNavigate } from '@/lib/hooks/useModal';
 import { getBonus, getOrders, getUserPromos } from '@/lib/api';
 import { useFavorites } from '@/lib/store/favorites';
 import { isActiveOrder } from '@/components/account/sections';
@@ -43,16 +44,16 @@ export function SiteHeader({ categories, mobile = true, query }: { categories: C
   const [screen, setScreen] = useState(false);
   const suggest = useSuggest(q);
 
-  const submit = (v: string) => { if (!v.trim()) return; addRecentSearch(v.trim()); setScreen(false); router.push(`/search?q=${encodeURIComponent(v.trim())}`); };
+  const submit = (v: string) => { if (!v.trim()) return; addRecentSearch(v.trim()); setScreen(false); beforeNavigate(); router.push(`/search?q=${encodeURIComponent(v.trim())}`); };
   const pick = (p: Product) => { setScreen(false); openQuickView(p.id); };
-  const category = (slug: string) => { setScreen(false); const root = categories.find(c => c.sub.some(x => x.slug === slug)); router.push(`/catalog?cat=${root?.slug ?? ''}&sub=${slug}`); };
+  const category = (slug: string) => { setScreen(false); beforeNavigate(); const root = categories.find(c => c.sub.some(x => x.slug === slug)); router.push(`/catalog?cat=${root?.slug ?? ''}&sub=${slug}`); };
 
   return (
     <>
       <div className={s.desktopOnly}>
         <div className={s.headerWrap}>
           <MartHeader mode="desktop" method={method} address={label} methodLoading={!hydrated} categories={categories} query={q}
-            userName={user?.name ?? ''} signedIn={!!user} userPhone={user?.phone} onLogout={() => { logout(); router.push('/'); }}
+            userName={user?.name ?? ''} signedIn={!!user} userPhone={user?.phone} onLogout={() => { logout(); beforeNavigate(); router.push('/'); }}
             orders={user ? menuData.orders : []} accountBadges={{ ...menuData.badges, favorites: favorites.length }}
             loginHref={`/login?next=${encodeURIComponent(pathname || '/')}`}
             onMethod={openMethod} onQuery={setQ} onSubmit={submit}

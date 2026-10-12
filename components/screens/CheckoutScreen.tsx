@@ -27,7 +27,7 @@ import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { usePromo } from '@/lib/hooks/usePromo';
 import { useAuth } from '@/lib/store/auth';
 import { useCart } from '@/lib/store/cart';
-import { useMethod } from '@/lib/store/method';
+import { quotePlan, useMethod } from '@/lib/store/method';
 import { useUi } from '@/lib/store/ui';
 import type { Bonus, Card, Category } from '@/lib/types';
 import s from '@/components/site/site.module.css';
@@ -82,11 +82,13 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   }, [user]);
 
   const method = m.method || 'delivery', pk = method === 'pickup';
-  const planOpts = { method, together, pickupPoint: pk ? m.label : '', floor, lift };
+  const planOpts = { method, together, pickupPoint: pk ? m.label : '', floor, lift, ...quotePlan(m) };
   const t = orderTotals({ lines, plan: planOpts, promoPct: promo?.pct ?? 0, useBonus: !!user && useBonus, balance: bonus?.balance ?? 0, maxPart: bonus?.maxPart ?? 0 });
   const promoField = usePromo(t.goods, t.discount);
   const kaspi = pay === 'kaspi';
-  const phoneOk = phoneComplete(phone), kaspiOk = !kaspi || phoneComplete(kaspiPhone);
+  /** Счёт в Kaspi на номер — только если филиал (зоны доставки или точка самовывоза) не принимает Kaspi Pay автоматически. */
+  const kaspiInvoice = kaspi && !m.kaspiIntegrated;
+  const phoneOk = phoneComplete(phone), kaspiOk = !kaspiInvoice || phoneComplete(kaspiPhone);
   const reason = !phoneOk ? CHECKOUT.phoneRequired : !kaspiOk ? CHECKOUT.kaspiPhoneRequired
     : !offer ? CTA_BLOCKED.offer : t.hasSoldOut ? CTA_BLOCKED.soldOut : '';
   const cargo = t.plan.list.find(x => x.isCargo);
@@ -101,7 +103,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
     try {
       const { id } = await createOrder({
         cart, method, city: m.city, address: m.address, pickupPointId: m.pickupPointId, entrance, floor, flat, comment,
-        recipient: { name: user.name, phone }, leaveAtDoor: !pk && leaveAtDoor, kaspiPhone: kaspi ? kaspiPhone : undefined, together, courierSlot: slot, cargoDay, cargoInterval: cargoInt, lift,
+        recipient: { name: user.name, phone }, leaveAtDoor: !pk && leaveAtDoor, kaspiPhone: kaspiInvoice ? kaspiPhone : undefined, ...quotePlan(m), together, courierSlot: slot, cargoDay, cargoInterval: cargoInt, lift,
         promo: promo?.code, useBonus, payment: kaspi ? 'kaspi' : 'card', cardId: kaspi || pay === 'card' ? null : pay,
       });
       placed.current = true;
@@ -185,7 +187,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
       {mobile ? <b className={c.h16}>Оплата</b> : <h2 className={c.h2}>Оплата</h2>}
       <MartPayment value={pay} cards={cards} mobile={mobile} onChange={setPay} />
       {/* Kaspi Pay не всегда автоматический — выставляем счёт в Kaspi на номер (из профиля, можно поменять). */}
-      {kaspi && (
+      {kaspiInvoice && (
         <MartInput label={CHECKOUT.kaspiPhone} type="phone" required value={kaspiPhone} onChange={setKaspiPhone} onBlur={() => setTouched(true)}
           hint={CHECKOUT.kaspiHint} error={touched && !kaspiOk ? CHECKOUT.kaspiPhoneRequired : undefined} />
       )}

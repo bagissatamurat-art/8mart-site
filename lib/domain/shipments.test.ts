@@ -21,12 +21,12 @@ describe('planShipments', () => {
     const plan = planShipments([line('b6', 1)]); // клей 2 190
     expect(plan.multi).toBe(false);
     expect(plan.list).toHaveLength(1);
-    expect(plan.list[0]).toMatchObject({ kind: 'courier', label: 'Доставка', fee: 1000, feeText: '1 000 тг.', feeLabel: 'Доставка', meta: 'Курьер · 1 товар' });
+    expect(plan.list[0]).toMatchObject({ kind: 'courier', label: 'Доставка', fee: 2000, feeText: '2 000 тг.', feeLabel: 'Доставка', meta: 'Курьер · 1 товар' });
     expect(plan.hasCourierFee).toBe(true);
   });
   it('курьер бесплатно от порога (по goodsTotal после скидки)', () => {
     expect(planShipments([line('t4', 1)]).list[0].feeText).toBe('Бесплатно'); // 32 900
-    expect(planShipments([line('t4', 1)], { goodsTotal: 19999 }).fee).toBe(1000);
+    expect(planShipments([line('t4', 1)], { goodsTotal: 19999 }).fee).toBe(2000);
   });
   it('только Газель: тариф по весу, порог не действует', () => {
     const plan = planShipments([line('b1', 10)]); // 500 кг
@@ -42,10 +42,10 @@ describe('planShipments', () => {
     expect(plan.canSplit).toBe(true);
     expect(plan.multi).toBe(true);
     expect(plan.list.map(x => [x.kind, x.label, x.feeLabel, x.fee])).toEqual([
-      ['courier', 'Доставка 1 из 2', 'Доставка сегодня, курьер', 1000],
+      ['courier', 'Доставка 1 из 2', 'Доставка сегодня, курьер', 2000],
       ['cargo', 'Доставка 2 из 2', 'Доставка завтра, Газель', 3000],
     ]);
-    expect(plan.fee).toBe(4000);
+    expect(plan.fee).toBe(5000);
   });
   it('«Всё вместе завтра» — одна Газель на всё', () => {
     const plan = planShipments([line('b1', 2), line('b6', 1)], { together: true });
@@ -56,7 +56,7 @@ describe('planShipments', () => {
     const plan = planShipments([line('b1', 2, true), line('b6', 1)]);
     expect(plan.canSplit).toBe(false);
     expect(plan.list).toHaveLength(1);
-    expect(plan.list[0]).toMatchObject({ kind: 'courier', qty: 1, fee: 1000 });
+    expect(plan.list[0]).toMatchObject({ kind: 'courier', qty: 1, fee: 2000 });
   });
   it('самовывоз: бесплатно, тяжёлое со склада', () => {
     const plan = planShipments([line('b1', 2), line('b6', 1)], { method: 'pickup', pickupPoint: 'ул. Кабанбай батыра, 11' });
@@ -81,7 +81,7 @@ describe('splitOptions', () => {
   const lines = [line('b1', 2), line('b6', 1), line('b4', 1)];
   it('доставка', () => {
     expect(splitOptions(lines, { goodsTotal: 18783 })).toEqual([
-      { id: 'split', together: false, title: 'Двумя доставками', sub: 'Сегодня — 2 товара курьером, завтра — 2 товара Газелью', feeText: '1 000 + 3 000 тг.', sel: true },
+      { id: 'split', together: false, title: 'Двумя доставками', sub: 'Сегодня — 2 товара курьером, завтра — 2 товара Газелью', feeText: '2 000 + 3 000 тг.', sel: true },
       { id: 'together', together: true, title: 'Всё вместе завтра', sub: 'Одной Газелью, 9:00–21:00', feeText: '3 000 тг.', sel: false },
     ]);
   });

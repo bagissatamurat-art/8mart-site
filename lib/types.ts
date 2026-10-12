@@ -111,6 +111,8 @@ export interface OrderDraft {
   /** Kaspi Pay счётом: номер, на который выставить счёт в Kaspi. */
   kaspiPhone?: string;
   together: boolean; courierSlot: string; cargoDay: number; cargoInterval: number; lift: boolean;
+  /** Курьер по зоне адреса (мок; в проде сервер считает сам по координатам). */
+  courierFee?: number; courierEta?: number;
   promo?: string; useBonus: boolean; payment: 'kaspi' | 'card'; cardId?: string | null;
 }
 

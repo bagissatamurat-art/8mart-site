@@ -19,7 +19,7 @@ import { useCartLines } from '@/lib/hooks/useCartLines';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { usePromo } from '@/lib/hooks/usePromo';
 import { useCart } from '@/lib/store/cart';
-import { useMethod } from '@/lib/store/method';
+import { quotePlan, useMethod } from '@/lib/store/method';
 import { setCartQty, useUi } from '@/lib/store/ui';
 import type { Category, Product } from '@/lib/types';
 import s from '@/components/site/site.module.css';
@@ -39,12 +39,13 @@ export function CartScreen({ categories }: { categories: Category[] }) {
   const promo = useCart(st => st.promo);
   const method = useMethod(st => st.method);
   const label = useMethod(st => st.label);
+  const quote = useMethod(st => st.quote);
   const openMethod = useUi(st => st.openMethod);
   const openQuickView = useUi(st => st.openQuickView);
   const [upsell, setUpsell] = useState<Product[]>([]);
   useEffect(() => { getUpsell(Object.keys(cart)).then(setUpsell); }, [cart]);
 
-  const planOpts = { method: method || 'delivery', together, pickupPoint: method === 'pickup' ? label : '' } as const;
+  const planOpts = { method: method || 'delivery', together, pickupPoint: method === 'pickup' ? label : '', ...quotePlan({ method, quote }) } as const;
   const t = orderTotals({ lines, plan: planOpts, promoPct: promo?.pct ?? 0 });
   const promoField = usePromo(t.goods, t.discount);
   const reason = !method ? CTA_BLOCKED.method : t.hasSoldOut ? CTA_BLOCKED.soldOut : '';

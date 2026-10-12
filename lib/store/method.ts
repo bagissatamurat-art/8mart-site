@@ -28,5 +28,9 @@ export const useMethod = create<MethodState>()(persist(
 ));
 
 export const methodValue = (s: MethodState): MethodValue => ({
-  method: s.method, city: s.city, address: s.address, lat: s.lat, lng: s.lng, pickupPointId: s.pickupPointId, entrance: s.entrance, flat: s.flat,
+  method: s.method, city: s.city, address: s.address, lat: s.lat, lng: s.lng, pickupPointId: s.pickupPointId, entrance: s.entrance, flat: s.flat, quote: s.quote, kaspiIntegrated: s.kaspiIntegrated,
 });
+
+/** Курьер по зоне адреса (стоимость и время) — для planShipments / orderTotals. */
+export const quotePlan = (s: Pick<MethodValue, 'method' | 'quote'>) =>
+  s.method === 'delivery' && s.quote ? { courierFee: s.quote.fee, courierEta: s.quote.eta } : {};

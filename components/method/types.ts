@@ -1,4 +1,5 @@
 // Типы MartMethodModal. MethodValue = стор `method` из README («Стейт (клиент)») + поля формы доставки.
+import type { DeliveryQuote } from '@/lib/delivery';
 import type { Method } from '@/lib/types';
 
 export interface MethodValue {
@@ -15,6 +16,10 @@ export interface MethodValue {
   flat?: string;
   /** Название адреса — только в режиме addressOnly (кабинет). */
   title?: string;
+  /** Доставка: зона 8mart.kz для адреса — стоимость, время, филиал. Нет — общие условия из config.DELIVERY. */
+  quote?: DeliveryQuote | null;
+  /** Филиал (зоны доставки или точка самовывоза) принимает Kaspi Pay автоматически — счёт на номер не нужен. */
+  kaspiIntegrated?: boolean;
 }
 
 /** Принудительные состояния для витрины /kit. */

@@ -11,7 +11,7 @@ import { markStorySeen, useStoriesSeen } from '@/lib/store/storiesSeen';
 import type { Story } from '@/lib/types';
 import s from './MartStories.module.css';
 import { STATUS } from '@/lib/copy';
-import { modalAbove, useModal } from '@/lib/hooks/useModal';
+import { beforeNavigate, modalAbove, useModal } from '@/lib/hooks/useModal';
 import { Img } from '@/components/ui/Img';
 
 export type StoriesMode = 'desktop' | 'mobile';
@@ -286,7 +286,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
       copyTimer.current = setTimeout(() => { copyTimer.current = undefined; setCopied(false); setPaused(false); }, COPIED_MS);
     } else if (cta.href) {
       close();
-      if (/^https?:/.test(cta.href)) window.location.href = cta.href; else router.push(cta.href);
+      if (/^https?:/.test(cta.href)) window.location.href = cta.href; else { beforeNavigate(); router.push(cta.href); }
     }
   };
 

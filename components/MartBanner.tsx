@@ -33,7 +33,7 @@ export function MartBanner({ banner, mode = 'desktop', textShort, className }: M
       {link}
       <div className={s.plaque}>
         <span className={s.plaqueTitle}>Бесплатная доставка<br />от {tg(DELIVERY.freeFrom)}</span>
-        <span className={s.plaqueNote}>Иначе {tg(DELIVERY.fee)} · {DELIVERY.etaMin}–{DELIVERY.etaMax} минут</span>
+        <span className={s.plaqueNote}>Иначе от {tg(DELIVERY.fee)} · {DELIVERY.etaMin}–{DELIVERY.etaMax} минут</span>
       </div>
     </div>
   );
