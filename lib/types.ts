@@ -110,7 +110,8 @@ export interface OrderDraft {
   leaveAtDoor?: boolean;
   /** Kaspi Pay счётом: номер, на который выставить счёт в Kaspi. */
   kaspiPhone?: string;
-  together: boolean; courierSlot: string; cargoDay: number; cargoInterval: number; lift: boolean;
+  /** Слоты — id из GET /delivery/slots: 'asap' или «YYYY-MM-DD|09:00–12:00». */
+  together: boolean; courierSlot: string; cargoSlot: string; lift: boolean;
   /** Курьер по зоне адреса (мок; в проде сервер считает сам по координатам). */
   courierFee?: number; courierEta?: number;
   promo?: string; useBonus: boolean; payment: 'kaspi' | 'card'; cardId?: string | null;

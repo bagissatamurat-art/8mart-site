@@ -2,7 +2,7 @@
 .headCol { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .tagRow { display: flex; align-items: center; gap: 8px; }
 .tag { height: 22px; padding: 0 8px; border-radius: var(--r-pill); background: var(--primary-50); color: var(--primary-hover); font-size: var(--fs-caption); font-weight: 600; display: inline-flex; align-items: center; white-space: nowrap; }
-.tagCargo { background: var(--ink-1); color: #fff; }
+.tagCargo { background: var(--warning-bg); color: var(--warning-ink); } /* грузовой — не чёрным (решение владельца) */
 .label { font-size: var(--fs-13); color: var(--ink-2); }
 .when { font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
 .meta { font-size: var(--fs-13); color: var(--ink-2); line-height: 1.4; }

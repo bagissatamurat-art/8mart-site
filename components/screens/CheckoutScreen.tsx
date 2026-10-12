@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { MartAuth } from '@/components/MartAuth';
 import { MartButton } from '@/components/MartButton';
-import { MartChip } from '@/components/MartChip';
+import { SlotPicker } from '@/components/checkout/SlotPicker';
 import { MartInput } from '@/components/MartInput';
 import { MartPromo } from '@/components/MartPromo';
 import { MartShipmentHead, MartSplitChoice } from '@/components/MartShipments';
@@ -18,10 +18,10 @@ import { EarnNote, SummaryLines, TotalLine, TotalsRows } from '@/components/chec
 import { MobileTopBar } from '@/components/checkout/MobileTopBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { Skeleton } from '@/components/ui/Spinner';
-import { createOrder, getBonus, getCards } from '@/lib/api';
-import { SHIPPING } from '@/lib/config';
+import { createOrder, getBonus, getCards, getDeliverySlots } from '@/lib/api';
+import { DELIVERY, SHIPPING } from '@/lib/config';
 import { CART, CHECKOUT, CTA_BLOCKED } from '@/lib/copy';
-import { bonusText, groupDigits, itemsTitle, money, orderTotals, phoneComplete, splitOptions, tg } from '@/lib/domain';
+import { bonusText, groupDigits, itemsTitle, money, orderTotals, phoneComplete, slotTitle, splitOptions, tg, type SlotDay } from '@/lib/domain';
 import { useCartLines } from '@/lib/hooks/useCartLines';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { usePromo } from '@/lib/hooks/usePromo';
@@ -58,7 +58,9 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const [entrance, setEntrance] = useState(''), [floor, setFloor] = useState(''), [flat, setFlat] = useState('');
   const [comment, setComment] = useState('');
   const [slot, setSlot] = useState('asap');
-  const [cargoDay, setCargoDay] = useState(0), [cargoInt, setCargoInt] = useState(0);
+  const [cargoSlot, setCargoSlot] = useState('');
+  /** Дни и интервалы — из API (мок считает от текущего времени Казахстана). */
+  const [slotDays, setSlotDays] = useState<{ courier: SlotDay[]; cargo: SlotDay[] } | null>(null);
   const [lift, setLift] = useState(false);
   const [useBonus, setUseBonus] = useState(false);
   const [pay, setPay] = useState('kaspi');
@@ -73,6 +75,19 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   // Пустая корзина или не выбран способ — назад в корзину.
   useEffect(() => { if (ready && !placed.current && (!lines.length || !m.method)) router.replace('/cart'); }, [ready, lines.length, m.method, router]);
   useEffect(() => { setEntrance(e => e || m.entrance || ''); setFlat(f => f || m.flat || ''); }, [m.entrance, m.flat]);
+  // Слоты: «Ближайшее» подписано временем зоны адреса. Выбранный слот пропал (прошло время) — первый доступный.
+  const etaText = m.quote ? `~${m.quote.eta} мин` : `${DELIVERY.etaMin}–${DELIVERY.etaMax} мин`;
+  useEffect(() => {
+    let on = true;
+    Promise.all([getDeliverySlots('courier', etaText), getDeliverySlots('cargo')]).then(([courier, cargo]) => {
+      if (!on) return;
+      setSlotDays({ courier, cargo });
+      const has = (days: SlotDay[], id: string) => days.some(d => d.slots.some(x => x.id === id));
+      setSlot(v => (has(courier, v) ? v : courier[0]?.slots[0]?.id ?? ''));
+      setCargoSlot(v => (has(cargo, v) ? v : cargo[0]?.slots[0]?.id ?? ''));
+    });
+    return () => { on = false; };
+  }, [etaText]);
   useEffect(() => {
     if (!user) return;
     setPhone(p => p || user.phone);
@@ -103,7 +118,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
     try {
       const { id } = await createOrder({
         cart, method, city: m.city, address: m.address, pickupPointId: m.pickupPointId, entrance, floor, flat, comment,
-        recipient: { name: user.name, phone }, leaveAtDoor: !pk && leaveAtDoor, kaspiPhone: kaspiInvoice ? kaspiPhone : undefined, ...quotePlan(m), together, courierSlot: slot, cargoDay, cargoInterval: cargoInt, lift,
+        recipient: { name: user.name, phone }, leaveAtDoor: !pk && leaveAtDoor, kaspiPhone: kaspiInvoice ? kaspiPhone : undefined, ...quotePlan(m), together, courierSlot: slot, cargoSlot, lift,
         promo: promo?.code, useBonus, payment: kaspi ? 'kaspi' : 'card', cardId: kaspi || pay === 'card' ? null : pay,
       });
       placed.current = true;
@@ -122,10 +137,6 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const cta = <MartButton label={kaspi ? undefined : 'Оплатить'} amount={money(t.total)} variant={kaspi ? 'kaspi' : 'primary'} size={56} full
     disabled={!!reason} reason={reason} loading={placing} onClick={place} />;
   const reasonText = reason && <span className={mobile ? c.reasonM : c.reason}>{reason}</span>;
-  const chipSize = mobile ? 36 : 40;
-  const chips = (items: { label: string; sel: boolean; pick: () => void }[]) => (
-    <div className={mobile ? c.chipsScroll : c.chips}>{items.map(x => <MartChip key={x.label} label={x.label} selected={x.sel} size={chipSize} onClick={x.pick} />)}</div>
-  );
 
   const auth = (
     <div className={mobile ? c.authM : c.authCard}>
@@ -154,7 +165,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
     </section>
   );
 
-  // Как доставим: вместе/раздельно, отправления — курьер (когда), газель (день, интервал, подъём).
+  // Как доставим: отправления — курьер (день и время), грузовой (день, интервал, подъём); в самовывозе — вместе/раздельно.
   const shipSection = (
     <section className={mobile ? c.cardM : c.card}>
       {mobile ? <b className={c.h16}>{CHECKOUT.shipTitle(pk)}</b> : <h2 className={c.h2}>{CHECKOUT.shipTitle(pk)}</h2>}
@@ -162,18 +173,16 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
       {t.plan.list.map(sh => (
         <div key={sh.id} className={mobile ? c.shipM : c.ship}>
           <MartShipmentHead compact={mobile} kind={sh.kind} method={method} label={sh.label} meta={sh.meta} feeText={sh.feeText}
-            when={sh.isCargo && !pk ? `${SHIPPING.cargo.days[cargoDay]}, ${SHIPPING.cargo.intervals[cargoInt]}` : sh.when} />
+            when={(!pk && slotDays && slotTitle(sh.isCargo ? slotDays.cargo : slotDays.courier, sh.isCargo ? cargoSlot : slot)) || sh.when} />
           <div className={c.thumbs}>{sh.lines.filter(l => !l.soldOut).map(l => l.p.img && <Img key={l.p.id} src={l.p.img} w={40} h={40} className={c.thumb} />)}</div>
           {!pk && sh.isCourier && (
             <div className={c.slotGroup}><span className={c.slotTitle}>Когда доставить</span>
-              {chips(SHIPPING.courier.slots.map(([id, label]) => ({ label, sel: slot === id, pick: () => setSlot(id) })))}</div>
+              {slotDays ? <SlotPicker compact={mobile} label="Когда доставить курьером" days={slotDays.courier} value={slot} onChange={setSlot} /> : <Skeleton h={124} r={16} />}</div>
           )}
           {!pk && sh.isCargo && (
             <>
-              <div className={c.slotGroup}><span className={c.slotTitle}>День</span>
-                {chips(SHIPPING.cargo.days.map((label, i) => ({ label, sel: cargoDay === i, pick: () => setCargoDay(i) })))}</div>
-              <div className={c.slotGroup}><span className={c.slotTitle}>Интервал</span>
-                {chips(SHIPPING.cargo.intervals.map((label, i) => ({ label, sel: cargoInt === i, pick: () => setCargoInt(i) })))}</div>
+              <div className={c.slotGroup}><span className={c.slotTitle}>Когда привезти</span>
+                {slotDays ? <SlotPicker compact={mobile} label="Когда привезти грузовым" days={slotDays.cargo} value={cargoSlot} onChange={setCargoSlot} /> : <Skeleton h={124} r={16} />}</div>
               <MartToggleRow title="Подъём на этаж" sub={liftSub} on={lift} onToggle={() => setLift(v => !v)} />
             </>
           )}

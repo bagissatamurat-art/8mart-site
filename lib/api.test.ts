@@ -65,7 +65,7 @@ describe('бонусы в моке', () => {
 describe('заказ: оформление → статус → отмена', () => {
   const draft = {
     cart: { b1: 2, b6: 1 }, method: 'delivery' as const, city: 'astana', address: 'Кабанбай батыра, 11', pickupPointId: null,
-    recipient: { name: 'Айгерим', phone: '+7 (700) 133-90-71' }, together: false, courierSlot: 'asap', cargoDay: 1, cargoInterval: 2,
+    recipient: { name: 'Айгерим', phone: '+7 (700) 133-90-71' }, together: false, courierSlot: 'asap', cargoSlot: '2026-10-15|17:00–21:00',
     lift: false, useBonus: false, payment: 'kaspi' as const,
   };
   it('создаёт заказ с отправлениями и итогами', async () => {
@@ -73,7 +73,7 @@ describe('заказ: оформление → статус → отмена', (
     const o = await api.getOrder(id);
     expect(o).toMatchObject({ status: 'accepted', address: 'Астана, Кабанбай батыра, 11', total: 7970 + 2000 + 3000 });
     expect(o.shipments.map(s => s.kind)).toEqual(['courier', 'cargo']);
-    expect(o.shipments[1].eta).toBe('28 сентября, 17:00–21:00');
+    expect(o.shipments[1].eta).toBe('15 октября, 17:00–21:00');
     expect((await api.getOrders())[0].id).toBe(id);
     await api.cancelOrder(id);
     expect((await api.getOrder(id)).status).toBe('cancelled');

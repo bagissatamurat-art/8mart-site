@@ -35,8 +35,11 @@ describe('мок = data.js', () => {
   it('PRODUCTS в итоговой форме (кроме цветов)', () => expect(PRODUCTS).toEqual(fixPaths(D_PRODUCTS)));
   it('конфиг', () => {
     expect(C.DELIVERY).toEqual(D.DELIVERY);
+    // Слоты (дни и интервалы) — от текущей даты (lib/domain/slots), в прототипе — фиксированные строки.
     const { slots: _slots, ...courier } = C.SHIPPING.courier;
-    expect({ ...C.SHIPPING, courier }).toEqual(D.SHIPPING);
+    const { slots: _cargoSlots, ...cargo } = C.SHIPPING.cargo;
+    const { days: _d, intervals: _i, ...dCargo } = D.SHIPPING.cargo;
+    expect({ ...C.SHIPPING, courier, cargo }).toEqual({ ...D.SHIPPING, cargo: dCargo });
     expect(C.SORTS).toEqual(D.SORTS);
     expect(C.CAT_FILTERS).toEqual(D.CAT_FILTERS);
     expect(C.COLOR_SWATCH).toEqual(D.COLOR_SWATCH);

@@ -1,8 +1,8 @@
 // Слой данных. Сейчас отвечает моком (lib/mock.ts) в форме API-контракта из README.
 // Чтобы перейти на бэкенд, замените тело функций на fetch(`${API_URL}/...`) — сигнатуры и формы ответов не меняются.
 import * as M from './mock';
-import { CANCEL_BEFORE, CAT_FILTERS, PAGE_SIZE, PROMO, SHIPPING } from './config';
-import { cartItem, orderTotals, planShipments, type PlanOptions, type ShipmentPlan } from './domain';
+import { CANCEL_BEFORE, CAT_FILTERS, DELIVERY, PAGE_SIZE, PROMO } from './config';
+import { cargoSlots, cartItem, courierSlots, orderTotals, planShipments, slotEta, type PlanOptions, type ShipmentPlan, type SlotDay } from './domain';
 import { FLOWER_COMPOSITION } from './flowers';
 import { fetchLiveStories } from './stories';
 import type { QuoteResult } from './delivery';
@@ -245,7 +245,6 @@ export function createOrder(d: OrderDraft): Promise<{ id: string; payUrl?: strin
   const now = new Date(), m = readMock();
   const id = '8M-' + (10500 + m.placed.length);
   const city = M.CITIES.find(c => c.id === d.city)?.name;
-  const slot = SHIPPING.courier.slots.find(s => s[0] === d.courierSlot);
   const pk = d.method === 'pickup';
   const order: Order = {
     id, date: `${now.getDate()} ${MONTHS[now.getMonth()]}, ${hhmm(now)}`, method: d.method, status: 'accepted',
@@ -254,8 +253,8 @@ export function createOrder(d: OrderDraft): Promise<{ id: string; payUrl?: strin
     shipments: t.plan.list.map(x => ({
       kind: x.kind, status: 'accepted' as const, times: [hhmm(now)],
       eta: x.isCargo
-        ? (pk ? 'завтра с 9:00' : `${SHIPPING.cargo.days[d.cargoDay].replace(/^[^,]+, /, '')}, ${SHIPPING.cargo.intervals[d.cargoInterval]}`)
-        : pk ? hhmm(plusMin(now, 40)) : !slot || slot[0] === 'asap' ? `${hhmm(plusMin(now, 60))}–${hhmm(plusMin(now, 90))}` : slot[1],
+        ? (pk ? 'завтра с 9:00' : slotEta(d.cargoSlot) ?? 'завтра, 09:00–13:00')
+        : pk ? hhmm(plusMin(now, 40)) : slotEta(d.courierSlot) ?? `${hhmm(plusMin(now, d.courierEta ?? DELIVERY.etaMin))}–${hhmm(plusMin(now, (d.courierEta ?? DELIVERY.etaMax) + 30))}`,
     })),
     recipient: d.recipient, leaveAtDoor: d.method === 'delivery' ? d.leaveAtDoor : undefined, kaspiPhone: d.payment === 'kaspi' ? d.kaspiPhone : undefined,
     goods: t.goods, discount: t.discount, fees: t.fees.map(f => ({ label: f.label, amount: f.amount })),
@@ -313,5 +312,6 @@ export const getFavorites = (): Promise<string[]> => reply(M.FAVORITES, 0);
 /** PUT /favorites */
 export const putFavorites = (ids: string[]): Promise<string[]> => reply(ids, 0);
 
-/** Окна грузовой доставки для оформления (часть ответа /cart/validate в проде). */
-export const getCargoSlots = () => reply({ days: SHIPPING.cargo.days, intervals: SHIPPING.cargo.intervals }, 0);
+/** GET /delivery/slots?kind — дни и интервалы доставки для оформления. eta — подпись «Ближайшего» (по зоне адреса). */
+export const getDeliverySlots = (kind: 'courier' | 'cargo', eta = ''): Promise<SlotDay[]> =>
+  reply(kind === 'courier' ? courierSlots(new Date(), eta) : cargoSlots(new Date()), 0);

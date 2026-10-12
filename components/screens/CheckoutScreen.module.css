@@ -17,7 +17,6 @@
 .thumb { width: 40px; height: 40px; border-radius: 10px /* из референса */; object-fit: cover; background: var(--surface-subtle); }
 .slotGroup { display: flex; flex-direction: column; gap: 8px; }
 .slotTitle { font-size: var(--fs-small); font-weight: 600; }
-.chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .offer { padding: 4px 8px; }
 .authCard { background: var(--surface-card); border-radius: var(--r-24); padding: 28px; max-width: 520px; }
 .asideHead { display: flex; align-items: baseline; justify-content: space-between; }
@@ -38,7 +37,5 @@
 .addrM .addrText { font-size: var(--fs-small); }
 .grid3m { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .shipM { display: flex; flex-direction: column; gap: 12px; padding: 12px; border-radius: var(--r-16); border: 1px solid var(--border); }
-.chipsScroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding: 0 2px; }
-.chipsScroll::-webkit-scrollbar { display: none; }
 .ctaBar { position: sticky; bottom: 0; padding: 8px 16px max(12px, env(safe-area-inset-bottom)); background: var(--surface-card); box-shadow: 0 -1px 0 var(--divider); display: flex; flex-direction: column; gap: 6px; z-index: 10; }
 .reasonM { font-size: var(--fs-caption); color: var(--danger); text-align: center; line-height: 1.3; }

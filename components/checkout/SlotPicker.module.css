@@ -1,0 +1,30 @@
+.box { display: flex; flex-direction: column; gap: 12px; }
+
+/* Дни — равные карточки в ряд; на узком экране — прокрутка без полосы */
+.days { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(96px, 1fr); gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.days::-webkit-scrollbar { display: none; }
+.day {
+  height: 56px; border-radius: var(--r-16); border: 1px solid var(--border); background: var(--surface-card); cursor: pointer; padding: 0 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: inherit; color: var(--ink-1); outline: none;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.dayTitle { font-size: var(--fs-15); font-weight: 600; line-height: 1.2; }
+.dayDate { font-size: var(--fs-13); color: var(--ink-2); line-height: 1.2; }
+
+/* Интервалы — сетка: 2 колонки на mobile, сколько влезет на desktop */
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.compact .slots { grid-template-columns: 1fr 1fr; }
+.slot {
+  min-height: var(--h-56); border-radius: var(--r-16); border: 1px solid var(--border); background: var(--surface-card); cursor: pointer; padding: 8px 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: inherit; color: var(--ink-1); outline: none;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.slotLabel { font-size: var(--fs-15); font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.slotSub { font-size: var(--fs-13); color: var(--ink-2); line-height: 1.2; }
+
+.day:hover, .slot:hover { border-color: var(--border-strong); }
+.day:focus-visible, .slot:focus-visible { box-shadow: var(--focus-ring); }
+.on, .on:hover { border-color: var(--primary); background: var(--primary-50); box-shadow: inset 0 0 0 1px var(--primary); }
+.on:focus-visible { box-shadow: inset 0 0 0 1px var(--primary), var(--focus-ring); }
+.on .dayTitle, .on .slotLabel { color: var(--primary-active); }
+.on .dayDate, .on .slotSub { color: var(--primary-hover); }

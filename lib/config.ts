@@ -50,11 +50,13 @@ export const DELIVERY_TYPES: Record<'express' | 'cargo' | 'flowers', DeliveryTyp
 // Отправления. Тарифы, окна и вес — МОК. В API: product.weightKg, order.shipments[].
 export const SHIPPING = {
   courier: { name: 'Курьер', when: `Сегодня, за ${ETA} минут`, pickupWhen: 'Сегодня, через 30 минут',
-    /** «Когда доставить» в оформлении (03). asap — ближайшее. */
-    slots: [['asap', `Ближайшее, ${ETA} мин`], ['12-15', 'Сегодня 12:00–15:00'], ['15-18', 'Сегодня 15:00–18:00'], ['tmr', 'Завтра, утро']] as [string, string][] },
+    /** «Когда доставить» (03): «Ближайшее» сегодня + интервалы на days дней вперёд. Интервал сегодня доступен,
+     *  если до его начала не меньше leadMin минут. Время — Казахстан. МОК: в проде слоты отдаёт бэкенд. */
+    slots: { days: 3, leadMin: 60, intervals: ['09:00–12:00', '12:00–15:00', '15:00–18:00', '18:00–21:00'], asapUntil: '21:00' } },
   cargo: { name: 'Грузовой', when: 'Завтра, 9:00–21:00', pickupWhen: 'Завтра с 9:00', pickupWhere: 'Склад, ш. Коргалжын, 3',
     tiers: [{ upTo: 300, fee: 3000 }, { upTo: 1000, fee: 5000 }, { upTo: 1500, fee: 7000 }], liftFee: 200,
-    days: ['Завтра, 27 сентября', 'Пн, 28 сентября', 'Вт, 29 сентября'], intervals: ['9:00–13:00', '13:00–17:00', '17:00–21:00'] },
+    /** Грузовой: с завтрашнего дня, days дней, интервалы. МОК: в проде — бэкенд. */
+    slots: { days: 3, intervals: ['09:00–13:00', '13:00–17:00', '17:00–21:00'] } },
 };
 
 export const ORDER_STATUS: Record<OrderStatus, { label: string; labelPickup?: string; tone: 'active' | 'ok' | 'bad' }> = {

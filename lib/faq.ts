@@ -8,6 +8,6 @@ export const FAQ: [string, string][] = faqItems({
   fee: tg(DELIVERY.fee), freeFrom: tg(DELIVERY.freeFrom), etaMin: DELIVERY.etaMin, etaMax: DELIVERY.etaMax,
   maxPart: BONUS_RULES.maxPart, refundDays: REFUND_DAYS,
   cities: SNAPSHOT_CITIES.map(c => c.name).join(', '),
-  slots: SHIPPING.courier.slots.slice(1).map(([, label]) => label.toLowerCase()).join('; '),
+  slots: SHIPPING.courier.slots.intervals.join(', '),
   phone: BRAND.phone,
 });
