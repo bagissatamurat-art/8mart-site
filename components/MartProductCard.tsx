@@ -22,9 +22,12 @@ export interface MartProductCardProps {
   onFavorite?: (id: string, on: boolean) => void;
   onOpen?: (product: Product) => void;
   onQty?: (id: string, qty: number) => void;
+  /** Первый экран: фото без ленивой загрузки. priority — фото-LCP страницы (первая карточка каталога). */
+  eager?: boolean;
+  priority?: boolean;
 }
 
-export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavorite, onOpen, onQty }: MartProductCardProps) {
+export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavorite, onOpen, onQty, eager, priority }: MartProductCardProps) {
   const storeFav = useIsFavorite(p.id);
   const fav = favorite ?? storeFav;
   const hasPrice = p.price != null;
@@ -36,7 +39,7 @@ export function MartProductCard({ product: p, qty = 0, soldOut, favorite, onFavo
   return (
     <article className={`${s.card} ${soldOut ? s.sold : ''}`} onClick={open} data-quickview={onOpen ? p.id : undefined}>
       <div className={s.photo}>
-        {p.img ? <Img src={p.img} alt={p.name} fill sizes="(max-width: 1023px) 50vw, 220px" className={s.img} /> : <span className={s.ph}>фото товара</span>}
+        {p.img ? <Img src={p.img} alt={p.name} fill sizes="(max-width: 1023px) 48vw, (max-width: 1279px) 160px, 200px" quality={60} eager={eager} priority={priority} className={s.img} /> : <span className={s.ph}>фото товара</span>}
         {pct > 0 && !soldOut && <Badge tone="sale" className={s.disc}>−{pct}%</Badge>}
         {p.badge && !soldOut && <Badge tone="onPhoto" className={s.badge}>{p.badge}</Badge>}
         <button type="button" className={s.fav} aria-label={fav ? 'Убрать из избранного' : 'В избранное'} aria-pressed={fav}

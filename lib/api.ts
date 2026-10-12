@@ -1,5 +1,6 @@
 // Слой данных. Сейчас отвечает моком (lib/mock.ts) в форме API-контракта из README.
 // Чтобы перейти на бэкенд, замените тело функций на fetch(`${API_URL}/...`) — сигнатуры и формы ответов не меняются.
+import { cache } from 'react';
 import * as M from './mock';
 import { CANCEL_BEFORE, CAT_FILTERS, DELIVERY, PAGE_SIZE, PROMO } from './config';
 import { cargoSlots, cartItem, courierSlots, orderTotals, planShipments, slotEta, type PlanOptions, type ShipmentPlan, type SlotDay } from './domain';
@@ -23,8 +24,8 @@ export class ApiError extends Error {
 
 // ── Каталог ──
 
-/** GET /categories */
-export const getCategories = (): Promise<Category[]> => reply(M.CATEGORIES);
+/** GET /categories. cache — на сервере один запрос на рендер страницы (зовут и макет, и страница, и метаданные). */
+export const getCategories = cache((): Promise<Category[]> => reply(M.CATEGORIES));
 
 const attrValues = (p: Product, attr: string): string[] => {
   const v = (p as unknown as Record<string, unknown>)[attr];

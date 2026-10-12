@@ -1,5 +1,6 @@
 'use client';
 // MartChip — COMPONENTS.md → MartChip; референс site/MartChip.dc.html.
+import Link from 'next/link';
 import { Cross } from './ui/Cross';
 import s from './MartChip.module.css';
 
@@ -12,9 +13,14 @@ export interface MartChipProps {
   count?: number;
   size?: 36 | 40;
   onClick?: () => void;
+  /** Ссылка вместо кнопки (переход в раздел): поисковик видит адрес. */
+  href?: string;
 }
 
-export function MartChip({ label, selected, disabled, removable, count, size = 36, onClick }: MartChipProps) {
+export function MartChip({ label, selected, disabled, removable, count, size = 36, onClick, href }: MartChipProps) {
+  if (href) {
+    return <Link href={href} className={`${s.chip} ${selected ? s.selected : ''}`} style={{ height: size }} aria-current={selected ? 'page' : undefined}><span>{label}</span></Link>;
+  }
   return (
     <button type="button" className={`${s.chip} ${selected ? s.selected : ''}`} style={{ height: size }} disabled={disabled}
       aria-pressed={removable ? undefined : !!selected} aria-label={removable ? `${label} — убрать` : undefined} onClick={onClick}>

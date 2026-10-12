@@ -11,7 +11,7 @@ import { MethodCard, MobileTopBar } from '@/components/checkout/MobileTopBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteTabBar } from '@/components/site/SiteTabBar';
 import { Alert } from '@/components/ui/Alert';
-import { Skeleton } from '@/components/ui/Spinner';
+import { CardSkeleton, Skeleton } from '@/components/ui/Spinner';
 import { getUpsell } from '@/lib/api';
 import { CART, CART_ALERT, CTA_BLOCKED, METHOD_NONE } from '@/lib/copy';
 import { bonusText, itemsTitle, money, orderTotals, splitOptions } from '@/lib/domain';
@@ -42,7 +42,8 @@ export function CartScreen({ categories }: { categories: Category[] }) {
   const quote = useMethod(st => st.quote);
   const openMethod = useUi(st => st.openMethod);
   const openQuickView = useUi(st => st.openQuickView);
-  const [upsell, setUpsell] = useState<Product[]>([]);
+  /** null — грузится (скелетон полки, чтобы блок не выпрыгивал под отправлениями). */
+  const [upsell, setUpsell] = useState<Product[] | null>(null);
   useEffect(() => { getUpsell(Object.keys(cart)).then(setUpsell); }, [cart]);
 
   const planOpts = { method: method || 'delivery', together, pickupPoint: method === 'pickup' ? label : '', ...quotePlan({ method, quote }) } as const;
@@ -128,7 +129,13 @@ export function CartScreen({ categories }: { categories: Category[] }) {
                   <button type="button" className={c.clear} onClick={clear}>{CART.clear}</button>
                 </div>
                 {alert}{split}{shipments}
-                {upsell.length > 0 && (
+                {upsell === null && (
+                  <section className={c.upsell} aria-busy="true" aria-label={CART.upsell}>
+                    <Skeleton w={200} h={28} r={8} />
+                    <div className={c.upsellGrid}>{[0, 1, 2, 3].map(i => <CardSkeleton key={i} />)}</div>
+                  </section>
+                )}
+                {upsell && upsell.length > 0 && (
                   <section className={c.upsell} aria-label={CART.upsell}>
                     <h2 className={c.h2}>{CART.upsell}</h2>
                     <div className={c.upsellGrid}>

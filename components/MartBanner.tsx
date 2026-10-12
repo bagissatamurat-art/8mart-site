@@ -21,7 +21,8 @@ export function MartBanner({ banner, mode = 'desktop', textShort, className }: M
   const desktop = mode === 'desktop';
   const link = (
     <Link href={banner.href} className={[s.banner, desktop ? s.desktop : s.mobile, !desktop && className].filter(Boolean).join(' ')}>
-      <Img src={banner.img} fill priority sizes={desktop ? '(max-width: 1023px) 0px, 720px' : '(max-width: 1023px) 100vw, 0px'} className={s.img} />
+      {/* Одинаковые sizes у desktop- и mobile-баннера: один и тот же файл и одна предзагрузка на страницу. */}
+      <Img src={banner.img} fill priority sizes="(max-width: 1023px) 100vw, 720px" className={s.img} />
       <b className={s.title}>{banner.title}</b>
       <span className={s.text}>{desktop ? banner.text : (textShort ?? banner.textShort ?? banner.text)}</span>
       {desktop && banner.cta && <span className={s.pill}>{banner.cta}</span>}

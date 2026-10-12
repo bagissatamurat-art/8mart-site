@@ -2,6 +2,7 @@
 // Оформление — 03 Оформление.dc.html: 3a (1440) и 3b (390). Вход → способ (адрес, телефон получателя, комментарий, «у двери»)
 // → как доставим (отправления, газель) → оплата (Kaspi — номер для счёта) → оферта (включена) → CTA.
 // Блока «Получатель» нет: телефон подставляется из профиля, имя — из профиля (может быть пустым).
+import { PageSkeleton } from '@/components/site/PageSkeleton';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -130,7 +131,8 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const summary = lines.filter(l => !l.soldOut).map(l => ({ key: l.p.id, img: l.p.img, name: l.p.name, qty: l.qty, price: l.p.price }));
   const title = itemsTitle(t.count);
   const earn = t.earn > 0 && <EarnNote>{CART.earn(bonusText(t.earn))}</EarnNote>;
-  const spend = !!user && t.spendMax > 0 && (
+  // Бонусы грузятся — место строки «Списать» занято скелетоном (итоги не прыгают).
+  const spend = !!user && bonus === null ? <Skeleton h={64} r={16} /> : !!user && t.spendMax > 0 && (
     <MartToggleRow tone="bonus" coin on={useBonus} onToggle={() => setUseBonus(v => !v)}
       title={`Списать ${bonusText(t.spendMax).slice(1)}`} sub={`На счёте ${groupDigits(bonus?.balance ?? 0)} · до ${bonus?.maxPart}% суммы товаров`} />
   );
@@ -210,7 +212,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   );
 
   if (!ready || !lines.length || placed.current) {
-    return <div className={c.loading}><Skeleton h={56} r={16} /><Skeleton h={320} r={24} /></div>;
+    return <PageSkeleton variant="split" />;
   }
 
   if (mobile) {

@@ -15,13 +15,13 @@ export type CatalogStats = Record<string, { count: number; img?: string }>;
 export function RootTiles({ categories, stats }: { categories: Category[]; stats: CatalogStats }) {
   return (
     <div className={c.rootTiles}>
-      {categories.map(x => {
+      {categories.map((x, i) => {
         const n = stats[x.slug]?.count ?? 0;
         const [one, few, many] = CATALOG.sectionWords;
         const meta = x.sub.length ? CATALOG.tileMeta(`${x.sub.length} ${plural(x.sub.length, one, few, many)}`, itemsTitle(n)) : CATALOG.catEmpty.title;
         return (
           <Link key={x.slug} href={catalogHref({ cat: x.slug })} className={c.rootTile}>
-            {x.img ? <Img src={x.img} w={160} h={160} className={c.rootImg} /> : <span className={`${c.rootImg} ${c.stripes}`} />}
+            {x.img ? <Img src={x.img} w={160} h={160} className={c.rootImg} eager={i < 6} /> : <span className={`${c.rootImg} ${c.stripes}`} />}
             <span className={c.rootText}><b className={c.rootName}>{x.name}</b><span className={c.meta}>{meta}</span></span>
             <span className={c.rootArrow} aria-hidden><Chevron size={8} color="var(--ink-3)" direction="right" /></span>
           </Link>
@@ -38,11 +38,11 @@ export function SubTiles({ category, stats }: { category: Category; stats: Catal
         <span className={`${c.subImg} ${c.subAll}`}>{CATALOG.allGoods}</span>
         <span className={c.subText}><b className={c.subName}>{CATALOG.allGoods}</b><span className={c.meta}>{itemsTitle(stats[category.slug]?.count ?? 0)}</span></span>
       </Link>
-      {category.sub.map(x => {
+      {category.sub.map((x, i) => {
         const st = stats[x.slug];
         return (
           <Link key={x.slug} href={catalogHref({ cat: category.slug, sub: x.slug })} className={c.subTile}>
-            {st?.img ? <Img src={st.img} w={120} h={120} className={c.subImg} /> : <span className={`${c.subImg} ${c.stripes}`} />}
+            {st?.img ? <Img src={st.img} w={120} h={120} className={c.subImg} priority={i === 0} eager={i < 6} /> : <span className={`${c.subImg} ${c.stripes}`} />}
             <span className={c.subText}><b className={c.subName}>{x.name}</b><span className={c.meta}>{st?.count ? itemsTitle(st.count) : CATALOG.subEmpty}</span></span>
           </Link>
         );

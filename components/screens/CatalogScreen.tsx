@@ -36,7 +36,7 @@ export type { CatalogStats };
 /** Ввод цены пишем в адрес с задержкой, чтобы не плодить запросы на каждую цифру. */
 const PRICE_DEBOUNCE = 400;
 
-export function CatalogScreen({ categories, stats, initial }: { categories: Category[]; stats: CatalogStats; /** Первая страница списка с сервера */ initial?: { items: Product[]; total: number } | null }) {
+export function CatalogScreen({ categories, stats, initial }: { categories: Category[]; stats: CatalogStats; /** Страница списка с сервера (?page=N, по умолчанию 1) */ initial?: { items: Product[]; total: number; page?: number } | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
@@ -87,9 +87,11 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
   const [lastTotal, setLastTotal] = useState(0);
   useEffect(() => { if (!list.loading) setLastTotal(list.total); }, [list.loading, list.total]);
   const resultCount = list.loading ? lastTotal : list.total;
-  const [groups, setGroups] = useState<FilterGroup[]>([]);
+  /** null — группы фильтров грузятся (скелетон в панели, чтобы группы не вставлялись рывком). */
+  const [groups, setGroups] = useState<FilterGroup[] | null>(null);
   useEffect(() => {
     if (!url.cat) { setGroups([]); return; }
+    setGroups(null);
     let live = true;
     getFacets({ category: url.cat, sub: url.sub ?? undefined }).then(g => { if (live) setGroups(g); });
     return () => { live = false; };
@@ -122,6 +124,14 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
       ))}
     </div>
   );
+  // Следующая страница — настоящая ссылка ?page=N+1 вокруг скелетонов догрузки: поисковик проходит по всем товарам,
+  // а в браузере догрузка идёт прокруткой (или кликом по ссылке — без перехода).
+  const nextHref = () => { const h = catalogHref(url); return `${h}${h.includes('?') ? '&' : '?'}page=${list.page + 1}`; };
+  const moreLink = () => (
+    <a href={nextHref()} className={k.moreLink} aria-label={CATALOG.more} onClick={e => { e.preventDefault(); list.more(); }}>
+      {skeletons(4, list.sentinel)}
+    </a>
+  );
 
   const listBody = () => {
     if (list.loading) return <div aria-busy="true" aria-label="Загрузка">{skeletons(8)}</div>;
@@ -146,11 +156,11 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
     return (
       <>
         <div className={k.grid}>
-          {list.items.map(p => (
-            <MartProductCard key={p.id} product={p} qty={lines[p.id] || 0} onQty={setCartQty} onOpen={x => openQuickView(x.id)} />
+          {list.items.map((p, i) => (
+            <MartProductCard key={p.id} product={p} qty={lines[p.id] || 0} onQty={setCartQty} onOpen={x => openQuickView(x.id)} eager={i < 4} priority={i === 0} />
           ))}
         </div>
-        {list.hasMore && skeletons(4, list.sentinel)}
+        {list.hasMore && moreLink()}
         {!list.hasMore && !list.loadingMore && list.total > PAGE_SIZE && <span className={k.end}>{CATALOG.end}</span>}
       </>
     );
@@ -175,7 +185,7 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
         <div className={k.side}>
           <CatalogSidebar categories={categories} level={level} cat={url.cat} sub={url.sub} />
           {level === 'list' && (
-            <MartFiltersPanel value={panelValue} groups={groups} resultCount={resultCount} showToggles={false} onChange={applyFilters} onReset={resetAll} />
+            <MartFiltersPanel value={panelValue} groups={groups ?? []} groupsLoading={groups === null} resultCount={resultCount} showToggles={false} onChange={applyFilters} onReset={resetAll} />
           )}
         </div>
 
@@ -220,7 +230,7 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
 
       {level === 'list' && (
         <>
-          <MartFiltersSheet open={sheet === 'filters'} onClose={() => setSheet(null)} value={panelValue} groups={groups}
+          <MartFiltersSheet open={sheet === 'filters'} onClose={() => setSheet(null)} value={panelValue} groups={groups ?? []} groupsLoading={groups === null}
             resultCount={resultCount} showToggles={false} onChange={applyFilters} onReset={resetAll} />
           <MartSortSheet open={sheet === 'sort'} onClose={() => setSheet(null)} value={url.sort} onChange={setSort} />
         </>

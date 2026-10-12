@@ -238,5 +238,5 @@
   .desc { max-height: 1200px; transition: max-height .4s var(--ease-out); }
   .desc.descCollapsed { max-height: 120px; }
   .favOnPhoto[aria-pressed="true"] svg, .favInline[aria-pressed="true"] svg { animation: var(--anim-heart); }
-  .photoImg { animation: var(--anim-fade); }
+  .modal .photoImg { animation: var(--anim-fade); } /* на странице товара фото не проявляется: это LCP */
 }

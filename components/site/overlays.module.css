@@ -1,0 +1,5 @@
+/* Пока грузится код модалки способа получения — её место на весь экран (как сама модалка), спиннер по центру. */
+.methodLoading {
+  position: fixed; inset: 0; z-index: var(--z-modal-top); background: var(--surface-page);
+  display: flex; align-items: center; justify-content: center; animation: var(--anim-fade);
+}

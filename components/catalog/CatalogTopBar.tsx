@@ -14,13 +14,14 @@ export function CatalogTopBar({ root, title, count, backHref, children }: {
     <div className={c.topBar}>
       {root ? (
         <>
-          <h1 className={c.topRoot}>{CATALOG.title}</h1>
+          {/* h1 страницы — в CatalogScreen (desktop); здесь заголовок шапки mobile, чтобы на странице был один <h1>. */}
+          <p role="heading" aria-level={1} className={c.topRoot}>{CATALOG.title}</p>
           <Link href="/search" className={c.searchLink}><span className={c.loupe} aria-hidden />{CATALOG.searchPlaceholder}</Link>
         </>
       ) : (
         <div className={c.topRow}>
           <Link href={backHref} className={c.back} aria-label="Назад"><Chevron size={9} color="var(--ink-1)" direction="left" /></Link>
-          <h1 className={c.topTitle}>{title}</h1>
+          <p role="heading" aria-level={1} className={c.topTitle}>{title}</p>
           {count && <span className={c.topCount}>{count}</span>}
         </div>
       )}

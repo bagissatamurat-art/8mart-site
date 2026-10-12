@@ -2,6 +2,7 @@
 // Список каталога с бесконечной прокруткой: первая страница при смене запроса, следующие — когда сентинел у края экрана (rootMargin 120, как в 07).
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getProducts } from '@/lib/api';
+import { PAGE_SIZE } from '@/lib/config';
 import type { Product, ProductQuery } from '@/lib/types';
 
 export interface CatalogList {
@@ -16,13 +17,17 @@ export interface CatalogList {
   retry: () => void;
   /** ref для сентинела под сеткой. */
   sentinel: (el: HTMLElement | null) => void;
+  /** Последняя загруженная страница (для ссылки «следующая страница» — ?page=N+1). */
+  page: number;
+  /** Догрузить следующую страницу (клик по ссылке-сентинелу). */
+  more: () => void;
 }
 
 /** initial — первая страница, отрендеренная на сервере (SEO и без вспышки скелетонов); используется для стартового запроса. */
-export function useCatalogList(query: Omit<ProductQuery, 'page'> | null, initial?: { items: Product[]; total: number } | null): CatalogList {
+export function useCatalogList(query: Omit<ProductQuery, 'page'> | null, initial?: { items: Product[]; total: number; page?: number } | null): CatalogList {
   const key = query ? JSON.stringify(query) : '';
   const [st, setSt] = useState(() => initial && key
-    ? { key, items: initial.items, total: initial.total, page: 1, loading: false, loadingMore: false, error: false }
+    ? { key, items: initial.items, total: initial.total, page: initial.page ?? 1, loading: false, loadingMore: false, error: false }
     : { key: '', items: [] as Product[], total: 0, page: 0, loading: true, loadingMore: false, error: false });
   const [attempt, setAttempt] = useState(0);
   const req = useRef(0);
@@ -43,7 +48,7 @@ export function useCatalogList(query: Omit<ProductQuery, 'page'> | null, initial
 
   const more = useCallback(() => {
     const cur = stRef.current;
-    if (busy.current || !cur.key || cur.loading || cur.error || cur.items.length >= cur.total) return;
+    if (busy.current || !cur.key || cur.loading || cur.error || cur.page * PAGE_SIZE >= cur.total) return;
     const id = req.current;
     busy.current = true;
     setSt(x => ({ ...x, loadingMore: true }));
@@ -74,7 +79,8 @@ export function useCatalogList(query: Omit<ProductQuery, 'page'> | null, initial
   return {
     items: fresh ? st.items : [], total: fresh ? st.total : 0,
     loading: !fresh || st.loading, loadingMore: fresh && st.loadingMore, error: fresh && st.error,
-    hasMore: fresh && !st.loading && !st.error && st.items.length < st.total,
-    retry: () => setAttempt(a => a + 1), sentinel,
+    // Открыли ?page=N: товаров на экране меньше, чем «до конца», — считаем по номеру страницы.
+    hasMore: fresh && !st.loading && !st.error && st.page * PAGE_SIZE < st.total,
+    retry: () => setAttempt(a => a + 1), sentinel, page: fresh ? st.page : 0, more,
   };
 }

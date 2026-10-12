@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { NOINDEX } from '@/lib/seo';
 import { notFound } from 'next/navigation';
 import { ACCOUNT_SECTIONS, sectionTitle, type AccountSection } from '@/components/account/sections';
 import { AccountScreen } from '@/components/screens/AccountScreen';
@@ -14,7 +15,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { section } = await params;
-  return { title: `${isSection(section) ? sectionTitle(section) : 'Личный кабинет'}`, robots: { index: false } };
+  return { title: `${isSection(section) ? sectionTitle(section) : 'Личный кабинет'}`, robots: NOINDEX };
 }
 
 export default async function AccountSectionPage({ params }: Params) {

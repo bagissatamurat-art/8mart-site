@@ -5,14 +5,14 @@ import { OrderScreen } from '@/components/screens/OrderScreen';
 import { NOT_FOUND } from '@/lib/copy';
 import type { Category } from '@/lib/types';
 
-/** /order/<id> без заранее собранной страницы → статус заказа; иначе — «Страница не найдена». */
+/** «Страница не найдена» — сразу в HTML с сервера. На статическом хостинге /order/<id> без собранной страницы
+ *  тоже попадает сюда — тогда в браузере показываем статус заказа. */
 export function NotFoundRoute({ categories }: { categories: Category[] }) {
-  const [orderId, setOrderId] = useState<string | null | undefined>(undefined);
+  const [orderId, setOrderId] = useState<string | null>(null);
   useEffect(() => {
     const m = location.pathname.match(/\/order\/([^/]+)\/?$/);
-    setOrderId(m ? decodeURIComponent(m[1]) : null);
+    if (m) setOrderId(decodeURIComponent(m[1]));
   }, []);
-  if (orderId === undefined) return null;
   if (orderId) return <OrderScreen id={orderId} categories={categories} />;
   return (
     <main style={{ minHeight: '60dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24, textAlign: 'center' }}>

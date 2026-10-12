@@ -1,5 +1,6 @@
 'use client';
 // Статус заказа — 03 Оформление.dc.html, шаг success (3a / 3b): шкала по отправлениям, поддержка, отмена до передачи в доставку.
+import { PageSkeleton } from '@/components/site/PageSkeleton';
 import { useEffect, useState } from 'react';
 import { MartButton } from '@/components/MartButton';
 import { ConfirmDialog } from '@/components/account/ConfirmDialog';
@@ -7,7 +8,6 @@ import { OrderTrack } from '@/components/checkout/OrderTrack';
 import { EarnNote, SummaryLines, TotalLine, TotalsRows } from '@/components/checkout/OrderSummary';
 import { MobileTopBar } from '@/components/checkout/MobileTopBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
-import { Skeleton } from '@/components/ui/Spinner';
 import { cancelOrder, getOrder, resolveCartItem } from '@/lib/api';
 import { CANCEL_BEFORE, REFUND_DAYS, SUPPORT_WA } from '@/lib/config';
 import { CART, ORDER_PAGE, CHECKOUT } from '@/lib/copy';
@@ -26,7 +26,8 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   const [cancelling, setCancelling] = useState(false);
   useEffect(() => { getOrder(id).then(setOrder).catch(() => setOrder(null)); }, [id]);
 
-  if (order === undefined) return <div className={c.loading}><Skeleton h={48} r={12} w="40%" /><Skeleton h={360} r={24} /><Skeleton h={120} r={24} /></div>;
+  // Загрузка — скелетон всей страницы (шапка + колонка + панель), как итоговая раскладка: без скачка.
+  if (order === undefined) return <PageSkeleton variant="split" />;
   if (order === null) return (
     <div className={c.loading}><h1 className={l.h1}>{ORDER_PAGE.notFound}</h1><MartButton label="На главную" size={56} href="/" /></div>
   );

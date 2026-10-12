@@ -53,7 +53,7 @@ export function AccountPayments({ cards, onDeleteCard }: { cards: Card[]; onDele
   return (
     <>
       <div className={`${s.card} ${s.row}`}>
-        <img src={asset('/assets/kaspi-logo.svg')} alt="Kaspi" className={s.payIcon} />
+        <img src={asset('/assets/kaspi-logo.svg')} alt="Kaspi" width={40} height={40} className={s.payIcon} />
         <span className={s.col}>
           <b className={s.payTitle}>Kaspi Pay</b>
           <span className={s.muted13}>Оплата в приложении Kaspi — привязывать не нужно</span>

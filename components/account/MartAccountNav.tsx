@@ -2,6 +2,7 @@
 // Навигация кабинета — site/06 Личный кабинет.dc.html.
 // desktop — сайдбар (профиль, разделы со счётчиками, «Выйти»); mobile — экран «Профиль» (шапка, активный заказ, список разделов, «Выйти»)
 // и шапка экрана раздела с кнопкой «Назад» (MartAccountScreenHeader).
+import { Skeleton } from '../ui/Spinner';
 import Link from 'next/link';
 import type { Bonus, Order, User, UserPromo } from '@/lib/types';
 import { Chevron } from '../ui/Cross';
@@ -79,6 +80,8 @@ export function MartAccountNav({ mode = 'desktop', section, user, orders, promos
         <span className={s.who}><b className={s.nameM}>{name || ACCOUNT_PAGE.nameFallback}</b><span className={s.phoneM}>{user.phone}</span></span>
       </div>
       <div className={s.mBody}>
+        {/* Заказы грузятся — место карточки активного заказа занято, список разделов не прыгает вниз. */}
+        {orders === undefined && <Skeleton h={96} r={20} />}
         {active && (
           <Link href={orderHref(active.id)} className={s.activeCard}>
             <span className={s.activeTop}><span className={s.activeNo}>Активный заказ №{active.id}</span><Chevron size={8} color="var(--ink-3)" direction="right" /></span>

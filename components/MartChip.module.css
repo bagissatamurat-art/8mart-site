@@ -1,7 +1,7 @@
 .chip {
   display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: var(--r-pill);
   border: 1.5px solid var(--border); background: var(--surface-card); color: var(--ink-1);
-  font-family: var(--font); font-size: var(--fs-small); font-weight: 500; cursor: pointer; white-space: nowrap; flex: none;
+  font-family: var(--font); font-size: var(--fs-small); font-weight: 500; cursor: pointer; white-space: nowrap; flex: none; text-decoration: none; /* MartChip href — ссылка */
   transition: background var(--dur) var(--ease);
 }
 .chip:hover { background: var(--surface-subtle); }

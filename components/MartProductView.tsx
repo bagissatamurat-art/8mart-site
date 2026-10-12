@@ -209,7 +209,7 @@ function View({
           </button>
         )}
         <div className={s.body}>
-          <Gallery slides={imgs} idx={cur} name={pr.name} mobile={mobile} fav={fav} onFav={toggleFav} onIdx={setIdx} resetKey={v?.id} />
+          <Gallery slides={imgs} idx={cur} name={pr.name} mobile={mobile} fav={fav} onFav={toggleFav} onIdx={setIdx} resetKey={v?.id} page={page} />
           {info}
           {after && <div className={s.after}>{after}</div>}
         </div>

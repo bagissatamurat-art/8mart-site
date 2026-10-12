@@ -1,5 +1,6 @@
 'use client';
-// Брейкпоинт сайта 1024 (--breakpoint в tokens.css): уже 1024 — mobile. На сервере и до гидрации — desktop.
+// Брейкпоинт сайта 1024 (--breakpoint в tokens.css): уже 1024 — mobile. На сервере и до гидрации — serverValue
+// (по умолчанию desktop; страница товара знает устройство заранее — proxy.ts по User-Agent).
 import { useSyncExternalStore } from 'react';
 
 const QUERY = '(max-width: 1023.98px)';
@@ -10,6 +11,6 @@ function subscribe(cb: () => void) {
   return () => mq.removeEventListener('change', cb);
 }
 
-export function useIsMobile(): boolean {
-  return useSyncExternalStore(subscribe, () => window.matchMedia(QUERY).matches, () => false);
+export function useIsMobile(serverValue = false): boolean {
+  return useSyncExternalStore(subscribe, () => window.matchMedia(QUERY).matches, () => serverValue);
 }

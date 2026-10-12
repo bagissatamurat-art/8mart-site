@@ -35,7 +35,7 @@
 .sideImg { width: 36px; height: 36px; border-radius: 10px; /* из референса, нет в tokens.css */ object-fit: cover; background: var(--surface-subtle); }
 
 /* Полка товаров */
-.shelf { display: flex; flex-direction: column; gap: 16px; }
+.shelf { display: flex; flex-direction: column; gap: 16px; content-visibility: auto; contain-intrinsic-size: auto 420px; } /* полки ниже первого экрана не рисуются, пока до них не докрутили */
 .shelfHead { display: flex; align-items: baseline; justify-content: space-between; }
 .shelfTitle { margin: 0; font-size: var(--fs-h2); font-weight: 700; }
 .shelfTitleLink, .shelfTitleLink:hover { color: inherit; text-decoration: none; }

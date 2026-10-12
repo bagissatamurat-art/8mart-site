@@ -11,8 +11,9 @@ export type Slide = string | null;
 
 const PH_TEXT = 'фото товара';
 
-function Photo({ src, alt, small }: { src: Slide; alt: string; small?: boolean }) {
-  if (src) return <Img src={src} alt={alt} fill sizes={small ? '64px' : '(max-width: 1023px) 100vw, 460px'} priority={!small} className={s.photoImg} />;
+/** lcp — первое фото на странице товара (предзагрузка); near — соседнее в ленте (без ленивой загрузки). */
+function Photo({ src, alt, small, lcp, near }: { src: Slide; alt: string; small?: boolean; lcp?: boolean; near?: boolean }) {
+  if (src) return <Img src={src} alt={alt} fill sizes={small ? '64px' : '(max-width: 1023px) 100vw, 460px'} priority={lcp} eager={near} className={s.photoImg} />;
   return <span className={small ? s.phSmall : s.ph}>{small ? null : PH_TEXT}</span>;
 }
 
@@ -26,9 +27,11 @@ export interface GalleryProps {
   onIdx: (i: number) => void;
   /** Меняется при смене размера — лента прокручивается к началу. */
   resetKey?: string;
+  /** Страница товара: первое фото — LCP (предзагрузка). В быстром просмотре — нет. */
+  page?: boolean;
 }
 
-export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey }: GalleryProps) {
+export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey, page }: GalleryProps) {
   const n = slides.length, multi = n > 1;
   const stripRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +46,7 @@ export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey
       <div className={s.galleryM}>
         <div ref={stripRef} className={s.strip} onScroll={onScroll} aria-label={`Фото товара, ${idx + 1} из ${n}`}>
           {slides.map((src, i) => (
-            <div key={i} className={s.slide} aria-hidden={i !== idx || undefined}><Photo src={src} alt={name} /></div>
+            <div key={i} className={s.slide} aria-hidden={i !== idx || undefined}><Photo src={src} alt={name} lcp={page && i === 0} near={Math.abs(i - idx) <= 1} /></div>
           ))}
         </div>
         {multi && (
@@ -59,7 +62,7 @@ export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey
   return (
     <div className={s.gallery}>
       <div className={s.main}>
-        <Photo src={slides[idx] ?? null} alt={name} />
+        <Photo src={slides[idx] ?? null} alt={name} lcp={page && idx === 0} near />
         <button type="button" className={`${s.onPhoto} ${s.favOnPhoto}`} onClick={onFav}
           aria-label={fav ? 'Убрать из избранного' : 'В избранное'} aria-pressed={fav}>
           <HeartIcon on={fav} size={22} />

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { NOINDEX } from '@/lib/seo';
 import { OrderScreen } from '@/components/screens/OrderScreen';
 import { getCategories, getOrders } from '@/lib/api';
 
@@ -10,7 +11,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  return { title: `Заказ №${(await params).id}`, robots: { index: false } };
+  return { title: `Заказ №${(await params).id}`, robots: NOINDEX };
 }
 
 // Заказ читается на клиенте: в моке созданные заказы живут в localStorage браузера.

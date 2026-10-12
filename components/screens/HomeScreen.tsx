@@ -1,7 +1,6 @@
 'use client';
 // Главная — 01 Главная и каталог.dc.html: 1a (1440) и 1b (390). Основной товар — цветы: полки по подкатегориям букетов.
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { MartStories } from '@/components/MartStories';
 import { MartBanner } from '@/components/MartBanner';
 import { MartChip } from '@/components/MartChip';
@@ -24,7 +23,6 @@ export interface HomeShelf { title: string; href: string; products: Product[] }
 export interface HomeData { categories: Category[]; stories: Story[]; banner: Banner; shelves: HomeShelf[] }
 
 export function HomeScreen({ categories, stories, banner, shelves }: HomeData) {
-  const router = useRouter();
   const hydrated = useUi(st => st.hydrated);
   const [deleted, setDeleted] = useState(false);
 
@@ -48,7 +46,7 @@ export function HomeScreen({ categories, stories, banner, shelves }: HomeData) {
             <div className={s.mobileOnly}>
               <div className={s.chips}>
                 <MartChip label="Все" selected />
-                {categories.map(c => <MartChip key={c.slug} label={c.name} onClick={() => router.push(`/catalog?cat=${c.slug}`)} />)}
+                {categories.map(c => <MartChip key={c.slug} label={c.name} href={`/catalog?cat=${c.slug}`} />)}
               </div>
             </div>
             <div className={s.desktopOnly}><MartBanner banner={banner} mode="desktop" /></div>

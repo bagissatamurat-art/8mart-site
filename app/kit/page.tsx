@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { NOINDEX } from '@/lib/seo';
 import Foundations from './sections/Foundations';
 import Controls from './sections/Controls';
 import Filters from './sections/Filters';
@@ -15,14 +16,14 @@ import Checkout from './sections/Checkout';
 import s from './kit.module.css';
 import { asset } from '@/lib/basePath';
 
-export const metadata: Metadata = { title: 'UI Kit', robots: { index: false } };
+export const metadata: Metadata = { title: 'UI Kit', robots: NOINDEX };
 
 const TOC: [string, string][] = [
-  ['colors', 'Цвета'], ['type', 'Типографика'], ['radii', 'Радиусы'], ['button', 'Кнопка'], ['input', 'Инпут'], ['promo', 'Промокод'],
+  ['colors', 'Цвета'], ['type', 'Типографика'], ['radii', 'Радиусы'], ['button', 'Кнопка'], ['input', 'Инпут'], ['select', 'Список'], ['promo', 'Промокод'],
   ['shipments', 'Отправления'], ['stepper', 'Счётчик'], ['chips', 'Чипы'], ['filters', 'Фильтры'], ['stories', 'Сторис'], ['banner', 'Баннер'],
   ['card', 'Карточка товара'], ['badges', 'Бейджи и алерты'], ['cart', 'Корзина'], ['tabbar', 'Таб-бар'], ['header', 'Шапка'], ['search', 'Поиск'],
   ['product', 'Быстрый просмотр'], ['method', 'Способ получения'], ['auth', 'Вход'], ['account', 'Кабинет'],
-  ['sidebar', 'Сайдбар'], ['shelf', 'Полка'], ['toast', 'Тост'], ['crumbs', 'Крошки'], ['card-skeleton', 'Скелетон карточки'], ['marks', 'Радио · чекбокс · свитч'],
+  ['sidebar', 'Сайдбар'], ['shelf', 'Полка'], ['toast', 'Тост'], ['crumbs', 'Крошки'], ['card-skeleton', 'Скелетон карточки'], ['loading', 'Состояния загрузки'], ['marks', 'Радио · чекбокс · свитч'],
   ['checkout-controls', 'Оформление'], ['checkout-summary', 'Итоги'], ['order-track', 'Статус заказа'], ['topbar', 'Шапка экрана'],
 ];
 

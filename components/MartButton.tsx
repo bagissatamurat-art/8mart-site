@@ -36,7 +36,7 @@ export function MartButton({
   const content = (
     <>
       {loading && <span className={s.spinnerWrap}><Spinner /></span>}
-      {kaspi && <img src={asset('/assets/kaspi-pay.svg')} alt="Kaspi Pay" className={s.kaspiImg} style={{ height: size }} />}
+      {kaspi && <img src={asset('/assets/kaspi-pay.svg')} alt="Kaspi Pay" width={Math.round(size * 343 / 52)} height={size} className={s.kaspiImg} style={{ height: size }} />}
       {(!kaspi || label) && label != null && <span>{label}</span>}
       {!kaspi && amount && <><span className={s.sep} aria-hidden /><span className={s.amount}>{amount}</span></>}
     </>

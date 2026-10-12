@@ -5,7 +5,10 @@ import { CategorySidebar } from '@/components/site/CategorySidebar';
 import { ProductShelf } from '@/components/site/ProductShelf';
 import { Toast } from '@/components/ui/Toast';
 import { Breadcrumbs } from '@/components/site/Breadcrumbs';
-import { CardSkeleton } from '@/components/ui/Spinner';
+import { CardSkeleton, Skeleton } from '@/components/ui/Spinner';
+import { PageSkeleton, type PageSkeletonVariant } from '@/components/site/PageSkeleton';
+import { MartFilters } from '@/components/MartFilters';
+import { MartHeader } from '@/components/MartHeader';
 import { CheckMark, RadioMark, SwitchMark } from '@/components/ui/Marks';
 import { MartButton } from '@/components/MartButton';
 import { CATEGORIES, PRODUCTS } from '@/lib/mock';
@@ -38,6 +41,29 @@ export default function Site() {
       <KitSection id="card-skeleton" title="Скелетон карточки · CardSkeleton" note="07 Каталог: 300 (mobile 290), r20, p8, фото 1:1 r14 + две строки r6, пульс 1.4 с. Каталог, поиск, загрузка страницы.">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(180px,100%),180px))', gap: 12, background: 'var(--surface-page)', padding: 12, borderRadius: 20 }}>
           <CardSkeleton /><CardSkeleton />
+        </div>
+      </KitSection>
+      <KitSection id="loading" title="Состояния загрузки · PageSkeleton и точечные скелетоны"
+        note="Скелетон повторяет итоговую раскладку — без скачка, когда придут данные. Страница: app/**/loading.tsx и до гидрации (grid — каталог и поиск, home, product, split — корзина/оформление/заказ, account, auth). Точечные: группы фильтров, шапка до входа, строка бонусов, слоты доставки, рекомендации в корзине.">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(420px,100%),1fr))', gap: 16 }}>
+          {(['home', 'grid', 'product', 'split', 'account', 'auth'] as PageSkeletonVariant[]).map(v => (
+            <KitItem key={v} label={`PageSkeleton · ${v}`}>
+              <div style={{ height: 300, overflow: 'hidden', borderRadius: 16, border: '1px solid var(--border)' }}>
+                <div style={{ width: 1440, transform: 'scale(.3)', transformOrigin: '0 0' }}><PageSkeleton variant={v} /></div>
+              </div>
+            </KitItem>
+          ))}
+          <KitItem label="Группы фильтров грузятся · MartFilters groupsLoading">
+            <div style={{ background: 'var(--surface-card)', borderRadius: 24, padding: 20, maxWidth: 300 }}>
+              <MartFilters value={{ min: '', max: '', sale: false }} groups={[]} groupsLoading showToggles={false} showActions={false} onChange={() => {}} />
+            </div>
+          </KitItem>
+          <KitItem label="Шапка до гидрации · MartHeader methodLoading (адрес и вход неизвестны)">
+            <MartHeader mode="desktop" methodLoading contained />
+          </KitItem>
+          <KitItem label="Строка «Списать бонусы» / слоты доставки — Skeleton 64 / 124">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 420 }}><Skeleton h={64} r={16} /><Skeleton h={124} r={16} /></div>
+          </KitItem>
         </div>
       </KitSection>
       <KitSection id="marks" title="Индикаторы выбора · RadioMark / CheckMark / SwitchMark" note="Рисуются внутри кнопки-строки с role radio / checkbox / switch. Радио 20 (strong — рамка #C9C7CF), чекбокс 20 r6, переключатель 40×24 (bonus — зелёный).">

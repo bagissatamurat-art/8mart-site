@@ -62,7 +62,7 @@ export function MartStories({ stories, mode = 'mobile', className }: MartStories
               onClick={() => setOpenAt(i)}
             >
               <span className={s.thumbInner}>
-                <Img src={t.cover} fill sizes="104px" className={s.thumbImg} />
+                <Img src={t.cover} fill sizes="104px" quality={60} className={s.thumbImg} eager={i < 6} />
                 <span className={s.thumbShade} aria-hidden />
                 <span className={s.thumbTitle}>{t.title}</span>
               </span>
@@ -400,7 +400,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
       {!isPreview && stories[pos.si + 1] && <Ghost story={stories[pos.si + 1]} sl={0} side="next" />}
       <div ref={cardRef} className={s.card}>
         {under && <span className={s.layer} aria-hidden><Img src={under} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} /></span>}
-        <span ref={layerRef} className={s.layer}><Img src={slide.img} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} priority /></span>
+        <span ref={layerRef} className={s.layer}><Img src={slide.img} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} eager /></span>
         {video && (
           <video key={video} ref={videoRef} className={s.slideImg} src={video} muted={muted} playsInline autoPlay preload="auto"
             disablePictureInPicture onError={() => setVideoFailed(true)} aria-hidden />

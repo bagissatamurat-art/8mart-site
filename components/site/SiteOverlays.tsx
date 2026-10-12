@@ -4,9 +4,14 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { QuickViewSkeleton } from './QuickViewSkeleton';
+import { Spinner } from '@/components/ui/Spinner';
+import o from './overlays.module.css';
 
 // Модалки грузятся по требованию — их код не входит в бандл страниц.
-const MartMethodModal = dynamic(() => import('@/components/MartMethodModal').then(m => m.MartMethodModal), { ssr: false });
+// Код модалки — отдельным файлом по первому открытию; пока грузится — экран модалки со спиннером, а не пустота.
+const MartMethodModal = dynamic(() => import('@/components/MartMethodModal').then(m => m.MartMethodModal), { ssr: false, loading: () => (
+  <div className={o.methodLoading} role="status" aria-label="Загружаем выбор способа получения"><Spinner size={28} variant="track" /></div>
+) });
 import { getCities } from '@/lib/api';
 import { loadQuickView, loadQuickViewComponent, peekQuickView, peekQuickViewComponent, preloadQuickView, type QuickViewData } from './quickViewData';
 import { useCart } from '@/lib/store/cart';

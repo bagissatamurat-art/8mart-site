@@ -17,11 +17,11 @@ import { Breadcrumbs } from '@/components/site/Breadcrumbs';
 import { SiteFaq } from '@/components/site/SiteFaq';
 import { SiteFooter } from '@/components/site/SiteFooter';
 
-export interface ProductData { product: ProductDetail; group: Product[]; categories: Category[] }
+export interface ProductData { product: ProductDetail; group: Product[]; categories: Category[]; /** Телефон по User-Agent — вёрстка с сервера (proxy.ts). */ initialMobile?: boolean }
 
-export function ProductScreen({ product, group, categories }: ProductData) {
+export function ProductScreen({ product, group, categories, initialMobile }: ProductData) {
   const router = useRouter();
-  const mobile = useIsMobile();
+  const mobile = useIsMobile(initialMobile);
   const lines = useCart(st => st.lines);
   const count = useCartCount();
   const method = useMethod(st => st.method);
@@ -56,7 +56,8 @@ export function ProductScreen({ product, group, categories }: ProductData) {
       <SiteHeader categories={categories} mobile={false} />
       <div className={p.wrap}>
         <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Каталог', href: '/catalog' },
-          ...(cat ? [{ label: cat.name, href: `/catalog?cat=${cat.slug}` }] : []), { label: sub?.name ?? '' }]} />
+          ...(cat ? [{ label: cat.name, href: `/catalog?cat=${cat.slug}` }] : []),
+          ...(cat && sub ? [{ label: sub.name, href: `/catalog?cat=${cat.slug}&sub=${sub.slug}` }] : []), { label: product.name }]} />
         <div className={s.grid2}>
           <div className={`${p.min0} ${p.stack}`}>{view}<SiteFaq /></div>
           <div className={s.aside}><SiteMiniCart /></div>

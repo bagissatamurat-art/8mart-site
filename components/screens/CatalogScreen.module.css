@@ -42,3 +42,5 @@
   .desktopOnlyFlex { display: none; }
   .mobileOnlyFlex { display: flex; }
 }
+.moreLink { display: block; color: inherit; text-decoration: none; border-radius: var(--r-20); outline: none; } /* ссылка ?page=N+1 вокруг скелетонов догрузки */
+.moreLink:focus-visible { box-shadow: var(--focus-ring); }

@@ -142,7 +142,8 @@ export function MartHeader(props: MartHeaderProps) {
         <button ref={menuBtn} type="button" className={`${s.menuBtn} ${user ? s.menuBtnUser : ''}`} onClick={() => openMenu(true)}
           aria-haspopup="dialog" aria-expanded={menu} aria-label={user ? `Меню, ${userName || ACCOUNT_PAGE.nameFallback}` : 'Меню, войти'}>
           <span className={s.burger} aria-hidden><span /><span /><span /></span>
-          {user ? <span className={s.avatar} aria-hidden>{userName ? userName[0] : <PersonIcon size={16} />}</span> : <span className={s.login}>Войти</span>}
+          {/* До гидрации вход неизвестен — нейтральный кружок вместо «Войти», который потом сменился бы аватаром. */}
+          {methodLoading ? <Skeleton w={32} h={32} r={16} /> : user ? <span className={s.avatar} aria-hidden>{userName ? userName[0] : <PersonIcon size={16} />}</span> : <span className={s.login}>Войти</span>}
         </button>
       </header>
       {menu && <MartSideMenu {...props} contained={contained} onClose={() => openMenu(false)} />}

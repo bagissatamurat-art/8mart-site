@@ -3,6 +3,7 @@
 // (сайдбар desktop, лист mobile, кнопка «Фильтры», чипы активных фильтров).
 // Цена от–до + группы по категории (CAT_FILTERS / getFacets) + переключатели «В наличии», «Со скидкой».
 // Desktop — в сайдбаре, применяется сразу, «Сбросить». Mobile — нижний лист с CTA «Показать · N товаров».
+import { Skeleton } from './ui/Spinner';
 import { useId } from 'react';
 import type { FilterDef } from '@/lib/config';
 import type { ProductQuery } from '@/lib/types';
@@ -80,6 +81,8 @@ export interface MartFiltersProps {
   /** Текст суммы в CTA вместо числа (mobile: «4 товара»). */
   resultText?: string;
   showToggles?: boolean;
+  /** Группы ещё грузятся — скелетон группы под ценой. */
+  groupsLoading?: boolean;
   /** Кнопки «Показать» / «Сбросить» снизу (лист mobile, витрина). В сайдбаре desktop — выключены. */
   showActions?: boolean;
   onChange: (v: FiltersValue) => void;
@@ -88,7 +91,7 @@ export interface MartFiltersProps {
   onApply?: (v: FiltersValue) => void;
 }
 
-export function MartFilters({ value: v, groups, resultCount = 0, resultText, showToggles = true, showActions = true, onChange, onReset, onApply }: MartFiltersProps) {
+export function MartFilters({ value: v, groups, groupsLoading, resultCount = 0, resultText, showToggles = true, showActions = true, onChange, onReset, onApply }: MartFiltersProps) {
   const uid = useId();
   const digits = (x: string) => x.replace(/\D/g, '');
   const toggle = (k: string, l: string) => {
@@ -115,6 +118,12 @@ export function MartFilters({ value: v, groups, resultCount = 0, resultText, sho
         </div>
       </div>
 
+      {groupsLoading && (
+        <div className={s.group} aria-busy="true" aria-label="Загружаем фильтры">
+          <Skeleton w={90} h={16} r={6} />
+          {[0, 1, 2, 3].map(i => <Skeleton key={i} h={24} r={6} style={{ margin: '8px 0' }} />)}
+        </div>
+      )}
       {shown.map(g => {
         const sel = groupValues(v, g.key);
         return (

@@ -3,7 +3,8 @@
 // и site/06 Личный кабинет.dc.html (сайдбар, меню и экран раздела — MartAccountNav).
 // Чисто презентационный: данные приходят пропсами, действия — колбэками. Загрузка — скелетоны (пульс 1.4 с).
 import type { Address, Bonus, Card, Order, Product, User, UserPromo } from '@/lib/types';
-import { Skeleton } from './ui/Spinner';
+import { CardSkeleton, Skeleton } from './ui/Spinner';
+import { ACCOUNT_PAGE } from '@/lib/copy';
 import { AccountOrders } from './account/AccountOrders';
 import { AccountAddresses, AccountBonus, AccountFavorites, AccountPayments, AccountPromos } from './account/AccountLists';
 import { AccountProfile } from './account/AccountProfile';
@@ -68,18 +69,12 @@ export function MartAccount({
     orders: data.orders, favorites: data.favorites, addresses: data.addresses, payments: data.cards,
     promos: data.promos, bonus: data.bonus, profile: data.user,
   };
-  if (loading || need[section] == null) {
-    return (
-      <div className={cls} aria-busy="true" aria-label="Загрузка">
-        {[0, 1, 2].map(k => (
-          <div key={k} className={`${s.card} ${s.skel}`}>
-            <Skeleton w="40%" h={18} r={6} />
-            <Skeleton w="70%" h={14} r={6} style={{ background: 'var(--surface-page)' }} />
-            <div className={s.skelRow}>{[0, 1, 2].map(i => <Skeleton key={i} w={48} h={48} r={10} style={{ background: 'var(--surface-page)' }} />)}</div>
-          </div>
-        ))}
-      </div>
-    );
+  // undefined — ещё грузится; null — запрос упал (бонусы): показываем ошибку, а не вечный скелетон.
+  if (loading || need[section] === undefined) {
+    return <div className={cls} aria-busy="true" aria-label="Загрузка"><SectionSkeleton section={section} /></div>;
+  }
+  if (section === 'bonus' && data.bonus === null) {
+    return <div className={cls}><div className={s.card}><p className={s.skelNote}>{ACCOUNT_PAGE.bonusError}</p></div></div>;
   }
 
   return (
@@ -94,4 +89,32 @@ export function MartAccount({
         onDeleteAccount={onDeleteAccount} confirmOpen={demoConfirmOpen} inlineDialog={demoInlineDialog} />}
     </div>
   );
+}
+
+/** Скелетон раздела — по форме самого раздела: карточки заказов, сетка избранного, строки адресов/карт/промокодов, бонусы, профиль. */
+function SectionSkeleton({ section }: { section: AccountSection }) {
+  const sub = { background: 'var(--surface-page)' };
+  if (section === 'favorites') return <div className={s.skelGrid}>{[0, 1, 2, 3].map(i => <CardSkeleton key={i} />)}</div>;
+  if (section === 'profile') {
+    return <div className={`${s.card} ${s.skel}`}>{[0, 1, 2].map(i => <Skeleton key={i} h={56} r={16} style={sub} />)}<Skeleton w={180} h={44} r={22} style={sub} /></div>;
+  }
+  if (section === 'bonus') {
+    return <>
+      <div className={`${s.card} ${s.skel}`}><Skeleton w="30%" h={14} r={6} style={sub} /><Skeleton w="45%" h={40} r={10} style={sub} /><Skeleton w="70%" h={14} r={6} style={sub} /></div>
+      <div className={`${s.card} ${s.skel}`}>{[0, 1, 2].map(i => <Skeleton key={i} h={44} r={12} style={sub} />)}</div>
+    </>;
+  }
+  if (section === 'orders') {
+    return <>{[0, 1, 2].map(k => (
+      <div key={k} className={`${s.card} ${s.skel}`}>
+        <Skeleton w="40%" h={18} r={6} />
+        <Skeleton w="70%" h={14} r={6} style={sub} />
+        <div className={s.skelRow}>{[0, 1, 2].map(i => <Skeleton key={i} w={48} h={48} r={10} style={sub} />)}</div>
+      </div>
+    ))}</>;
+  }
+  // Адреса, карты, промокоды — строки списка
+  return <div className={`${s.card} ${s.skel}`}>{[0, 1, 2].map(i => (
+    <div key={i} className={s.skelLine}><Skeleton w={40} h={40} r={12} style={sub} /><div><Skeleton w="50%" h={16} r={6} style={sub} /><Skeleton w="75%" h={13} r={6} style={sub} /></div></div>
+  ))}</div>;
 }
