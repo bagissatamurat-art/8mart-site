@@ -1,3 +1,4 @@
+// TEMP-ADAPTER: временный мост к публичному API 8mart.kz / DaData, пока нет бэкенда. С бэкендом — удалить (см. BACKEND_HANDOFF.md, раздел 3).
 // Импорт филиалов 8mart.kz → lib/branches.snapshot.json (сырой ответ API, без преобразований).
 // Перевод в города и точки самовывоза — lib/branches.ts (он же переводит живые данные в /api/branches).
 // Запуск: node scripts/import-branches.mjs

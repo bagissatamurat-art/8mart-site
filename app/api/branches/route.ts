@@ -1,3 +1,4 @@
+// TEMP-ADAPTER: временный мост к публичному API 8mart.kz / DaData, пока нет бэкенда. С бэкендом — удалить (см. BACKEND_HANDOFF.md, раздел 3).
 // GET /api/branches — точки самовывоза с живым статусом филиалов 8mart.kz (открыт / принимает заказы).
 // Прокси к публичному API с кэшем 60 с; API недоступен — снимок из lib/branches.snapshot.json.
 import { BRANCHES_API, SNAPSHOT_POINTS, toPickupPoint, type RawBranch } from '@/lib/branches';

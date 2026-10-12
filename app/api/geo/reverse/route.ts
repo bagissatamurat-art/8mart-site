@@ -1,3 +1,4 @@
+// TEMP-ADAPTER: временный мост к публичному API 8mart.kz / DaData, пока нет бэкенда. С бэкендом — удалить (см. BACKEND_HANDOFF.md, раздел 3).
 // GET /api/geo/reverse?lat&lng — адрес по пину: DaData geolocate, запасной — Mapbox Geocoding v6.
 // Ни DaData, ни Mapbox не настроены (или оба упали) → 503.
 import { badRequest, hasDadata, hasMapbox, reverseGeocode, unavailable } from '../geo.server';

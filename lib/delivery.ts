@@ -1,3 +1,4 @@
+// TEMP-ADAPTER (частично): DELIVERY_API, RawZone и toQuote — мост к зонам 8mart.kz, с бэкендом удалить. Типы DeliveryQuote/QuoteResult — контракт, оставить.
 // Зоны доставки 8mart.kz: GET /public/branches/resolve-delivery?lat&lng → филиал, зона, стоимость и время для точки на карте.
 // Вне зон — 400 «Selected address is outside delivery zones». Вызываем с сервера (app/api/delivery/quote), браузер — через него.
 export const DELIVERY_API = 'https://dukenfy-api.8mart.kz/api/v1/public/branches/resolve-delivery';

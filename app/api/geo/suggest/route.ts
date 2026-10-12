@@ -1,3 +1,4 @@
+// TEMP-ADAPTER: временный мост к публичному API 8mart.kz / DaData, пока нет бэкенда. С бэкендом — удалить (см. BACKEND_HANDOFF.md, раздел 3).
 // GET /api/geo/suggest?q&city — подсказки адреса (прокси DaData). city — id из GET /cities.
 // Нет DADATA_API_KEY → 503 (UI: «Подсказки недоступны — укажите дом пином на карте»).
 import { badRequest, hasDadata, resolveCity, suggestAddress, unavailable } from '../geo.server';

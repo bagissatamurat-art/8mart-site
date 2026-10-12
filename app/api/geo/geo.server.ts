@@ -1,3 +1,4 @@
+// TEMP-ADAPTER: временный мост к публичному API 8mart.kz / DaData, пока нет бэкенда. С бэкендом — удалить (см. BACKEND_HANDOFF.md, раздел 3).
 // Геосервисы на сервере: DaData (подсказки и адрес по точке) + запасной Mapbox Geocoding v6.
 // Логика перенесена из design_handoff_8mart_site/site/geo.js. Ключи — только из process.env (.env.local),
 // во фронт не попадают. Файл импортируют только route handlers /api/geo/*.

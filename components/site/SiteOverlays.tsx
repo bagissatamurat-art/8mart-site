@@ -16,6 +16,7 @@ import { getCities } from '@/lib/api';
 import { loadQuickView, loadQuickViewComponent, peekQuickView, peekQuickViewComponent, preloadQuickView, type QuickViewData } from './quickViewData';
 import { useCart } from '@/lib/store/cart';
 import { useAuth } from '@/lib/store/auth';
+import { setAuthTokenProvider } from '@/lib/http';
 import { methodValue, useMethod } from '@/lib/store/method';
 import { closeOverlays, flushPending, setCartQty, useUi } from '@/lib/store/ui';
 import type { Category, City } from '@/lib/types';
@@ -27,6 +28,9 @@ export function methodLabel(v: MethodValue, cities: City[]): string {
   const city = cities.find(c => c.id === v.city)?.name;
   return [city, v.address].filter(Boolean).join(', ');
 }
+
+// Токен входа для запросов lib/api.ts к бэкенду (Authorization: Bearer).
+setAuthTokenProvider(() => useAuth.getState().accessToken);
 
 function StoreHydrator() {
   useEffect(() => {

@@ -1,3 +1,4 @@
+// TEMP-ADAPTER: временный мост к публичному API 8mart.kz / DaData, пока нет бэкенда. С бэкендом — удалить (см. BACKEND_HANDOFF.md, раздел 3).
 // Настоящие сторис 8mart.kz (GET /api/v1/public/stories): сейчас — видео с обложкой. Только на сервере, кэш 5 мин;
 // API недоступен — пусто (остаются сторис сайта из lib/mock).
 import { BRAND } from './config';

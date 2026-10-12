@@ -1,3 +1,4 @@
+// TEMP-ADAPTER: временный мост к публичному API 8mart.kz / DaData, пока нет бэкенда. С бэкендом — удалить (см. BACKEND_HANDOFF.md, раздел 3).
 // GET /api/delivery/quote?lat&lng — стоимость и время доставки по зонам 8mart.kz для точки на карте.
 // Координаты округляем до ~10 м: кэш (5 мин) общий для соседних точек, API 8mart.kz не дёргаем на каждый сдвиг пина.
 import { DELIVERY_API, toQuote, type QuoteResult, type RawZone } from '@/lib/delivery';

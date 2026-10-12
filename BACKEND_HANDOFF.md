@@ -9,7 +9,14 @@
 ## 1. Как устроен слой данных
 
 - **Единственный шов — `lib/api.ts`.** Каждая функция — один эндпоинт, её JSDoc содержит метод и путь (`/** GET /products?… */`). Экраны не делают `fetch` сами.
-- **Формы ответов — `lib/types.ts`.** Мок в `lib/mock.ts` уже в этой форме. Чтобы подключить бэкенд, замените тело функции на `fetch(\`${API_URL}/…\`)` и верните тот же тип.
+- **Формы ответов — `lib/types.ts`.** Мок в `lib/mock.ts` уже в этой форме.
+- **Переключатель мок / API уже встроен** (`lib/http.ts`). Каждая функция `lib/api.ts` — `endpoint('имя', настоящий запрос, мок)`; настоящий запрос уже написан по пути из JSDoc и таблиц ниже.
+  - `NEXT_PUBLIC_API_URL=https://api.8mart.kz/v1` — все функции идут в API. Пусто — весь сайт на моке.
+  - `NEXT_PUBLIC_API_MOCK=getOrders,getBonus` — эти функции пока остаются на моке (`*` — все). Так эндпоинты подключаются по одному.
+  - `apiFetch`: JSON; `Authorization: Bearer <accessToken>` (источник токена регистрирует `components/site/SiteOverlays.tsx`); `credentials: 'include'` для refresh-cookie; массивы в query — повтором ключа; ошибка — `ApiError(status, error.message | message)`; 204 — `undefined`.
+  - Публичные GET каталога на сервере Next кэшируются на 60 с (`revalidate`), остальные — без кэша.
+  - Если форма ответа бэкенда отличается — переводить в «настоящей» ветке функции, а не в экранах.
+- **CORS.** Браузер ходит в API напрямую с домена сайта: нужны `Access-Control-Allow-Origin` для домена сайта и `Access-Control-Allow-Credentials: true`. Либо проксировать через `rewrites` в `next.config.ts`.
 - **Ошибки — `ApiError(status, message)`.** Экраны различают 404 (страница «не найдено») и 409 (корзина изменилась). Остальное показывают как сбой.
 - **Задержка мока** (`reply()`, 250 мс в браузере, 0 на сервере) нужна только чтобы были видны скелетоны. С настоящим API её убрать.
 
@@ -112,6 +119,8 @@
 
 ## 3. Временные адаптеры — заменить
 
+В коде помечены `TEMP-ADAPTER` (`grep -rn TEMP-ADAPTER app lib scripts`). Они работают только в мок-ветке: при включённом API `lib/api.ts` в них не ходит, после подключения их можно удалить.
+
 | Где | Что делает | Чем заменить |
 |---|---|---|
 | `app/api/branches/route.ts` (+ `lib/branches.ts`, `lib/branches.snapshot.json`) | Филиалы из `dukenfy-api.8mart.kz/api/v1/public/branches`, кэш 60 с; если API недоступен, отдаёт снимок | `GET /pickup-points?city` |
@@ -154,6 +163,8 @@
 | `DADATA_API_KEY`, `DADATA_SECRET` | сервер | подсказки адресов |
 | `NEXT_PUBLIC_SITE_URL` | сборка | canonical, sitemap, Open Graph |
 | `NEXT_PUBLIC_BASE_PATH` | сборка | если сайт открывается не с корня домена |
+| `NEXT_PUBLIC_API_URL` | сборка | адрес бэкенда; пусто — сайт на моке |
+| `NEXT_PUBLIC_API_MOCK` | сборка | функции `lib/api.ts`, которые остаются на моке, через запятую; `*` — все |
 
 Образец — `.env.example`. Ключи в репозиторий не коммитить.
 
