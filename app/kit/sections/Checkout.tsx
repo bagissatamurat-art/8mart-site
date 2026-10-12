@@ -66,11 +66,11 @@ export default function Checkout() {
 
       <KitSection id="order-track" title="Статус заказа · OrderTrack" note="Своя шкала на каждое отправление; текущий этап — розовое кольцо и подпись; курьер в пути — «Позвонить». Отмена — «Заказ принят → Заказ отменён».">
         <KitPanel layout="grid" min={480}>
-          <KitItem label="доставка · курьер в пути + Газель собирается"><OrderTrack order={base} /></KitItem>
+          <KitItem label="доставка · курьер в пути + грузовой собирается"><OrderTrack order={base} /></KitItem>
           <KitItem label="самовывоз · принят"><OrderTrack order={order({ method: 'pickup' }, [{ kind: 'courier', status: 'accepted', eta: '14:45', times: ['14:05'] }])} /></KitItem>
           <KitItem label="доставлен"><OrderTrack order={order({ status: 'done' }, [{ kind: 'courier', status: 'done', times: ['14:05', '14:07', '14:32', '15:18'] }])} /></KitItem>
           <KitItem label="отменён"><OrderTrack order={order({ status: 'cancelled' }, [{ kind: 'courier', status: 'cancelled', times: ['14:05', '14:12'] }])} refundText={ORDER_PAGE.refund('22 783 тг.', true, '1–3 рабочих дней')} /></KitItem>
-          <KitItem label="mobile · Газель в пути"><div style={{ maxWidth: 358 }}><OrderTrack mobile order={order({}, [{ kind: 'cargo', status: 'onway', eta: '27 сентября, 9:00–13:00', times: ['14:05', '27 сент., 08:10', '27 сент., 10:20'], courier: { name: 'Нурлан, Газель · 456 DEF 01', phone: '+77001112233' } }])} /></div></KitItem>
+          <KitItem label="mobile · грузовой в пути"><div style={{ maxWidth: 358 }}><OrderTrack mobile order={order({}, [{ kind: 'cargo', status: 'onway', eta: '27 сентября, 9:00–13:00', times: ['14:05', '27 сент., 08:10', '27 сент., 10:20'], courier: { name: 'Нурлан, грузовой · 456 DEF 01', phone: '+77001112233' } }])} /></div></KitItem>
         </KitPanel>
       </KitSection>
 

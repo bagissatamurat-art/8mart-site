@@ -107,7 +107,7 @@ export default function Controls() {
         <KitPanel style={{ gap: 24 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 20 }}>
             <MartShipmentHead kind="courier" label="Доставка 1 из 2" when="Сегодня, за 60–90 минут" meta="Курьер · 2 товара" feeText="1 000 тг." />
-            <MartShipmentHead kind="cargo" label="Доставка 2 из 2" when="Завтра, 9:00–21:00" meta="Газель · 125 кг · разгрузка у подъезда" feeText="3 000 тг." />
+            <MartShipmentHead kind="cargo" label="Доставка 2 из 2" when="Завтра, 9:00–21:00" meta="Грузовой · 125 кг · разгрузка у подъезда" feeText="3 000 тг." />
             <MartShipmentHead kind="cargo" method="pickup" label="Самовывоз 2 из 2" when="Завтра с 9:00" meta="Склад, ш. Коргалжын, 3 · поможем погрузить" feeText="Бесплатно" />
             <MartShipmentHead kind="courier" method="pickup" label="Самовывоз 1 из 2" when="Сегодня, через 30 минут" meta="пр. Туран, 37 · храним 24 часа" feeText="Бесплатно" compact />
           </div>

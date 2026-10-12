@@ -313,5 +313,5 @@ export const getFavorites = (): Promise<string[]> => reply(M.FAVORITES, 0);
 /** PUT /favorites */
 export const putFavorites = (ids: string[]): Promise<string[]> => reply(ids, 0);
 
-/** Окна доставки Газели для оформления (часть ответа /cart/validate в проде). */
+/** Окна грузовой доставки для оформления (часть ответа /cart/validate в проде). */
 export const getCargoSlots = () => reply({ days: SHIPPING.cargo.days, intervals: SHIPPING.cargo.intervals }, 0);

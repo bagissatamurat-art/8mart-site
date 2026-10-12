@@ -71,7 +71,7 @@ export function OrderTrack({ order, mobile, refundText }: { order: Order; mobile
           state: j < cur || (j === cur && cur === 3) ? 'done' : j === cur ? 'current' : 'todo' }));
         const e = eta(sh, pk, cur);
         const qty = order.items.reduce((sum, it) => sum + ((resolveCartItem(it.id)?.delivery === 'cargo') === (sh.kind === 'cargo') ? it.qty : 0), 0);
-        const tag = pk ? (sh.kind === 'cargo' ? 'Склад' : 'Точка') : (sh.kind === 'cargo' ? 'Газель' : 'Курьер');
+        const tag = pk ? (sh.kind === 'cargo' ? 'Склад' : 'Точка') : (sh.kind === 'cargo' ? 'Грузовой' : 'Курьер');
         const label = (pk ? 'Самовывоз ' : 'Доставка ') + (i + 1) + ' из ' + order.shipments.length + ' · ' + itemsTitle(qty);
         return (
           <div key={i} className={`${s.track} ${i < order.shipments.length - 1 ? s.trackSep : ''}`}>

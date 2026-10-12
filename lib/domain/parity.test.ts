@@ -20,6 +20,12 @@ for (const t of Object.values(D.DELIVERY_TYPES) as { delivery: { when: string; p
   t.delivery.when = realTariff(t.delivery.when); t.delivery.price = realTariff(t.delivery.price);
 }
 
+// Грузовая доставка: в прототипе «Газель», у нас «грузовой» (решение владельца). Доставка смешанной корзины —
+// всегда двумя отправлениями (в прототипе был выбор «всё вместе»): прототипу together передаём только в самовывозе.
+const cargoName = (s: string) => s.replace(/Газель · /g, 'Грузовой · ').replace(/Доставка завтра, Газель/g, 'Доставка завтра, грузовой')
+  .replace(/Доставка Газелью/g, 'Доставка грузовым').replace(/Газелью/g, 'грузовым').replace(/Одной Газелью/g, 'Одним грузовым');
+D.SHIPPING.cargo.name = 'Грузовой';
+
 const notFlower = (p: { delivery?: string }) => p.delivery !== 'flowers';
 const PRODUCTS = ALL.filter(notFlower);
 const D_PRODUCTS = (D.PRODUCTS as { delivery?: string }[]).filter(notFlower);
@@ -83,7 +89,10 @@ describe('функции = data.js', () => {
       const ours = spec.map(s => ({ p: cartItem(s.k, PRODUCTS)!, qty: s.qty, soldOut: s.soldOut }));
       const theirs = spec.map(s => ({ p: D.cartItem(s.k), qty: s.qty, soldOut: s.soldOut }));
       expect(fixPaths(planShipments(ours, opts))).toEqual(fixPaths(planShipments(ours, opts)));
-      expect(JSON.stringify(fixPaths(planShipments(ours, opts)))).toBe(JSON.stringify(fixPaths(D.planShipments(theirs, opts))));
+      const dOpts = { ...opts, together: opts.method === 'pickup' && opts.together };
+      const theirsPlan = D.planShipments(theirs, dOpts);
+      if (opts.method !== 'pickup') theirsPlan.canSplit = false;
+      expect(JSON.stringify(fixPaths(planShipments(ours, opts)))).toBe(cargoName(JSON.stringify(fixPaths(theirsPlan))));
       const sp = planShipments(ours, opts);
       if (sp.canSplit) expect(splitOptions(ours, opts)).toEqual(D.splitOptions(theirs, opts));
       expect(bonusFor(ours)).toBe(D.bonusFor(theirs));

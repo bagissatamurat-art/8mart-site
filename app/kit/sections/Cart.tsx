@@ -28,7 +28,7 @@ export default function Cart() {
             <KitItem label="compact · раскупили"><MartCartLine product={item('b3')} qty={6} compact soldOut /></KitItem>
           </KitPanel>
           <div className={s.stack}>
-            <KitItem label="живая: курьер + Газель"><MartMiniCart cart={cart} onChange={change} /></KitItem>
+            <KitItem label="живая: курьер + грузовой"><MartMiniCart cart={cart} onChange={change} /></KitItem>
             <KitItem label="одна доставка, бесплатно от порога"><MartMiniCart cart={{ t4: 1 }} /></KitItem>
             <KitItem label="самовывоз"><MartMiniCart cart={{ b6: 2, h3: 4 }} method="pickup" /></KitItem>
             <KitItem label="пусто"><MartMiniCart cart={{}} /></KitItem>

@@ -23,7 +23,7 @@ export function MartShipmentHead({ kind, method = 'delivery', label, when, meta,
     <div className={s.head}>
       <div className={s.headCol}>
         <span className={s.tagRow}>
-          <span className={`${s.tag} ${cargo ? s.tagCargo : ''}`}>{pk ? (cargo ? 'Склад' : 'Точка') : (cargo ? 'Газель' : 'Курьер')}</span>
+          <span className={`${s.tag} ${cargo ? s.tagCargo : ''}`}>{pk ? (cargo ? 'Склад' : 'Точка') : (cargo ? 'Грузовой' : 'Курьер')}</span>
           <span className={s.label}>{label}</span>
         </span>
         <b className={s.when} style={{ fontSize: compact ? 16 : 18 }}>{when}</b>
@@ -47,7 +47,7 @@ export function MartSplitChoice({ options, method = 'delivery', compact, onPick 
     <div className={s.split}>
       <div className={s.splitHead}>
         <b style={{ fontSize: compact ? 16 : 18 }}>{pk ? 'Как забрать заказ' : 'Как привезти заказ'}</b>
-        <span className={s.meta}>{pk ? 'Тяжёлые товары выдаём только со склада, с завтрашнего дня' : 'Тяжёлые товары возим Газелью — только на следующий день'}</span>
+        <span className={s.meta}>{pk ? 'Тяжёлые товары выдаём только со склада, с завтрашнего дня' : 'Тяжёлые товары возит грузовой — только на следующий день'}</span>
       </div>
       <div className={s.grid} role="radiogroup" style={{ gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))' }}>
         {options.map(o => (

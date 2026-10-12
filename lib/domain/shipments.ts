@@ -1,6 +1,7 @@
 // Отправления: один заказ может приехать несколькими доставками. Перенесено 1:1 из data.js.
-// Товар с delivery 'cargo' (тяжёлый/габаритный) едет Газелью на следующий день; остальные (express, flowers) — курьером сегодня.
-// Если в корзине есть оба типа — клиент выбирает: двумя доставками или всё вместе завтра Газелью.
+// Товар с delivery 'cargo' (тяжёлый/габаритный) едет грузовым на следующий день; остальные (express, flowers) — курьером сегодня.
+// Доставка: курьер и грузовой — разные машины, каждое отправление везём отдельно (выбора «всё вместе» нет).
+// Самовывоз: если в корзине оба типа — клиент выбирает: забрать в два приёма или всё завтра со склада.
 import { DELIVERY, SHIPPING } from '../config';
 import { money, itemsTitle } from './format';
 import type { Method, Product, ShipmentKind } from '../types';
@@ -35,7 +36,8 @@ export function planShipments<L extends PlanLine>(lines: L[], opts: PlanOptions 
   const isCargo = (l: L) => l.p.delivery === 'cargo';
   const heavy = lines.filter(isCargo), light = lines.filter(l => !isCargo(l));
   const act = (ls: L[]) => ls.filter(l => !l.soldOut);
-  const canSplit = act(heavy).length > 0 && act(light).length > 0;
+  // Выбор «вместе / раздельно» — только в самовывозе; доставка смешанной корзины — всегда двумя отправлениями.
+  const canSplit = pk && act(heavy).length > 0 && act(light).length > 0;
   const together = canSplit && !!opts.together;
   const groups: [ShipmentKind, L[]][] = !act(heavy).length ? [['courier', lines]] : !act(light).length ? [['cargo', lines]] : together ? [['cargo', lines]] : [['courier', light], ['cargo', heavy]];
   const n = groups.length, gt = opts.goodsTotal ?? act(lines).reduce((s, l) => s + (l.p.price || 0) * l.qty, 0);
@@ -48,9 +50,9 @@ export function planShipments<L extends PlanLine>(lines: L[], opts: PlanOptions 
     const when = pk ? SHIPPING[kind].pickupWhen : kind === 'courier' && opts.courierEta ? `Сегодня, за ~${opts.courierEta} минут` : SHIPPING[kind].when;
     const where = pk ? (kind === 'cargo' ? SHIPPING.cargo.pickupWhere : (opts.pickupPoint || '')) : '';
     const meta = pk ? [where, kind === 'cargo' ? 'поможем погрузить' : 'храним 24 часа'].filter(Boolean).join(' · ')
-      : kind === 'cargo' ? 'Газель · ' + fmtKg(kg) + ' · разгрузка у подъезда' : 'Курьер · ' + itemsTitle(qty);
+      : kind === 'cargo' ? 'Грузовой · ' + fmtKg(kg) + ' · разгрузка у подъезда' : 'Курьер · ' + itemsTitle(qty);
     return { id: kind, kind, index: i + 1, lines: ls, qty, kg: Math.round(kg), cargoUnits, fee: base, lift, total: base + lift, label, when, meta, where,
-      feeLabel: pk ? 'Самовывоз' : kind === 'cargo' ? (n > 1 ? 'Доставка завтра, Газель' : 'Доставка Газелью') : (n > 1 ? 'Доставка сегодня, курьер' : 'Доставка'),
+      feeLabel: pk ? 'Самовывоз' : kind === 'cargo' ? (n > 1 ? 'Доставка завтра, грузовой' : 'Доставка грузовым') : (n > 1 ? 'Доставка сегодня, курьер' : 'Доставка'),
       feeText: base === 0 ? 'Бесплатно' : money(base), feeColor: base === 0 ? '#1DA765' : '#17151A', isCargo: kind === 'cargo', isCourier: kind === 'courier' };
   });
   return { canSplit, together, multi: n > 1, list, fee: list.reduce((s, x) => s + x.fee, 0), lift: list.reduce((s, x) => s + x.lift, 0), hasCourierFee: list.some(x => x.isCourier && x.fee > 0) };
@@ -63,7 +65,7 @@ export function splitOptions<L extends PlanLine>(lines: L[], opts: PlanOptions =
   const [c, g] = a.list;
   const f = (pl: ShipmentPlan<L>) => pl.fee === 0 ? 'Бесплатно' : pl.list.map(x => x.fee).filter(Boolean).map(money).join(' + ').replace(/ тг\.(?= \+)/g, '');
   return [
-    { id: 'split', together: false, title: pk ? 'Забрать в два приёма' : 'Двумя доставками', sub: pk ? 'Сегодня — ' + itemsTitle(c.qty) + ' в выбранной точке, завтра — ' + itemsTitle(g.qty) + ' со склада' : 'Сегодня — ' + itemsTitle(c.qty) + ' курьером, завтра — ' + itemsTitle(g.qty) + ' Газелью', feeText: f(a), sel: !opts.together },
-    { id: 'together', together: true, title: pk ? 'Всё завтра со склада' : 'Всё вместе завтра', sub: pk ? SHIPPING.cargo.pickupWhere + ', с 9:00' : 'Одной Газелью, 9:00–21:00', feeText: f(b), sel: !!opts.together },
+    { id: 'split', together: false, title: pk ? 'Забрать в два приёма' : 'Двумя доставками', sub: pk ? 'Сегодня — ' + itemsTitle(c.qty) + ' в выбранной точке, завтра — ' + itemsTitle(g.qty) + ' со склада' : 'Сегодня — ' + itemsTitle(c.qty) + ' курьером, завтра — ' + itemsTitle(g.qty) + ' грузовым', feeText: f(a), sel: !opts.together },
+    { id: 'together', together: true, title: pk ? 'Всё завтра со склада' : 'Всё вместе завтра', sub: pk ? SHIPPING.cargo.pickupWhere + ', с 9:00' : 'Одним грузовым, 9:00–21:00', feeText: f(b), sel: !!opts.together },
   ];
 }
