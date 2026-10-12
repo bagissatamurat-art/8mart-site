@@ -44,7 +44,7 @@ Props: `label`, `value`, `type: text|phone|code|textarea`, `required`, `hint?`, 
 
 ## MartChip
 Props: `label`, `selected`, `disabled`, `removable`, `count?`, `size` (36). Pill, padding 0 14, 14/500, border 1.5.
-default #FFF / border #E3E2E7 → hover #F7F7F8 → selected #17151A, текст #FFF → disabled #F7F7F8, текст #9E9BA6. `removable` — крестик справа (фильтры).
+default #FFF / border #E3E2E7 → hover #F7F7F8 → selected #FDF0F6, рамка #EE1D74, текст #BF0F5E 600 (было #17151A — решение владельца: выбранное розовым, не чёрным) → disabled #F7F7F8, текст #9E9BA6. `removable` — крестик справа (фильтры).
 
 ## MartStepper
 Props: `qty`, `max`, `size` (44 / 36), `tone: primary|neutral`, `full`, `disabled`, `onChange`. Pill. primary — #EE1D74/#FFF, neutral — #F7F7F8/#17151A. «+» блокируется на `max` (opacity .4). qty → 0 удаляет позицию.

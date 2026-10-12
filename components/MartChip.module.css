@@ -5,7 +5,8 @@
   transition: background var(--dur) var(--ease);
 }
 .chip:hover { background: var(--surface-subtle); }
-.selected, .selected:hover { background: var(--ink-1); border-color: var(--ink-1); color: #fff; }
+/* Выбранный — розовым, как выбранный день доставки (не чёрным: решение владельца) */
+.selected, .selected:hover { background: var(--primary-50); border-color: var(--primary); color: var(--primary-active); font-weight: 600; }
 .chip:disabled, .chip:disabled:hover { background: var(--surface-subtle); border-color: var(--surface-disabled); color: var(--ink-3); cursor: not-allowed; }
 .count { font-size: var(--fs-caption); opacity: .7; }
 .x { margin-left: 2px; display: block; }
