@@ -14,7 +14,7 @@ import { SiteTabBar } from '@/components/site/SiteTabBar';
 import { CatalogSidebar } from '@/components/catalog/CatalogSidebar';
 import { CatalogTopBar } from '@/components/catalog/CatalogTopBar';
 import { RootTiles, SubTiles, type CatalogStats } from '@/components/catalog/CatalogTiles';
-import { catalogHref, catalogLevel, parseCatalog, type CatalogState } from '@/components/catalog/catalogUrl';
+import { catalogHref, catalogLevel, catalogSearch, parseCatalog, type CatalogState } from '@/components/catalog/catalogUrl';
 import { useCatalogList } from '@/components/catalog/useCatalogList';
 import { getFacets } from '@/lib/api';
 import { CAT_FILTERS, PAGE_SIZE } from '@/lib/config';
@@ -40,7 +40,7 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
-  const search = sp.toString();
+  const search = catalogSearch(pathname, sp.toString()).toString();
   const url = useMemo(() => parseCatalog(new URLSearchParams(search), categories), [search, categories]);
   const level = catalogLevel(url);
   const category = categories.find(x => x.slug === url.cat) || null;

@@ -2,13 +2,20 @@
 import { BRAND, DELIVERY } from './config';
 import type { Category, City, PickupPoint, Product } from './types';
 
-/** Боевой адрес сайта. Задаётся NEXT_PUBLIC_SITE_URL (на Vercel — домен проекта); по умолчанию — Vercel-домен. */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://8mart-site.vercel.app').replace(/\/$/, '');
+/** Боевой адрес сайта (основное зеркало — www). NEXT_PUBLIC_SITE_URL переопределяет его для стендов. */
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.8mart.kz').replace(/\/$/, '');
 export const SITE_NAME = BRAND.name;
-export const SITE_DESCRIPTION = 'Букеты из роз, гортензий и хризантем с доставкой по Астане за 30–70 минут и самовывозом. Размеры S, M, L — соберём сегодня. Также стройматериалы и товары для дома.';
+/** Города с филиалами — для заголовков и описаний (страница каждого города — /dostavka-cvetov/<город>). */
+export const CITIES_IN = 'в Астане, Актобе, Кокшетау, Костанае и Уральске';
+/** «в Астане» — для заголовков страниц городов (/dostavka-cvetov/<id>). Новый город — добавить сюда. */
+export const CITY_IN: Record<string, string> = {
+  astana: 'в Астане', aktobe: 'в Актобе', kokshetau: 'в Кокшетау', kostanay: 'в Костанае', uralsk: 'в Уральске',
+};
+export const cityPath = (id: string) => `/dostavka-cvetov/${id}`;
+export const SITE_DESCRIPTION = `Букеты из роз, гортензий и хризантем с доставкой за 30–70 минут и самовывозом из 7 магазинов ${CITIES_IN}. Размеры S, M, L — соберём сегодня.`;
 
 /** Заголовок h1 главной (визуально скрыт: в макете 01 заголовка нет). */
-export const HOME_H1 = '8mart — цветы и букеты с доставкой по Астане за 30–70 минут';
+export const HOME_H1 = `8mart — доставка цветов и букетов за 30–70 минут ${CITIES_IN}`;
 
 /** Общее для openGraph всех страниц: страница, задающая свой openGraph, иначе потеряла бы siteName и locale. */
 export const OG_BASE = { type: 'website' as const, locale: 'ru_KZ', siteName: BRAND.name };
@@ -19,8 +26,7 @@ export const NOINDEX = { index: false, follow: true } as const;
 export const abs = (path: string) => (/^https?:/.test(path) ? path : SITE_URL + path);
 
 /** Адрес категории каталога (канонический — без сортировки и фильтров). */
-export const catalogPath = (cat?: string | null, sub?: string | null) =>
-  !cat ? '/catalog' : sub ? `/catalog?cat=${cat}&sub=${sub}` : `/catalog?cat=${cat}`;
+export { catalogPathOf as catalogPath } from '@/components/catalog/catalogUrl';
 
 type Crumb = { name: string; path: string };
 /** FAQPage — те же вопросы, что в блоке «Вопросы и ответы» (lib/faq.ts). */

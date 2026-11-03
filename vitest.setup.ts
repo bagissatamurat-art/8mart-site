@@ -1,3 +1,5 @@
+// Тесты логики каталога работают на полном демо-наборе (lib/mock.ts).
+process.env.NEXT_PUBLIC_DEMO_CATALOG = '1';
 // localStorage в памяти для тестов сторов (в Node его нет или он без файла).
 const mem = new Map<string, string>();
 Object.defineProperty(globalThis, 'localStorage', {

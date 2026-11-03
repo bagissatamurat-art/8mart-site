@@ -18,7 +18,7 @@ import type {
 export const CITIES: City[] = SNAPSHOT_CITIES;
 export const PICKUP_POINTS: PickupPoint[] = SNAPSHOT_POINTS;
 
-export const CATEGORIES: Category[] = [
+const ALL_CATEGORIES: Category[] = [
   { slug: 'tsvety', name: 'Цветы', img: `${A}/assets/cat-flowers.png`, sub: [ { slug: 'gortenzii', name: 'Гортензии' }, { slug: 'rozy', name: 'Розы' }, { slug: 'hrizantemy', name: 'Хризантемы' } ] },
   { slug: 'stroymaterialy', name: 'Стройматериалы', img: `${A}/assets/cat-build.png`, sub: [
     { slug: 'sukhie-smesi', name: 'Сухие смеси' }, { slug: 'kirpich-i-bloki', name: 'Кирпич и блоки' }, { slug: 'gipsokarton', name: 'Гипсокартон' },
@@ -29,7 +29,7 @@ export const CATEGORIES: Category[] = [
 ];
 
 /** Цветы — из каталога 8mart.kz (lib/flowers.ts, scripts/import-flowers.mjs); основной товар — первыми. Стройка — прототип. */
-export const PRODUCTS: Product[] = [
+const ALL_PRODUCTS: Product[] = [
   ...FLOWERS,
   {id: "b1", name: "Цемент М400, 50 кг", weight: "50 кг", price: 2890, oldPrice: 3290, badge: "Товар дня", cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, bonus: 87, pack: "50 кг", delivery: "cargo", group: "m400", weightKg: 50},
   {id: "b8", name: "Цемент М500 Д0, 50 кг", weight: "50 кг", price: 3190, cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, bonus: 64, pack: "50 кг", delivery: "cargo", weightKg: 50},
@@ -62,6 +62,17 @@ export const PRODUCTS: Product[] = [
   {id: "g5", name: "Набор латексных шаров, 10 шт", weight: "10 шт", price: 2490, cat: "shary", img: `${A}/assets/p-g5.png`, pack: "10 шт", delivery: "express", weightKg: 1},
 ];
 
+// Сайт показывает только настоящие товары (букеты): демо-стройка из макета не продаётся — ни людям, ни поисковикам (решение 04.11).
+// Тесты логики каталога (фильтры, страницы, грузовая доставка) включают её: NEXT_PUBLIC_DEMO_CATALOG=1 в vitest.setup.ts.
+const DEMO = process.env.NEXT_PUBLIC_DEMO_CATALOG === '1';
+export const PRODUCTS: Product[] = DEMO ? ALL_PRODUCTS : ALL_PRODUCTS.filter(p => p.delivery === 'flowers');
+/** Витрина компонентов /kit показывает полный демо-набор независимо от сайта. */
+export { ALL_PRODUCTS as KIT_PRODUCTS, ALL_CATEGORIES as KIT_CATEGORIES };
+/** Разделы и подразделы без товаров не показываем. */
+export const CATEGORIES: Category[] = ALL_CATEGORIES
+  .map(c => ({ ...c, sub: c.sub.filter(x => PRODUCTS.some(p => p.cat === x.slug)) }))
+  .filter(c => c.sub.length > 0);
+
 // ── Карточка товара (GET /products/{id}): описание и характеристики. МОК ──
 const CEMENT_DESC = 'Портландцемент М400 Д20 — универсальный цемент для большинства строительных работ: приготовления бетона и кладочных растворов, заливки фундаментов, стяжки пола и штукатурки.\nДобавка 20% минеральных компонентов повышает водостойкость и снижает риск появления трещин. Подходит для работы при температуре от +5 °C.\nДля бетона М200 смешивайте 1 часть цемента, 2,8 части песка и 4,8 части щебня. Готовый раствор используйте в течение 2 часов. Храните мешки в сухом помещении на поддоне, не дольше 60 дней с даты производства.';
 export const PRODUCT_DETAILS: Record<string, { description: string; specs: [string, string][] }> = {
@@ -83,18 +94,18 @@ const bouquetSlide = (id: string): Story['slides'][number] => {
 };
 export const STORIES: Story[] = [
   { id: 's-bouquets', title: 'Букеты', cover: `${A}/assets/st-flowers.jpg`, slides: [
-    { img: `${A}/assets/st-flowers.jpg`, title: `Букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут`, text: 'Розы, гортензии и хризантемы — соберём сегодня и привезём', cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
+    { img: `${A}/assets/st-flowers.jpg`, title: `Букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут`, text: 'Розы, гортензии и хризантемы — соберём сегодня и привезём', cta: { label: 'Выбрать букет', href: '/catalog/tsvety' } } ] },
   { id: 's-roses', title: 'Розы', cover: bouquet('f1').img!, slides: [bouquetSlide('f1'), bouquetSlide('f6'), bouquetSlide('f3')] },
   { id: 's-hydrangeas', title: 'Гортензии', cover: bouquet('f4').img!, slides: [bouquetSlide('f4'), bouquetSlide('f7')] },
   { id: 's-chrysanthemums', title: 'Хризантемы', cover: bouquet('f8').img!, slides: [bouquetSlide('f8'), bouquetSlide('f10')] },
   { id: 's-promo', title: 'Промокод', cover: `${A}/assets/st-gifts.jpg`, slides: [
     { img: `${A}/assets/st-gifts.jpg`, title: `−${PROMO.pct}% по коду ${PROMO.code}`, text: `На заказ от ${groupDigits(PROMO.minSum)} тг. Введите код в корзине`, cta: { label: 'Скопировать код', copy: PROMO.code } } ] },
   { id: 's-delivery', title: 'Доставка', cover: `${A}/assets/st-delivery.jpg`, slides: [
-    { img: `${A}/assets/st-delivery.jpg`, title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Привезём букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе от ${groupDigits(DELIVERY.fee)} тг`, cta: { label: 'Выбрать букет', href: '/catalog?cat=tsvety' } } ] },
+    { img: `${A}/assets/st-delivery.jpg`, title: `Бесплатно от ${groupDigits(DELIVERY.freeFrom)} тг`, text: `Привезём букет за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут. Иначе от ${groupDigits(DELIVERY.fee)} тг`, cta: { label: 'Выбрать букет', href: '/catalog/tsvety' } } ] },
 ];
 export const BANNERS: Banner[] = [
   { img: `${A}/assets/banner-flowers.jpg`, title: `Букеты за ${DELIVERY.etaMin}–${DELIVERY.etaMax} минут`, text: 'Розы, гортензии и хризантемы — соберём сегодня и привезём',
-    textShort: 'Привезём сегодня', cta: 'Выбрать букет', href: '/catalog?cat=tsvety' },
+    textShort: 'Привезём сегодня', cta: 'Выбрать букет', href: '/catalog/tsvety' },
 ];
 
 // ── Личный кабинет (GET /me/*, /orders) ──

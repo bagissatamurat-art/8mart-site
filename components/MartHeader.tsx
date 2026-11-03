@@ -20,6 +20,7 @@ import { useModal } from '@/lib/hooks/useModal';
 import { PersonIcon } from './ui/PersonIcon';
 import { AppPromo } from './site/AppPromo';
 import { ACCOUNT_PAGE } from '@/lib/copy';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 /** Разделы кабинета: /account/<section> (ids — как в маршрутах /account/[section]). */
 export type AccountSection = 'orders' | 'favorites' | 'addresses' | 'payments' | 'promos' | 'bonus' | 'profile';
@@ -226,7 +227,7 @@ export function MartSideMenu({ userName = '', signedIn, userPhone = '', orders =
           <div className={s.list}>
             <span className={s.caption}>Каталог</span>
             {categories.map(c => (
-              <Link key={c.slug} href={`/catalog?cat=${c.slug}`} className={s.row} onClick={onClose}>
+              <Link key={c.slug} href={catalogPathOf(c.slug)} className={s.row} onClick={onClose}>
                 <span className={s.catIcon}>{c.img && <Img src={c.img} w={32} h={32} />}</span>{c.name}
               </Link>
             ))}

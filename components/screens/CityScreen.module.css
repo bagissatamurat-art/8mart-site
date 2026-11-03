@@ -1,0 +1,25 @@
+/* Страница города: колонка контента шириной сайта, карточки как на остальных экранах (белые, радиус 24). */
+.wrap { display: flex; flex-direction: column; gap: 24px; max-width: 1440px; width: 100%; margin: 0 auto; padding: 0 var(--page-pad-desktop) 40px; }
+.head { display: flex; flex-direction: column; gap: 12px; max-width: 840px; }
+.h1 { margin: 0; font-size: var(--fs-h1); font-weight: 800; letter-spacing: var(--tracking-tight); }
+.lead { margin: 0; font-size: var(--fs-body); line-height: var(--lh-body); color: var(--ink-2); }
+.card { background: var(--surface-card); border-radius: var(--r-24); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.h2 { margin: 0; font-size: var(--fs-h2); font-weight: 700; }
+.shops { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.shop { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--divider); }
+.shop:first-child { border-top: 0; padding-top: 0; }
+.shopName { font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+.brand { font-size: var(--fs-small); font-weight: 500; color: var(--ink-2); }
+.muted { color: var(--ink-2); font-size: var(--fs-small); }
+.terms { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.terms dt { font-weight: 700; margin-bottom: 4px; }
+.terms dd { margin: 0; color: var(--ink-2); line-height: var(--lh-body); }
+.others { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; font-size: var(--fs-small); }
+
+@media (max-width: 1023.98px) {
+  .wrap { padding: 0 var(--page-pad-mobile) 96px; gap: 16px; }
+  .h1 { font-size: 22px; } /* tokens.css: h1 на телефоне 22px */
+  .h2 { font-size: 20px; }
+  .shop { flex-direction: column; gap: 4px; }
+  .terms { grid-template-columns: minmax(0, 1fr); }
+}

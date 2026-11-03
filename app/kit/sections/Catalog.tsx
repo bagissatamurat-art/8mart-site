@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MartProductCard } from '@/components/MartProductCard';
 import { Badge } from '@/components/ui/Badge';
 import { Alert } from '@/components/ui/Alert';
-import { PRODUCTS } from '@/lib/mock';
+import { KIT_PRODUCTS as PRODUCTS } from '@/lib/mock';
 import { CART_ALERT } from '@/lib/copy';
 import type { Product } from '@/lib/types';
 import { KitSection } from '../Kit';

@@ -11,7 +11,7 @@ import { MartFilters } from '@/components/MartFilters';
 import { MartHeader } from '@/components/MartHeader';
 import { CheckMark, RadioMark, SwitchMark } from '@/components/ui/Marks';
 import { MartButton } from '@/components/MartButton';
-import { CATEGORIES, PRODUCTS } from '@/lib/mock';
+import { KIT_CATEGORIES as CATEGORIES, KIT_PRODUCTS as PRODUCTS } from '@/lib/mock';
 import { KitItem, KitSection } from '../Kit';
 import { TOASTS } from '@/lib/copy';
 

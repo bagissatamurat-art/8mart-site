@@ -10,8 +10,12 @@ import { MartChip } from '@/components/MartChip';
 import { MartSelect } from '@/components/MartSelect';
 import { checkPromo } from '@/lib/api';
 import { money, splitOptions } from '@/lib/domain';
-import { resolveCartItem } from '@/lib/api';
+import { cartItem } from '@/lib/domain';
+import { KIT_PRODUCTS } from '@/lib/mock';
 import { KitItem, KitPanel, KitSection } from '../Kit';
+
+/** Витрина — на полном демо-наборе (сайт показывает только настоящие товары). */
+const resolveCartItem = (k: string) => cartItem(k, KIT_PRODUCTS);
 
 const KIT_SLOTS = [{ id: 'asap', label: 'Ближайшее', sub: '~30 мин' }, { id: '12', label: '12:00–15:00' }, { id: '15', label: '15:00–18:00' }, { id: '18', label: '18:00–21:00' }];
 

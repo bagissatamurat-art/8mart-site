@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { MartAccount, MartAccountNav, MartAccountScreenHeader, ACCOUNT_SECTIONS, sectionTitle, type AccountSection } from '@/components/MartAccount';
 import { MartChip } from '@/components/MartChip';
 import { MartTabBar } from '@/components/MartTabBar';
-import { ADDRESSES, BONUS, CARDS, ORDERS, PRODUCTS, USER, USER_PROMOS } from '@/lib/mock';
+import { ADDRESSES, BONUS, CARDS, ORDERS, KIT_PRODUCTS as PRODUCTS, USER, USER_PROMOS } from '@/lib/mock';
 import { useFavorites } from '@/lib/store/favorites';
 import type { Address, Card, Product, User } from '@/lib/types';
 import { KitItem, KitPanel, KitSection } from '../Kit';

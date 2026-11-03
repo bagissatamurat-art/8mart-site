@@ -18,6 +18,7 @@ import h from './HomeScreen.module.css';
 import { TOASTS } from '@/lib/copy';
 import { SiteFaq } from '@/components/site/SiteFaq';
 import { SiteFooter } from '@/components/site/SiteFooter';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 export interface HomeShelf { title: string; href: string; products: Product[] }
 /** banner — первый активный баннер; в админке их может не быть. */
@@ -47,7 +48,7 @@ export function HomeScreen({ categories, stories, banner, shelves }: HomeData) {
             <div className={s.mobileOnly}>
               <div className={s.chips}>
                 <MartChip label="Все" selected />
-                {categories.map(c => <MartChip key={c.slug} label={c.name} href={`/catalog?cat=${c.slug}`} />)}
+                {categories.map(c => <MartChip key={c.slug} label={c.name} href={catalogPathOf(c.slug)} />)}
               </div>
             </div>
             {banner && <div className={s.desktopOnly}><MartBanner banner={banner} mode="desktop" /></div>}

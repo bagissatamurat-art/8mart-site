@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { faqLd, organizationLd, storesLd, websiteLd } from '@/lib/seo';
 import { SNAPSHOT_CITIES, SNAPSHOT_POINTS } from '@/lib/branches';
 import { FAQ } from '@/lib/faq';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 /** Полки главной — подкатегории основной категории (цветы): «Розы», «Гортензии», «Хризантемы». */
 const MAIN_CATEGORY = 'tsvety';
@@ -16,7 +17,7 @@ export default async function Home() {
   const main = categories.find(c => c.slug === MAIN_CATEGORY);
   const shelves = await Promise.all((main?.sub ?? []).map(async sub => ({
     title: sub.name,
-    href: `/catalog?cat=${MAIN_CATEGORY}&sub=${sub.slug}`,
+    href: catalogPathOf(MAIN_CATEGORY, sub.slug),
     products: (await getProducts({ category: MAIN_CATEGORY, sub: sub.slug })).items.slice(0, 4),
   })));
   return (

@@ -32,6 +32,7 @@ import site from '@/components/site/site.module.css';
 import s from './SearchScreen.module.css';
 import { Img } from '@/components/ui/Img';
 import { Breadcrumbs } from '@/components/site/Breadcrumbs';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 /** Сортировки поиска: по умолчанию «По релевантности» (5c) — порядок выдачи, в API это sort по умолчанию (id 'popular'). */
 const SEARCH_SORTS: [SortId, string][] = [['popular', SEARCH.relevance], ...SORTS.filter(x => x[0] !== 'popular')];
@@ -76,7 +77,7 @@ export function SearchScreen({ q, categories }: { q: string; categories: Categor
   const goCategory = (slug: string) => {
     setEditing(false);
     const root = categories.find(c => c.sub.some(x => x.slug === slug));
-    router.push(`/catalog?cat=${root?.slug ?? ''}&sub=${slug}`);
+    router.push(root ? catalogPathOf(root.slug, slug) : '/catalog');
   };
 
   // ── Все совпадения: категории-уточнения и фасеты ──

@@ -1,10 +1,11 @@
 // Адрес каталога ⇄ состояние экрана (07 Каталог). Одно место кодирования параметров.
 //
 //   /catalog                              — корень: плитки категорий
-//   /catalog?cat=<корень>                 — категория: плитки подкатегорий + «Все товары»
-//   /catalog?cat=<корень>&all=1           — список «Все товары» категории
-//   /catalog?cat=<корень>&sub=<подкат.>   — список подкатегории
+//   /catalog/<корень>                     — категория: плитки подкатегорий + «Все товары»
+//   /catalog/<корень>?all=1               — список «Все товары» категории
+//   /catalog/<корень>/<подкат.>           — список подкатегории
 //   /catalog?sale=1                       — список всех товаров со скидкой («Выгодная полка» с главной)
+// Раздел и подраздел — в пути (так их видит поисковик); старые адреса ?cat=&sub= навсегда перенаправляет proxy.ts.
 // Параметры списка: sort=<SortId> (popular не пишем), min, max (тг, цифры), sale=1,
 // фильтры групп CAT_FILTERS — повторяющимся ключом группы: ?packs=25 кг&packs=50 кг, ?colors=Белый.
 // Любой фильтр или сортировка при одной cat тоже открывают список.
@@ -57,11 +58,21 @@ export function catalogLevel(st: CatalogState): CatalogLevel {
   return st.sub || st.all || st.sort !== 'popular' || anyFilter(st.filters) ? 'list' : 'cat';
 }
 
+/** Параметры экрана из адреса: раздел и подраздел из пути /catalog/<cat>/<sub> поверх строки запроса. */
+export function catalogSearch(pathname: string, sp: URLSearchParams | string): URLSearchParams {
+  const p = new URLSearchParams(sp);
+  const [, , cat, sub] = pathname.replace(/\/$/, '').split('/'); // '', 'catalog', cat, sub
+  if (cat) { p.set('cat', decodeURIComponent(cat)); p.delete('sub'); }
+  if (cat && sub) p.set('sub', decodeURIComponent(sub));
+  return p;
+}
+
+/** Путь раздела без параметров: /catalog, /catalog/<cat>, /catalog/<cat>/<sub>. */
+export const catalogPathOf = (cat?: string | null, sub?: string | null) => (!cat ? '/catalog' : sub ? `/catalog/${cat}/${sub}` : `/catalog/${cat}`);
+
 export function catalogHref(st: Partial<CatalogState>): string {
   const p = new URLSearchParams();
-  if (st.cat) p.set('cat', st.cat);
-  if (st.cat && st.sub) p.set('sub', st.sub);
-  else if (st.cat && st.all) p.set('all', '1');
+  if (st.cat && !st.sub && st.all) p.set('all', '1');
   if (st.sort && st.sort !== 'popular') p.set('sort', st.sort);
   const f = st.filters || {};
   if (f.min) p.set('min', String(f.min));
@@ -72,5 +83,6 @@ export function catalogHref(st: Partial<CatalogState>): string {
     if (Array.isArray(vals)) vals.forEach(v => p.append(g.key, v));
   });
   const q = p.toString();
-  return q ? `/catalog?${q}` : '/catalog';
+  const path = catalogPathOf(st.cat, st.cat ? st.sub : null);
+  return q ? `${path}?${q}` : path;
 }

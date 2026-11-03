@@ -16,6 +16,7 @@ import p from './ProductScreen.module.css';
 import { Breadcrumbs } from '@/components/site/Breadcrumbs';
 import { SiteFaq } from '@/components/site/SiteFaq';
 import { SiteFooter } from '@/components/site/SiteFooter';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 export interface ProductData { product: ProductDetail; group: Product[]; categories: Category[]; /** Телефон по User-Agent — вёрстка с сервера (proxy.ts). */ initialMobile?: boolean }
 
@@ -56,8 +57,8 @@ export function ProductScreen({ product, group, categories, initialMobile }: Pro
       <SiteHeader categories={categories} mobile={false} />
       <div className={p.wrap}>
         <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Каталог', href: '/catalog' },
-          ...(cat ? [{ label: cat.name, href: `/catalog?cat=${cat.slug}` }] : []),
-          ...(cat && sub ? [{ label: sub.name, href: `/catalog?cat=${cat.slug}&sub=${sub.slug}` }] : []), { label: product.name }]} />
+          ...(cat ? [{ label: cat.name, href: catalogPathOf(cat.slug) }] : []),
+          ...(cat && sub ? [{ label: sub.name, href: catalogPathOf(cat.slug, sub.slug) }] : []), { label: product.name }]} />
         <div className={s.grid2}>
           <div className={`${p.min0} ${p.stack}`}>{view}<SiteFaq /></div>
           <div className={s.aside}><SiteMiniCart /></div>

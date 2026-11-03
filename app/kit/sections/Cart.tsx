@@ -4,9 +4,13 @@ import { useState } from 'react';
 import { MartCartLine } from '@/components/MartCartLine';
 import { MartMiniCart } from '@/components/MartMiniCart';
 import { MartTabBar } from '@/components/MartTabBar';
-import { resolveCartItem } from '@/lib/api';
+import { cartItem } from '@/lib/domain';
+import { KIT_PRODUCTS } from '@/lib/mock';
 import { KitItem, KitPanel, KitSection } from '../Kit';
 import s from './sections.module.css';
+
+/** Витрина — на полном демо-наборе (сайт показывает только настоящие товары). */
+const resolveCartItem = (k: string) => cartItem(k, KIT_PRODUCTS);
 
 const item = (k: string) => resolveCartItem(k)!;
 

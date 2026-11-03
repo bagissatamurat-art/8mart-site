@@ -8,7 +8,7 @@ import { EarnNote, SummaryLines, TotalLine, TotalsRows } from '@/components/chec
 import { OrderTrack } from '@/components/checkout/OrderTrack';
 import { MethodCard, MobileTopBar } from '@/components/checkout/MobileTopBar';
 import { Alert } from '@/components/ui/Alert';
-import { CARDS, ORDERS, PRODUCTS } from '@/lib/mock';
+import { CARDS, ORDERS, KIT_PRODUCTS as PRODUCTS } from '@/lib/mock';
 import { CART, CART_ALERT, ORDER_PAGE } from '@/lib/copy';
 import { cartItem, orderTotals } from '@/lib/domain';
 import type { Order } from '@/lib/types';

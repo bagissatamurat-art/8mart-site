@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import { MartHeader, MartSideMenu } from '@/components/MartHeader';
 import { MartSearch, MartSearchScreen, type SearchSuggest } from '@/components/MartSearch';
 import { searchSuggest } from '@/lib/api';
-import { BONUS, CATEGORIES, FAVORITES, ORDERS, USER, USER_PROMOS } from '@/lib/mock';
+import { BONUS, KIT_CATEGORIES as CATEGORIES, FAVORITES, ORDERS, USER, USER_PROMOS } from '@/lib/mock';
 import { KitItem, KitSection } from '../Kit';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 const ADDRESS = 'Астана, Кабанбай батыра, 11';
 const RECENT = ['цемент 50 кг', 'гипсокартон', 'розы'];
@@ -42,7 +43,7 @@ function LiveDesktop({ user }: { user?: boolean }) {
       <MartHeader mode="desktop" method={user ? 'delivery' : null} address={user ? ADDRESS : ''} categories={CATEGORIES}
         {...(user ? userProps : {})} query={q} onQuery={setQ} contained={!user} onMethod={noop}
         searchPanel={<MartSearch query={q} suggest={suggest} recent={RECENT} onQuery={setQ}
-          onPick={p => router.push(`/product/${p.id}`)} onCategory={slug => router.push(`/catalog?cat=${slug}`)}
+          onPick={p => router.push(`/product/${p.id}`)} onCategory={slug => router.push(catalogPathOf(slug))}
           onSubmit={v => router.push(`/search?q=${encodeURIComponent(v)}`)} />} />
     </div>
   );

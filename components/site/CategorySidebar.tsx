@@ -3,12 +3,13 @@ import Link from 'next/link';
 import type { Category } from '@/lib/types';
 import s from './site.module.css';
 import { Img } from '@/components/ui/Img';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 export function CategorySidebar({ categories, active }: { categories: Category[]; active?: string }) {
   return (
     <nav className={s.sidebar} aria-label="Категории">
       {categories.map(c => (
-        <Link key={c.slug} href={`/catalog?cat=${c.slug}`} className={`${s.sideRow} ${c.slug === active ? s.sideRowActive : ''}`}
+        <Link key={c.slug} href={catalogPathOf(c.slug)} className={`${s.sideRow} ${c.slug === active ? s.sideRowActive : ''}`}
           aria-current={c.slug === active ? 'page' : undefined}>
           <Img src={c.img} w={36} h={36} className={s.sideImg} />{c.name}
         </Link>

@@ -17,6 +17,7 @@ import { isActiveOrder } from '@/components/account/sections';
 import type { AccountSection } from '@/components/MartHeader';
 import type { Category, Order, Product } from '@/lib/types';
 import s from './site.module.css';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 export function SiteHeader({ categories, mobile = true, query }: { categories: Category[]; /** false — на странице без mobile-шапки (товар) */ mobile?: boolean; /** Запрос в поле (страница поиска) */ query?: string }) {
   const router = useRouter();
@@ -46,7 +47,7 @@ export function SiteHeader({ categories, mobile = true, query }: { categories: C
 
   const submit = (v: string) => { if (!v.trim()) return; addRecentSearch(v.trim()); setScreen(false); beforeNavigate(); router.push(`/search?q=${encodeURIComponent(v.trim())}`); };
   const pick = (p: Product) => { setScreen(false); openQuickView(p.id); };
-  const category = (slug: string) => { setScreen(false); beforeNavigate(); const root = categories.find(c => c.sub.some(x => x.slug === slug)); router.push(`/catalog?cat=${root?.slug ?? ''}&sub=${slug}`); };
+  const category = (slug: string) => { setScreen(false); beforeNavigate(); const root = categories.find(c => c.sub.some(x => x.slug === slug)); router.push(root ? catalogPathOf(root.slug, slug) : '/catalog'); };
 
   return (
     <>

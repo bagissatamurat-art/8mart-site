@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
     dangerouslyAllowLocalIP: api.hostname === 'localhost',
   },
   // Шрифты и картинки из public — с долгим кэшем браузера (по умолчанию Next отдаёт их с max-age=0).
+  // Технический адрес Vercel — копия сайта: навсегда на основное зеркало, чтобы поисковик не держал дубль.
+  // Превью-сборки (другие адреса *.vercel.app) не трогаем.
+  async redirects() {
+    return [{ source: '/:path*', has: [{ type: 'host', value: '8mart-site.vercel.app' }], destination: 'https://www.8mart.kz/:path*', permanent: true }];
+  },
   async headers() {
     return [
       { source: '/fonts/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] },

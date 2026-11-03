@@ -4,7 +4,7 @@ import { ProductScreen } from '@/components/screens/ProductScreen';
 import { ApiError, getAllProductIds, getCategories, getGroup, getProduct } from '@/lib/api';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { money } from '@/lib/domain';
-import { breadcrumbsLd, catalogPath, OG_BASE, productLd } from '@/lib/seo';
+import { breadcrumbsLd, catalogPath, OG_BASE, productLd, CITIES_IN } from '@/lib/seo';
 
 export type Params = { params: Promise<{ id: string }> };
 
@@ -22,11 +22,11 @@ async function load(id: string) {
 export async function productMetadata({ params }: Params): Promise<Metadata> {
   const product = await load((await params).id);
   const price = product.price != null ? `${product.variants ? 'от ' : ''}${money(product.price)}` : '';
-  const description = [price, product.description.split('\n')[0]].filter(Boolean).join(' — ').slice(0, 300);
+  const description = [price, `доставка за 30–70 минут и самовывоз ${CITIES_IN}`, product.description.split('\n')[0]].filter(Boolean).join('. ').slice(0, 300);
   const image = product.images[0] ?? product.img;
   return {
-    // «Розы Мандала — купить с доставкой по Астане — 8mart» (шаблон добавляет «— 8mart»).
-    title: `${product.name} — купить с доставкой по Астане`, description,
+    // «Розы Мандала — купить с доставкой — 8mart» (шаблон добавляет «— 8mart»); города — в описании и на страницах городов.
+    title: `${product.name} — купить с доставкой`, description,
     alternates: { canonical: `/product/${product.id}` },
     openGraph: { ...OG_BASE, title: product.name, description, url: `/product/${product.id}`, ...(image ? { images: [{ url: image, alt: product.name }] } : {}) },
   };

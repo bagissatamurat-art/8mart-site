@@ -7,7 +7,7 @@ import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: '8mart — цветы и букеты с доставкой по Астане', template: '%s — 8mart' },
+  title: { default: '8mart — доставка цветов и букетов: Астана, Актобе, Кокшетау, Костанай, Уральск', template: '%s — 8mart' },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   // canonical — у каждой страницы свой (у главной — в app/page.tsx); в макете его нет, чтобы не унаследовался «/».

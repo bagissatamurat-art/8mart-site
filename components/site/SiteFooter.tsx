@@ -4,11 +4,13 @@
 import Link from 'next/link';
 import { BRAND, SUPPORT_WA } from '@/lib/config';
 import { FOOTER } from '@/lib/copy';
+import { CITY_IN, cityPath } from '@/lib/seo';
 import { SNAPSHOT_CITIES } from '@/lib/branches';
 import { asset } from '@/lib/basePath';
 import type { Category } from '@/lib/types';
 import { AppPromo } from './AppPromo';
 import s from './footer.module.css';
+import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
 const MAIN_CATEGORY = 'tsvety';
 
@@ -43,7 +45,7 @@ export function SiteFooter({ categories = [] }: { categories?: Category[] }) {
 
         <nav className={s.col} aria-label={FOOTER.buyers}>
           <b className={s.colTitle}>{FOOTER.buyers}</b>
-          <Link href={`/catalog?cat=${MAIN_CATEGORY}`}>{FOOTER.links.flowers}</Link>
+          <Link href={catalogPathOf(MAIN_CATEGORY)}>{FOOTER.links.flowers}</Link>
           <Link href="/account/bonus">{FOOTER.links.bonus}</Link>
           <Link href="/account/promos">{FOOTER.links.promos}</Link>
           <Link href="/account">{FOOTER.links.account}</Link>
@@ -52,7 +54,7 @@ export function SiteFooter({ categories = [] }: { categories?: Category[] }) {
 
         <nav className={s.col} aria-label={FOOTER.catalog}>
           <b className={s.colTitle}>{FOOTER.catalog}</b>
-          {main?.sub.map(sub => <Link key={sub.slug} href={`/catalog?cat=${MAIN_CATEGORY}&sub=${sub.slug}`}>{sub.name}</Link>)}
+          {main?.sub.map(sub => <Link key={sub.slug} href={catalogPathOf(MAIN_CATEGORY, sub.slug)}>{sub.name}</Link>)}
           <Link href="/catalog">{FOOTER.links.all}</Link>
         </nav>
 
@@ -61,7 +63,9 @@ export function SiteFooter({ categories = [] }: { categories?: Category[] }) {
           <a href={`tel:${BRAND.phoneRaw}`} className={s.phone}>{BRAND.phone}</a>
           <a href={`mailto:${BRAND.email}`}>{BRAND.email}</a>
           <a href={`https://wa.me/${SUPPORT_WA}`} target="_blank" rel="noopener noreferrer">{FOOTER.whatsapp}</a>
-          <span className={s.cities}><span className={s.citiesTitle}>{FOOTER.cities}</span>{SNAPSHOT_CITIES.map(c => c.name).join(' · ')}</span>
+          <span className={s.cities}><span className={s.citiesTitle}>{FOOTER.cities}</span>
+            {SNAPSHOT_CITIES.map((c, i) => <span key={c.id}>{i > 0 && ' · '}{CITY_IN[c.id] ? <Link href={cityPath(c.id)}>{c.name}</Link> : c.name}</span>)}
+          </span>
         </div>
       </div>
       <div className={s.bottom}>{FOOTER.copyright(new Date().getFullYear())}</div>
