@@ -82,7 +82,8 @@ export interface OrderShipment {
   /** Самовывоз: до какого срока храним, когда готово к выдаче. */
   until?: string;
 }
-export interface OrderItem { id: string; qty: number }
+/** Позиция заказа. name, price, img, delivery — снимок на момент заказа (бэкенд); в моке их нет — берём из каталога. */
+export interface OrderItem { id: string; qty: number; name?: string; price?: number; img?: string; delivery?: Product['delivery'] }
 export interface Order {
   id: string; date: string; method: Method; status: OrderStatus; address: string; eta?: string;
   payment: 'kaspi' | 'card'; promo?: string; items: OrderItem[];
@@ -98,6 +99,10 @@ export interface Order {
   fees?: { label: string; amount: number }[];
   /** Списано бонусов. */
   spend?: number;
+  // ── Оплата (бэкенд): пока unpaid — ждём оплату до payUntil; Kaspi счётом — invoiceIssued, когда оператор выставил счёт. ──
+  payState?: 'unpaid' | 'paid' | 'refunded';
+  payUntil?: string | null;
+  invoiceIssued?: boolean;
 }
 
 /** POST /orders — тело запроса. */

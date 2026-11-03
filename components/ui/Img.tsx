@@ -13,6 +13,8 @@ type Props = { src: string; alt?: string; className?: string; priority?: boolean
   & ({ w: number; h: number; fill?: never; sizes?: string } | { fill: true; sizes: string; w?: never; h?: never });
 
 export function Img({ src, alt = '', className, priority, draggable, eager, quality, ...p }: Props) {
+  // Фото ещё не загружено в админке (бэкенд отдаёт пустую строку) — пустая плашка того же размера вместо битой картинки.
+  if (!src) return <span className={className} style={p.fill ? { position: 'absolute', inset: 0 } : { display: 'inline-block', width: p.w, height: p.h }} aria-hidden />;
   const blur = blurOf(src);
   const common = {
     src, alt, className, draggable, quality, sizes: p.sizes,

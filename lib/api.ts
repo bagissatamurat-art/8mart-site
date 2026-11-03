@@ -2,14 +2,15 @@
 // Каждая функция — endpoint(имя, настоящий запрос, мок): пока NEXT_PUBLIC_API_URL пуст или функция перечислена
 // в NEXT_PUBLIC_API_MOCK, отвечает мок (lib/mock.ts) в той же форме (см. lib/http.ts). Сигнатуры не менять — на них экраны.
 import { cache } from 'react';
-import { ApiError, apiFetch, endpoint } from './http';
+import { ApiError, apiFetch, endpoint, isMocked } from './http';
+import { useCartItems } from './store/cartItems';
 import * as M from './mock';
 import { CANCEL_BEFORE, CAT_FILTERS, DELIVERY, PAGE_SIZE, PROMO } from './config';
 import { cargoSlots, cartItem, courierSlots, orderTotals, planShipments, slotEta, type PlanOptions, type ShipmentPlan, type SlotDay } from './domain';
 import { FLOWER_COMPOSITION } from './flowers';
 import type { QuoteResult } from './delivery';
 import type {
-  Address, Banner, Bonus, Card, CartProduct, Category, City, Order, OrderDraft, PickupPoint, Product, ProductDetail,
+  Address, Banner, Bonus, Card, CartProduct, Category, City, Order, OrderDraft, OrderItem, PickupPoint, Product, ProductDetail,
   ProductQuery, PromoCheck, Story, User, UserPromo,
 } from './types';
 
@@ -135,19 +136,34 @@ export const getBanners = (): Promise<Banner[]> => endpoint('getBanners', () => 
 
 // ── Корзина ──
 
-/** Синхронный разбор ключа корзины по моку — для клиентских сторов до ответа /cart/validate.
- *  С бэкендом: каталог для этого разбора должен приходить с сервера (вопрос в BACKEND_HANDOFF.md, раздел 7). */
-export const resolveCartItem = (key: string): CartProduct | null => cartItem(key, M.PRODUCTS);
+/** Синхронный разбор ключа корзины «f7-s» в товар. С API — по ответам /cart/validate (lib/store/cartItems, localStorage);
+ *  в моке — по мок-каталогу. Неизвестный ключ — null (позицию покажем после ответа сервера). */
+export const resolveCartItem = (key: string): CartProduct | null =>
+  useCartItems.getState().items[key] ?? (isMocked('validateCart') ? cartItem(key, M.PRODUCTS) : null);
 
 /** Мок наличия в филиале: распроданные позиции (сервер вернёт soldOut в /cart/validate). Ключ цветов — по id варианта. */
 const isSoldOut = (key: string) => M.SOLD_OUT_IN_BRANCH.includes(key.split('|')[0]);
 
-/** POST /cart/validate — сервер пересчитывает цены, наличие и отправления. */
-export function validateCart(cart: Record<string, number>, opts: PlanOptions = {}): Promise<{
+/** Позиция заказа для экрана: снимок с бэкенда, иначе — товар каталога по ключу. */
+export function orderItemInfo(it: OrderItem): { name: string; img?: string; price: number | null; delivery?: Product['delivery'] } {
+  const p = it.name ? null : resolveCartItem(it.id);
+  return it.name ? { name: it.name, img: it.img || undefined, price: it.price ?? null, delivery: it.delivery }
+    : { name: p?.name ?? it.id, img: p?.img, price: p?.price ?? null, delivery: p?.delivery };
+}
+
+/** Откуда везём — сервер выбирает филиал по точке самовывоза или координатам адреса. */
+export type CartPlace = { pickupPointId?: string; lat?: number; lng?: number };
+
+/** POST /cart/validate — сервер пересчитывает цены, наличие и отправления. Позиции ответа запоминаются для resolveCartItem. */
+export function validateCart(cart: Record<string, number>, opts: PlanOptions & CartPlace = {}): Promise<{
   lines: { id: string; qty: number; soldOut: boolean; price: number | null }[];
   plan: ShipmentPlan<{ p: CartProduct; qty: number; soldOut: boolean }>;
 }> {
-  return endpoint('validateCart', () => apiFetch('/cart/validate', { method: 'POST', body: { cart, ...opts } }), () => mockValidate(cart, opts));
+  return endpoint('validateCart', async () => {
+    const r = await apiFetch<Awaited<ReturnType<typeof mockValidate>>>('/cart/validate', { method: 'POST', body: { cart, ...opts } });
+    if (typeof window !== 'undefined') useCartItems.getState().remember(r.plan.list.flatMap(sh => sh.lines.map(l => l.p)));
+    return r;
+  }, () => mockValidate(cart, opts));
 }
 function mockValidate(cart: Record<string, number>, opts: PlanOptions) {
   const resolved = Object.entries(cart).map(([id, qty]) => ({ p: resolveCartItem(id), qty, soldOut: isSoldOut(id) }))

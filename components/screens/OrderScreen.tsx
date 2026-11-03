@@ -8,10 +8,10 @@ import { OrderTrack } from '@/components/checkout/OrderTrack';
 import { EarnNote, SummaryLines, TotalLine, TotalsRows } from '@/components/checkout/OrderSummary';
 import { MobileTopBar } from '@/components/checkout/MobileTopBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
-import { cancelOrder, getOrder, resolveCartItem } from '@/lib/api';
+import { cancelOrder, getOrder, orderItemInfo } from '@/lib/api';
 import { CANCEL_BEFORE, REFUND_DAYS, SUPPORT_WA } from '@/lib/config';
 import { CART, ORDER_PAGE, CHECKOUT } from '@/lib/copy';
-import { bonusText, itemsTitle, money } from '@/lib/domain';
+import { bonusText, formatPhone, itemsTitle, money } from '@/lib/domain';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { Category, Order } from '@/lib/types';
 import s from '@/components/site/site.module.css';
@@ -38,7 +38,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   const refund = ORDER_PAGE.refund(money(order.total), kaspi, REFUND_DAYS);
   const count = order.items.reduce((sum, it) => sum + it.qty, 0);
   const title = itemsTitle(count);
-  const lines = order.items.map(it => { const p = resolveCartItem(it.id); return { key: it.id, img: p?.img, name: p?.name ?? it.id, qty: it.qty, price: p?.price ?? null }; });
+  const lines = order.items.map(it => { const p = orderItemInfo(it); return { key: it.id, img: p.img, name: p.name, qty: it.qty, price: p.price }; });
   const totals = {
     goods: order.goods ?? 0, discount: order.discount ?? 0, spend: order.spend ?? 0, progress: null,
     fees: (order.fees ?? []).map(f => ({ label: f.label, amount: f.amount, free: f.amount === 0, text: f.amount === 0 ? 'Бесплатно' : money(f.amount) })),
@@ -62,7 +62,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   const info = (
     <div className={c.info}>
       <div className={c.infoRow}><span className={c.infoLabel}>{pk ? 'Самовывоз' : 'Доставка'}</span><span className={c.infoStrong}>{order.address}</span></div>
-      {order.recipient && <div className={c.infoRow}><span className={c.infoLabel}>Получатель</span><span>{[order.recipient.name, order.recipient.phone].filter(Boolean).join(' · ')}{order.leaveAtDoor ? ` · ${CHECKOUT.leftAtDoor.toLowerCase()}` : ''}</span></div>}
+      {order.recipient && <div className={c.infoRow}><span className={c.infoLabel}>Получатель</span><span>{[order.recipient.name, formatPhone(order.recipient.phone)].filter(Boolean).join(' · ')}{order.leaveAtDoor ? ` · ${CHECKOUT.leftAtDoor.toLowerCase()}` : ''}</span></div>}
     </div>
   );
   const summaryBody = (
@@ -71,7 +71,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
       <div className={l.divider} />
       <TotalsRows compact totals={totals} promo={promo} />
       <div className={l.divider} />
-      <TotalLine small total={order.total} paid={cancelled ? ORDER_PAGE.refundShort : ORDER_PAGE.paid(kaspi)} />
+      <TotalLine small total={order.total} paid={cancelled ? ORDER_PAGE.refundShort : order.payState === 'unpaid' ? ORDER_PAGE.toPay : ORDER_PAGE.paid(kaspi)} />
       {earnText && <EarnNote>{earnText}</EarnNote>}
     </>
   );

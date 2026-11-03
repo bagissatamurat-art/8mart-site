@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { ORDER_STATUS } from '@/lib/config';
 import { bonusText, money, plural } from '@/lib/domain';
-import { resolveCartItem } from '@/lib/api';
+import { orderItemInfo } from '@/lib/api';
 import type { Order } from '@/lib/types';
 import { MartButton } from '../MartButton';
 import { BonusCoin } from '../ui/BonusCoin';
@@ -81,7 +81,7 @@ function PastOrder({ o, href, onOpen, onRepeat }: { o: Order; href: string; onOp
   useEffect(() => () => { alive.current = false; }, []);
   const cancelled = o.status === 'cancelled';
   const tone = ORDER_STATUS[o.status].tone;
-  const thumbs = o.items.slice(0, 4).map(it => resolveCartItem(it.id));
+  const thumbs = o.items.slice(0, 4).map(orderItemInfo);
   const n = o.items.length;
   const earned = o.status === 'done' ? o.bonus : 0;
 

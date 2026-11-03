@@ -31,7 +31,7 @@ import l from '@/components/site/page.module.css';
 
 export function CartScreen({ categories }: { categories: Category[] }) {
   const mobile = useIsMobile();
-  const { lines, ready } = useCartLines();
+  const { lines, ready, when } = useCartLines();
   const cart = useCart(st => st.lines);
   const together = useCart(st => st.together);
   const setTogether = useCart(st => st.setTogether);
@@ -62,7 +62,7 @@ export function CartScreen({ categories }: { categories: Category[] }) {
   const shipments = t.plan.list.map(sh => (
     <div key={sh.id} className={mobile ? c.shipM : c.ship}>
       <div className={mobile ? c.shipHeadM : c.shipHead}>
-        <MartShipmentHead kind={sh.kind} method={method || 'delivery'} label={sh.label} when={sh.when} meta={sh.meta} feeText={sh.feeText} compact={mobile} />
+        <MartShipmentHead kind={sh.kind} method={method || 'delivery'} label={sh.label} when={when[sh.kind] ?? sh.when} meta={sh.meta} feeText={sh.feeText} compact={mobile} />
       </div>
       <div className={mobile ? c.shipDivM : c.shipDiv} />
       {sh.lines.map(l => <MartCartLine key={l.p.id} product={l.p} qty={l.qty} soldOut={l.soldOut} compact={mobile} onChange={setCartQty} />)}

@@ -14,7 +14,7 @@ export function cartItem(key: string, products: Product[]): CartProduct | null {
   if (x) return color ? { ...x, id: key, name: x.name + ', ' + color.toLowerCase(), color } : x;
   for (const g of products) if (g.variants) {
     const v = g.variants.find(v => v.id === id);
-    if (v) return { ...g, id: key, name: g.name + ', ' + v.size + (color ? ', ' + color.toLowerCase() : ''), price: v.price, img: v.img, variant: v.size, color };
+    if (v) return { ...g, id: key, name: g.name + ', ' + v.size + (color ? ', ' + color.toLowerCase() : ''), price: v.price, img: v.img ?? g.img, variant: v.size, color };
   }
   return null;
 }

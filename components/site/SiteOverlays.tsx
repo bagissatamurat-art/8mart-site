@@ -15,6 +15,7 @@ const MartMethodModal = dynamic(() => import('@/components/MartMethodModal').the
 import { getCities } from '@/lib/api';
 import { loadQuickView, loadQuickViewComponent, peekQuickView, peekQuickViewComponent, preloadQuickView, type QuickViewData } from './quickViewData';
 import { useCart } from '@/lib/store/cart';
+import { useCartItems } from '@/lib/store/cartItems';
 import { useAuth } from '@/lib/store/auth';
 import { setAuthTokenProvider } from '@/lib/http';
 import { methodValue, useMethod } from '@/lib/store/method';
@@ -34,10 +35,11 @@ setAuthTokenProvider(() => useAuth.getState().accessToken);
 
 function StoreHydrator() {
   useEffect(() => {
-    Promise.all([useCart.persist.rehydrate(), useMethod.persist.rehydrate(), useAuth.persist.rehydrate()]).then(() => useUi.setState({ hydrated: true }));
+    Promise.all([useCart.persist.rehydrate(), useCartItems.persist.rehydrate(), useMethod.persist.rehydrate(), useAuth.persist.rehydrate()]).then(() => useUi.setState({ hydrated: true }));
     // Синхронизация между вкладками
     const onStorage = (e: StorageEvent) => {
       if (e.key === useCart.persist.getOptions().name) useCart.persist.rehydrate();
+      if (e.key === useCartItems.persist.getOptions().name) useCartItems.persist.rehydrate();
       if (e.key === useMethod.persist.getOptions().name) useMethod.persist.rehydrate();
       if (e.key === useAuth.persist.getOptions().name) useAuth.persist.rehydrate();
     };

@@ -40,7 +40,7 @@ import l from '@/components/site/page.module.css';
 export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const router = useRouter();
   const mobile = useIsMobile();
-  const { lines, ready } = useCartLines();
+  const { lines, ready, when } = useCartLines();
   const cart = useCart(st => st.lines);
   const together = useCart(st => st.together);
   const setTogether = useCart(st => st.setTogether);
@@ -175,7 +175,7 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
       {t.plan.list.map(sh => (
         <div key={sh.id} className={mobile ? c.shipM : c.ship}>
           <MartShipmentHead compact={mobile} kind={sh.kind} method={method} label={sh.label} meta={sh.meta} feeText={sh.feeText}
-            when={(!pk && slotDays && slotTitle(sh.isCargo ? slotDays.cargo : slotDays.courier, sh.isCargo ? cargoSlot : slot)) || sh.when} />
+            when={(!pk && slotDays && slotTitle(sh.isCargo ? slotDays.cargo : slotDays.courier, sh.isCargo ? cargoSlot : slot)) || (when[sh.kind] ?? sh.when)} />
           <div className={c.thumbs}>{sh.lines.filter(l => !l.soldOut).map(l => l.p.img && <Img key={l.p.id} src={l.p.img} w={40} h={40} className={c.thumb} />)}</div>
           {!pk && sh.isCourier && (
             <div className={c.slotGroup}><span className={c.slotTitle}>Когда доставить</span>

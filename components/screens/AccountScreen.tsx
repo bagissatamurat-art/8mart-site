@@ -68,7 +68,7 @@ export function AccountScreen({ categories, section }: AccountScreenProps) {
   // ── Действия ──
   const onRepeat = async (o: Order) => {
     const add = useCart.getState().add;
-    o.items.forEach(it => { if (resolveCartItem(it.id)) add(it.id, it.qty); });
+    o.items.forEach(it => { if (it.name || resolveCartItem(it.id)) add(it.id, it.qty); }); // снятые с продажи сервер отметит при проверке корзины
     setToast(true);
   };
   const onSaveAddress = async (v: MethodValue) => {

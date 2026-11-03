@@ -1,8 +1,8 @@
 'use client';
 // Шкала статуса заказа (03, шаг success): своя шкала на каждое отправление; отмена — «Заказ принят → Заказ отменён».
 import { ORDER_PAGE, ORDER_STAGES } from '@/lib/copy';
-import { itemsTitle } from '@/lib/domain';
-import { resolveCartItem } from '@/lib/api';
+import { formatPhone, itemsTitle } from '@/lib/domain';
+import { orderItemInfo } from '@/lib/api';
 import type { Order, OrderShipment, OrderStatus } from '@/lib/types';
 import { MartButton } from '../MartButton';
 import { Check } from '../ui/Cross';
@@ -62,15 +62,20 @@ export function OrderTrack({ order, mobile, refundText }: { order: Order; mobile
     );
   }
   const multi = order.shipments.length > 1;
+  const unpaid = order.payState === 'unpaid'
+    ? ORDER_PAGE.awaitingPay(order.payment === 'kaspi', !!order.invoiceIssued, formatPhone(order.kaspiPhone ?? order.recipient?.phone), payTime(order.payUntil))
+    : '';
   return (
     <>
       {order.shipments.map((sh, i) => {
         const cur = Math.max(0, STEP[sh.status]);
-        const defs = ORDER_STAGES[`${pk ? 'p' : 'd'}${sh.kind}` as const];
+        const base = ORDER_STAGES[`${pk ? 'p' : 'd'}${sh.kind}` as const];
+        // Не оплачен — первый шаг «Ждём оплату» с тем, кому и до какого времени платить.
+        const defs: [string, string][] = unpaid ? [[ORDER_PAGE.awaitingStage, unpaid], ...base.slice(1)] : base;
         const stages: Stage[] = defs.map(([title, sub], j) => ({ title, sub, time: j <= cur ? sh.times?.[j] ?? '' : '',
           state: j < cur || (j === cur && cur === 3) ? 'done' : j === cur ? 'current' : 'todo' }));
         const e = eta(sh, pk, cur);
-        const qty = order.items.reduce((sum, it) => sum + ((resolveCartItem(it.id)?.delivery === 'cargo') === (sh.kind === 'cargo') ? it.qty : 0), 0);
+        const qty = order.items.reduce((sum, it) => sum + ((orderItemInfo(it).delivery === 'cargo') === (sh.kind === 'cargo') ? it.qty : 0), 0);
         const tag = pk ? (sh.kind === 'cargo' ? 'Склад' : 'Точка') : (sh.kind === 'cargo' ? 'Грузовой' : 'Курьер');
         const label = (pk ? 'Самовывоз ' : 'Доставка ') + (i + 1) + ' из ' + order.shipments.length + ' · ' + itemsTitle(qty);
         return (
@@ -97,3 +102,8 @@ export function OrderTrack({ order, mobile, refundText }: { order: Order; mobile
   );
 }
 
+/** «01:54» по времени Казахстана (UTC+5) — срок оплаты. */
+function payTime(iso: string | null | undefined) {
+  if (!iso) return 'конца дня';
+  return new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Almaty' }).format(new Date(iso));
+}

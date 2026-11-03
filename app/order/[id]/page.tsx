@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import { NOINDEX } from '@/lib/seo';
 import { OrderScreen } from '@/components/screens/OrderScreen';
 import { getCategories, getOrders } from '@/lib/api';
+import { isMocked } from '@/lib/http';
 
 type Params = { params: Promise<{ id: string }> };
 
-// Демо-заказы собираются заранее; остальные id рендерятся по запросу.
+// Демо-заказы мока собираются заранее; остальные id рендерятся по запросу.
+// С настоящим API заказы личные (нужен вход) — при сборке их не перечисляем.
 export async function generateStaticParams() {
-  return (await getOrders()).map(o => ({ id: o.id }));
+  return isMocked('getOrders') ? (await getOrders()).map(o => ({ id: o.id })) : [];
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {

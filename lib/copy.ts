@@ -130,6 +130,12 @@ export const ORDER_PAGE = {
   bonusReturn: (bonus: string) => `Вернём ${bonus} на бонусный счёт`,
   earned: (bonus: string) => `Начислено ${bonus}`,
   paid: (kaspi: boolean) => kaspi ? 'Оплачено Kaspi' : 'Оплачено картой',
+  toPay: 'К оплате',
+  awaitingStage: 'Ждём оплату',
+  awaitingPay: (kaspi: boolean, invoice: boolean, phone: string, until: string) => !kaspi
+    ? `Оплатите картой до ${until}, иначе заказ отменится`
+    : invoice ? `Счёт выставлен в Kaspi на ${phone}. Оплатите его в приложении Kaspi до ${until}`
+      : `Выставим счёт в Kaspi на ${phone} в течение 5 минут. Оплатите до ${until}, иначе заказ отменится`,
   refundShort: 'Возврат',
   supportText: (id: string) => `Здравствуйте! Вопрос по заказу №${id}`,
   cancelTitle: (id: string) => `Отменить заказ №${id}?`,

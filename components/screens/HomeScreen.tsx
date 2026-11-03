@@ -20,7 +20,8 @@ import { SiteFaq } from '@/components/site/SiteFaq';
 import { SiteFooter } from '@/components/site/SiteFooter';
 
 export interface HomeShelf { title: string; href: string; products: Product[] }
-export interface HomeData { categories: Category[]; stories: Story[]; banner: Banner; shelves: HomeShelf[] }
+/** banner — первый активный баннер; в админке их может не быть. */
+export interface HomeData { categories: Category[]; stories: Story[]; banner?: Banner; shelves: HomeShelf[] }
 
 export function HomeScreen({ categories, stories, banner, shelves }: HomeData) {
   const hydrated = useUi(st => st.hydrated);
@@ -49,8 +50,8 @@ export function HomeScreen({ categories, stories, banner, shelves }: HomeData) {
                 {categories.map(c => <MartChip key={c.slug} label={c.name} href={`/catalog?cat=${c.slug}`} />)}
               </div>
             </div>
-            <div className={s.desktopOnly}><MartBanner banner={banner} mode="desktop" /></div>
-            <div className={s.mobileOnly}><MartBanner banner={banner} mode="mobile" /></div>
+            {banner && <div className={s.desktopOnly}><MartBanner banner={banner} mode="desktop" /></div>}
+            {banner && <div className={s.mobileOnly}><MartBanner banner={banner} mode="mobile" /></div>}
           </div>
           {shelves.map(sh => <ProductShelf key={sh.href} title={sh.title} href={sh.href} products={sh.products} />)}
           <SiteFaq />
