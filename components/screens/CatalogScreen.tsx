@@ -30,6 +30,7 @@ import { CardSkeleton } from '@/components/ui/Spinner';
 import { Breadcrumbs } from '@/components/site/Breadcrumbs';
 import { SiteFaq } from '@/components/site/SiteFaq';
 import { SiteFooter } from '@/components/site/SiteFooter';
+import { CATEGORY_SEO } from '@/lib/seo';
 
 export type { CatalogStats };
 
@@ -102,6 +103,8 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
 
   // ── Заголовки и навигация ──
   const title = level === 'root' ? CATALOG.title : saleShelf ? CATALOG.saleTitle : sub ? sub.name : category?.name ?? CATALOG.title;
+  // Заголовок и вступление раздела для людей и поиска (lib/seo); в узкой верхней панели телефона — короткое имя.
+  const seo = !saleShelf && level !== 'root' ? CATEGORY_SEO[(sub ?? category)?.slug ?? ''] : undefined;
   const countText = level === 'list' && !list.loading && !list.error ? itemsTitle(list.total) : '';
   const backHref = level === 'list' && category && subs.length ? catalogHref({ cat: category.slug }) : '/catalog';
   const crumbs: [string, string | null][] = [['Главная', '/'], [CATALOG.title, level !== 'root' ? '/catalog' : null]];
@@ -193,10 +196,12 @@ export function CatalogScreen({ categories, stats, initial }: { categories: Cate
           <div className={s.desktopOnly}>
             <Breadcrumbs items={crumbs.map(([label, href]) => ({ label, href }))} />
             <div className={k.titleRow}>
-              <h1 className={l.h1}>{title}</h1>
+              <h1 className={l.h1}>{seo?.h1 ?? title}</h1>
               {countText && <span className={k.count}>{countText}</span>}
             </div>
           </div>
+
+          {seo && <p className={k.intro}>{seo.intro}</p>}
 
           {level === 'root' && <RootTiles categories={categories} stats={stats} />}
 

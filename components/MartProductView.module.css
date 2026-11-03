@@ -157,6 +157,8 @@
 .optOn .packLabel, .optOn .sizeLabel { font-weight: 700; }
 .optPrice { font-size: var(--fs-caption); color: var(--ink-2); }
 .sizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-2); }
+.sizeInfo { margin: 0; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--ink-2); } /* состав выбранного размера */
+.sizeInfo b { color: var(--ink-1); font-weight: 600; }
 .size { align-items: center; }
 .sizeLabel { font-size: var(--fs-body); font-weight: 500; }
 .swatches { display: flex; gap: var(--s-3); flex-wrap: wrap; padding: 2px; }

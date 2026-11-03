@@ -8,7 +8,7 @@ import { JsonLd } from '@/components/ui/JsonLd';
 import { catalogLevel, parseCatalog } from '@/components/catalog/catalogUrl';
 import { CATALOG } from '@/lib/copy';
 import { getCategories, getProducts } from '@/lib/api';
-import { breadcrumbsLd, catalogPath, CITIES_IN, NOINDEX, OG_BASE, OG_IMAGE } from '@/lib/seo';
+import { breadcrumbsLd, catalogPath, CATEGORY_SEO, CITIES_IN, NOINDEX, OG_BASE, OG_IMAGE } from '@/lib/seo';
 import type { Category } from '@/lib/types';
 
 export type Raw = Record<string, string | string[] | undefined>;
@@ -39,7 +39,8 @@ export async function catalogMetadata(raw: Raw): Promise<Metadata> {
   const { c, s } = names(await getCategories(), url.cat, url.sub);
   const sale = !url.cat && url.filters.sale;
   const unknown = (!!raw.cat && !c) || (!!raw.sub && !s);
-  const title = s ? `${s.name} — ${c!.name}` : c ? c.name : sale ? CATALOG.saleTitle : 'Каталог';
+  const seoName = CATEGORY_SEO[(s ?? c)?.slug ?? '']?.h1;
+  const title = seoName ? (s ? seoName : `${seoName} — каталог`) : s ? `${s.name} — ${c!.name}` : c ? c.name : sale ? CATALOG.saleTitle : 'Каталог';
   const what = s?.name ?? c?.name ?? (sale ? 'товары со скидкой' : 'цветы и букеты');
   const description = `${what[0].toUpperCase() + what.slice(1)} в 8mart с доставкой за 30–70 минут и самовывозом ${CITIES_IN}. Цены, наличие, бонусы за покупки.`;
   // Страница списка ?page=N — своя каноническая ссылка (на ней другие товары), заголовок с номером.

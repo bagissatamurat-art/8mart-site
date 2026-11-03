@@ -13,7 +13,7 @@ import { Badge } from './ui/Badge';
 import { Cross, Chevron } from './ui/Cross';
 import { HeartIcon } from './ui/HeartIcon';
 import { Gallery, type Slide } from './product/Gallery';
-import { Colors, Cta, Description, Packs, Sizes, Specs, Ways } from './product/Sections';
+import { Colors, compositionOf, Cta, Description, Packs, Sizes, Specs, Ways } from './product/Sections';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { modalAbove, useModal } from '@/lib/hooks/useModal';
 import { useMounted } from '@/lib/hooks/useMounted';
@@ -187,7 +187,7 @@ function View({
       </div>
 
       {sibs.length > 1 && <Packs items={sibs} currentId={pr.id} onPick={onPickGroup} />}
-      {vs && v && <Sizes variants={vs} current={v} onPick={id => { setVid(id); setIdx(0); }} />}
+      {vs && v && <Sizes variants={vs} current={v} onPick={id => { setVid(id); setIdx(0); }} composition={compositionOf(pr.specs, v.size)} />}
       {colors && color && <Colors colors={colors} current={color} note={pr.colorNote} onPick={setColorSel} />}
 
       {!mobile && <div className={s.ctaD}>{cta}</div>}

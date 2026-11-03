@@ -12,6 +12,15 @@ export const CITY_IN: Record<string, string> = {
   astana: 'в Астане', aktobe: 'в Актобе', kokshetau: 'в Кокшетау', kostanay: 'в Костанае', uralsk: 'в Уральске',
 };
 export const cityPath = (id: string) => `/dostavka-cvetov/${id}`;
+
+/** Заголовок и вступление раздела каталога. «Гортензии» одним словом поисковик путает с саженцами и горшечными растениями,
+ *  поэтому заголовок — «Букеты с гортензиями». Только проверяемые факты: без сроков, цен и обещаний, которых нет в каталоге. */
+export const CATEGORY_SEO: Record<string, { h1: string; intro: string }> = {
+  tsvety: { h1: 'Букеты цветов', intro: 'Букеты из роз, гортензий и хризантем. У каждого букета три размера — S, M и L, состав размера указан в карточке. Собираем в день заказа, к букету — открытка и подкормка в подарок.' },
+  rozy: { h1: 'Букеты из роз', intro: 'Букеты из роз — микс, кустовые и пионовидные розы Мандала, отдельно и вместе с гортензией и хризантемой. Размеры S, M и L: сколько роз в каждом — в карточке букета.' },
+  gortenzii: { h1: 'Букеты с гортензиями', intro: 'Срезанная гортензия в букетах — с кустовыми розами и хризантемами. Пышный объём при небольшом числе цветов. Размеры S, M и L, состав каждого — в карточке.' },
+  hrizantemy: { h1: 'Букеты с хризантемами', intro: 'Букеты из хризантем — отдельно и вместе с розами Мандала и кустовыми розами. Хризантемы долго стоят в вазе. Размеры S, M и L, состав каждого — в карточке.' },
+};
 export const SITE_DESCRIPTION = `Букеты из роз, гортензий и хризантем с доставкой за 30–70 минут и самовывозом из 7 магазинов ${CITIES_IN}. Размеры S, M, L — соберём сегодня.`;
 
 /** Заголовок h1 главной (визуально скрыт: в макете 01 заголовка нет). */
@@ -78,7 +87,9 @@ export function productLd(p: Product & { description?: string; images?: string[]
   const url = abs(`/product/${p.id}`);
   const availability = p.soldOut ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock';
   const offer = !prices.length ? undefined : p.variants
-    ? { '@type': 'AggregateOffer', priceCurrency: 'KZT', lowPrice: Math.min(...prices), highPrice: Math.max(...prices), offerCount: prices.length, availability, url, shippingDetails: shippingLd() }
+    ? { '@type': 'AggregateOffer', priceCurrency: 'KZT', lowPrice: Math.min(...prices), highPrice: Math.max(...prices), offerCount: prices.length, availability, url,
+        // Цена каждого размера отдельно: поиск и ИИ-ответы берут «M — 22 600 тг» из разметки, а не из вёрстки.
+        offers: p.variants!.map(v => ({ '@type': 'Offer', sku: v.id, name: `${p.name}, ${v.size}`, priceCurrency: 'KZT', price: v.price, availability, url, shippingDetails: shippingLd() })) }
     : { '@type': 'Offer', priceCurrency: 'KZT', price: prices[0], availability, url, shippingDetails: shippingLd() };
   const imgs = (p.images?.length ? p.images : p.img ? [p.img] : []).map(abs);
   return {

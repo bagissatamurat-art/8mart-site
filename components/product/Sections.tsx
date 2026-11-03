@@ -30,14 +30,14 @@ export function Packs({ items, currentId, onPick }: { items: Product[]; currentI
   );
 }
 
-// Подсказка высоты букета — из референса (MartProductView.dc.html), совпадает с FLOWER_SPECS в моке.
-const SIZE_HINT: Record<string, string> = { S: '35 см', M: '45 см', L: '55 см' };
-
 // ── Размер (variants) ──
-export function Sizes({ variants, current, onPick }: { variants: Variant[]; current: Variant; onPick: (id: string) => void }) {
+/** Состав выбранного размера — из характеристик товара «Размер S: 4 шт кустовых роз, …»: что именно получит покупатель за эту цену. */
+export const compositionOf = (specs: [string, string][] | undefined, size: string) => specs?.find(([k]) => k === `Размер ${size}`)?.[1];
+
+export function Sizes({ variants, current, onPick, composition }: { variants: Variant[]; current: Variant; onPick: (id: string) => void; composition?: string }) {
   return (
     <div className={s.block10}>
-      <span className={s.optHead}><b>Размер</b><span className={s.optHint}>{SIZE_HINT[current.size] || ''}</span></span>
+      <span className={s.optHead}><b>Размер</b></span>
       <div className={s.sizes}>
         {variants.map(v => {
           const on = v.id === current.id;
@@ -49,6 +49,7 @@ export function Sizes({ variants, current, onPick }: { variants: Variant[]; curr
           );
         })}
       </div>
+      {composition && <p className={s.sizeInfo}><b>{current.size} · {money(current.price)}:</b> {composition}</p>}
     </div>
   );
 }

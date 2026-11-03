@@ -5,6 +5,7 @@
 .aside { position: sticky; top: 16px; }
 
 .titleRow { display: flex; align-items: baseline; gap: 12px; }
+.intro { margin: 0; max-width: 760px; font-size: var(--fs-body); line-height: var(--lh-body); color: var(--ink-2); } /* вступление раздела (lib/seo CATEGORY_SEO) */
 .count { font-size: var(--fs-body); color: var(--ink-3); }
 
 .chips { display: flex; gap: 8px; flex-wrap: wrap; min-width: 0; }
