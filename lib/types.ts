@@ -6,6 +6,10 @@ export type ShipmentKind = 'courier' | 'cargo';
 
 export interface Variant { id: string; size: string; price: number; img?: string }
 
+/** Видео товара — вертикальный ролик, уже обработанный сервером. src — со звуком (H.264 + AAC, до 720×1280),
+ *  preview — беззвучные первые 6 с для миниатюры, poster — первый кадр. duration — секунды. */
+export interface ProductVideo { src: string; preview: string; poster: string; width: number; height: number; duration: number }
+
 export interface DeliveryInfo { when: string; price: string; note: string }
 export interface PickupInfo { when: string; where: string; note: string }
 export interface DeliveryType { tag: string; delivery: DeliveryInfo; pickup: PickupInfo }
@@ -31,6 +35,8 @@ export interface Product {
   colors?: string[];
   colorNote?: string;
   conditions?: ProductConditions;
+  /** Видео товара (GET /products, /products/{id}); нет — null (в моке поля нет). Миниатюра поверх галереи и плеер на весь экран. */
+  video?: ProductVideo | null;
 }
 
 /** GET /products/{id} */
@@ -68,7 +74,11 @@ export interface StorySlide {
   /** Длительность видео, с (из API) — пока видео не загрузилось. */
   duration?: number;
 }
-export interface Story { id: string; title: string; cover: string; slides: StorySlide[] }
+export interface Story {
+  id: string; title: string; cover: string; slides: StorySlide[];
+  /** Товар сторис (GET /stories): в просмотре снизу — блок товара с «В корзину», избранным и «Поделиться». */
+  product?: Product;
+}
 export interface Banner { img: string; title: string; text: string; /** Подпись на mobile (в макете короче) */ textShort?: string; cta: string; href: string }
 
 export type OrderStatus = 'accepted' | 'assembling' | 'onway' | 'ready' | 'done' | 'cancelled';

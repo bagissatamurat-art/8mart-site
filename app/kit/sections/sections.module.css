@@ -14,3 +14,12 @@
 .cartGrid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
 @media (max-width: 900px) { .cartGrid { grid-template-columns: 1fr; } }
 .stack { display: flex; flex-direction: column; gap: 12px; }
+/* Видео товара */
+.videoGallery { position: relative; width: 320px; max-width: 100%; aspect-ratio: 1 / 1; border-radius: var(--r-18); overflow: hidden; background: var(--surface-subtle); }
+.videoReset {
+  position: absolute; right: 12px; top: 12px; height: var(--h-36); padding: 0 12px; border: 0; border-radius: var(--r-pill);
+  background: var(--surface-card); font-family: var(--font); font-size: var(--fs-small); font-weight: 600; cursor: pointer;
+}
+.videoDesktop { position: relative; width: 552px; max-width: 100%; height: 860px; border-radius: var(--r-20); overflow: hidden; }
+.videoPhone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: var(--r-24); overflow: hidden; border: 1px solid var(--border); }
+.stripBox { padding: 12px; border-radius: var(--r-20); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--border); }

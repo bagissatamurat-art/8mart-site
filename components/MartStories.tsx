@@ -1,10 +1,13 @@
 'use client';
 // MartStories — COMPONENTS.md → MartStories; референс site/MartStories.dc.html.
 // Ряд миниатюр + просмотрщик (desktop — карточка 400×711 на затемнении со стрелками, mobile — на весь экран).
+// Сторис с товаром (story.product): снизу вместо CTA — блок товара (MartProductStrip); покупатель взялся за него — пауза,
+// касание картинки — продолжить.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal, flushSync } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { MartButton } from './MartButton';
+import { MartProductStrip } from './MartProductStrip';
 import { Chevron, Cross } from './ui/Cross';
 import { STORY_DURATION } from '@/lib/config';
 import { markStorySeen, useStoriesSeen } from '@/lib/store/storiesSeen';
@@ -137,6 +140,9 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   const anims = useRef<Animation[]>([]);
   const drag = useRef<{ axis: 'x' | 'y' | null; dx: number; dy: number; t: number; v: number }>({ axis: null, dx: 0, dy: 0, t: 0, v: 0 });
   const closeRef = useRef<HTMLButtonElement>(null);
+  /** Блок товара: пока покупатель выбирает размер и кладёт в корзину, история стоит (shopping). */
+  const stripRef = useRef<HTMLDivElement>(null);
+  const shopping = useRef(false);
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose;
 
   const close = useCallback(() => { if (!isPreview) onCloseRef.current?.(); }, [isPreview]);
@@ -150,6 +156,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     setVideoFailed(false);
     setCopied(false);
     if (copyTimer.current) { clearTimeout(copyTimer.current); copyTimer.current = undefined; setPaused(false); }
+    if (shopping.current) { shopping.current = false; setPaused(false); }
     setPos({ si, sl });
   }, [stories]);
 
@@ -250,6 +257,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     if (isPreview) return;
     const onKey = (e: KeyboardEvent) => {
       if (modalAbove(dialogRef)) return;
+      if (stripRef.current?.contains(e.target as Node)) return; // в блоке товара клавиши — его кнопкам
       if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
       else if (e.key === ' ') { e.preventDefault(); setPaused(p => !p); }
@@ -369,6 +377,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     }
     const d = downRef.current;
     if (performance.now() - d.t > HOLD_MS) return; // было удержание — только пауза
+    if (shopping.current) { shopping.current = false; setPaused(false); return; } // покупатель вернулся к истории
     const r = e.currentTarget.getBoundingClientRect();
     if (e.clientX - r.left < r.width / 3) prev(); else next();
   };
@@ -376,6 +385,8 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   const showPause = paused || held;
   const video = !isPreview && !videoFailed ? slide.video : undefined;
   const hasText = !!(slide.title || slide.text);
+  const product = story.product;
+  const shop = () => { if (!isPreview && !shopping.current) { shopping.current = true; setPaused(true); } };
 
   const view = (
     <div
@@ -396,8 +407,8 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
       )}
       <div ref={stageRef} className={[s.stage, desktop ? s.cardDesktop : s.cardMobile].join(' ')}>
       <div ref={trackRef} className={s.track}>
-      {!isPreview && stories[pos.si - 1] && <Ghost story={stories[pos.si - 1]} sl={ghostPrevSl} side="prev" />}
-      {!isPreview && stories[pos.si + 1] && <Ghost story={stories[pos.si + 1]} sl={0} side="next" />}
+      {!isPreview && stories[pos.si - 1] && <Ghost story={stories[pos.si - 1]} sl={ghostPrevSl} side="prev" mobile={!desktop} />}
+      {!isPreview && stories[pos.si + 1] && <Ghost story={stories[pos.si + 1]} sl={0} side="next" mobile={!desktop} />}
       <div ref={cardRef} className={s.card}>
         {under && <span className={s.layer} aria-hidden><Img src={under} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} /></span>}
         <span ref={layerRef} className={s.layer}><Img src={slide.img} fill sizes="(max-width: 1023px) 100vw, 400px" draggable={false} className={s.slideImg} eager /></span>
@@ -435,7 +446,11 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
             </div>
           )}
         </div>
-        {cta && (
+        {product ? (
+          <div ref={stripRef} className={s.product} onPointerDownCapture={shop} onFocusCapture={shop}>
+            <MartProductStrip product={product} actions link mobile={!desktop} />
+          </div>
+        ) : cta && (
           <div className={s.cta}>
             <MartButton label={ctaLabel} variant="primary" size={56} full onClick={onCta} />
           </div>
@@ -455,7 +470,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
 }
 
 /** Соседняя история в ленте: та же карточка без событий — видна, пока свайпаешь или лента едет к ней. */
-function Ghost({ story, sl, side }: { story: Story; sl: number; side: 'prev' | 'next' }) {
+function Ghost({ story, sl, side, mobile }: { story: Story; sl: number; side: 'prev' | 'next'; mobile: boolean }) {
   const slide = story.slides[sl] ?? story.slides[0];
   return (
     <div className={`${s.card} ${side === 'prev' ? s.ghostPrev : s.ghostNext}`} aria-hidden inert>
@@ -474,7 +489,8 @@ function Ghost({ story, sl, side }: { story: Story; sl: number; side: 'prev' | '
           <p className={s.body}>{slide.text}</p>
         </div>
       </div>
-      {slide.cta && <div className={s.cta}><MartButton label={slide.cta.label} variant="primary" size={56} full /></div>}
+      {story.product ? <div className={s.product}><MartProductStrip product={story.product} actions link mobile={mobile} /></div>
+        : slide.cta && <div className={s.cta}><MartButton label={slide.cta.label} variant="primary" size={56} full /></div>}
     </div>
   );
 }

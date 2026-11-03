@@ -23,6 +23,11 @@ export const BONUS_RULES = { maxPart: 30 };
 export const STORY_DURATION = 6000; // = --story-duration в tokens.css
 export const STORIES_SEEN_KEY = '8mart.storiesSeen';
 export const FAVORITES_KEY = '8mart.favorites';
+/** Товары, у которых покупатель закрыл миниатюру видео, — до конца сессии (sessionStorage, string[]). */
+export const VIDEO_HIDDEN_KEY = '8mart.videoHidden';
+
+/** Функции в работе: выключенные не показываются. reviews — отзывы о товаре (кнопка в плеере видео), следующая задача. */
+export const FEATURES = { reviews: false };
 
 export const PAGE_SIZE = 8;
 export const SORTS: [SortId, string][] = [['popular', 'Сначала популярные'], ['cheap', 'Сначала дешевле'], ['expensive', 'Сначала дороже'], ['sale', 'Со скидкой'], ['bonus', 'С бонусами']];

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useCart, cartCount } from './cart';
 import { useMethod } from './method';
 import { flushPending, setCartQty, useUi } from './ui';
+import { hideVideo, useVideoHiddenStore } from './videoHidden';
 
 beforeEach(() => {
   useCart.setState({ lines: {}, together: false });
@@ -43,5 +44,14 @@ describe('localStorage', () => {
     useCart.getState().setQty('b4', 2);
     expect(JSON.parse(localStorage.getItem('8mart.cart')!).state.lines).toEqual({ b4: 2 });
     expect(JSON.parse(localStorage.getItem('8mart.method')!).state).toMatchObject({ method: 'delivery', label: 'Астана, Кабанбай батыра, 11' });
+  });
+});
+
+describe('миниатюра видео', () => {
+  it('крестик скрывает миниатюру этого товара (до конца сессии), повтор не дублирует', () => {
+    hideVideo('f7');
+    hideVideo('f7');
+    hideVideo('f4');
+    expect(useVideoHiddenStore.getState().ids).toEqual(['f7', 'f4']);
   });
 });

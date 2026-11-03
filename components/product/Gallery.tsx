@@ -1,8 +1,11 @@
 'use client';
 // Галерея быстрого просмотра. Desktop — большое фото + стрелки + счётчик + миниатюры 64×64;
 // mobile — свайп-лента со scroll-snap и точками. Нет фото → полосатый плейсхолдер (как в референсе).
+// Есть видео — его миниатюра справа сверху поверх фото (VideoThumb).
 import { useEffect, useRef } from 'react';
+import type { ProductVideo } from '@/lib/types';
 import { HeartIcon } from '../ui/HeartIcon';
+import { VideoThumb } from './VideoThumb';
 import s from '../MartProductView.module.css';
 import { Img } from '@/components/ui/Img';
 
@@ -29,11 +32,18 @@ export interface GalleryProps {
   resetKey?: string;
   /** Страница товара: первое фото — LCP (предзагрузка). В быстром просмотре — нет. */
   page?: boolean;
+  /** Видео товара: миниатюра поверх фото; нажатие — плеер, крестик — скрыть до конца сессии. */
+  video?: ProductVideo | null;
+  onVideo?: () => void;
+  onHideVideo?: () => void;
 }
 
-export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey, page }: GalleryProps) {
+export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey, page, video, onVideo, onHideVideo }: GalleryProps) {
   const n = slides.length, multi = n > 1;
   const stripRef = useRef<HTMLDivElement>(null);
+  // В листе (mobile, не страница) справа сверху — крестик окна: миниатюра ниже него.
+  const thumb = (cls: string | undefined) => video && onVideo
+    ? <VideoThumb video={video} onOpen={onVideo} onHide={() => onHideVideo?.()} className={cls} /> : null;
 
   useEffect(() => { if (stripRef.current) stripRef.current.scrollLeft = 0; }, [resetKey]);
 
@@ -54,6 +64,7 @@ export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey
             {slides.map((_, i) => <span key={i} className={`${s.dot} ${i === idx ? s.dotOn : ''}`} />)}
           </div>
         )}
+        {thumb(page ? s.videoThumbM : s.videoThumbSheet)}
       </div>
     );
   }
@@ -76,6 +87,7 @@ export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey
           </button>
           <span className={s.counter} aria-live="polite">{idx + 1} / {n}</span>
         </>}
+        {thumb(s.videoThumbD)}
       </div>
       {multi && (
         <div className={s.thumbs}>

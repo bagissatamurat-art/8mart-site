@@ -83,6 +83,12 @@
 .thumb:focus-visible { box-shadow: var(--focus-ring); }
 .thumbOn:focus-visible { box-shadow: 0 0 0 2px var(--primary), var(--focus-ring); }
 
+/* Миниатюра видео (VideoThumb) справа сверху: desktop — 22 % ширины (ниже неё — стрелка), mobile — 25 %;
+   в листе — под крестиком окна */
+.videoThumbD { top: var(--s-3); right: var(--s-3); width: 22%; }
+.videoThumbM { top: var(--s-3); right: var(--s-3); width: 25%; }
+.videoThumbSheet { top: calc(var(--s-3) + var(--h-44) + var(--s-2)); right: var(--s-3); width: 25%; }
+
 /* ── Галерея mobile: свайп + точки ── */
 .galleryM { position: relative; margin: 0 calc(-1 * var(--s-4)); min-width: 0; }
 .strip { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }

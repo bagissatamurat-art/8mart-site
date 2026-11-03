@@ -28,7 +28,8 @@ const ALL_CATEGORIES: Category[] = [
   { slug: 'podarki', name: 'Подарки', img: `${A}/assets/cat-goods.png`, sub: [ { slug: 'upakovka', name: 'Упаковка' }, { slug: 'otkrytki', name: 'Открытки' }, { slug: 'shary', name: 'Шары' } ] },
 ];
 
-/** Цветы — из каталога 8mart.kz (lib/flowers.ts, scripts/import-flowers.mjs); основной товар — первыми. Стройка — прототип. */
+/** Цветы — из каталога 8mart.kz (lib/flowers.ts, scripts/import-flowers.mjs); основной товар — первыми. Стройка — прототип.
+ *  Видео у товаров мока нет (поля video нет — как null у API; форма товаров сверяется с data.js); пример с видео — витрина /kit. */
 const ALL_PRODUCTS: Product[] = [
   ...FLOWERS,
   {id: "b1", name: "Цемент М400, 50 кг", weight: "50 кг", price: 2890, oldPrice: 3290, badge: "Товар дня", cat: "sukhie-smesi", img: `${A}/assets/b-cement.png`, bonus: 87, pack: "50 кг", delivery: "cargo", group: "m400", weightKg: 50},

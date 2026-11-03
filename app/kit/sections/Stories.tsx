@@ -3,10 +3,13 @@
 import { KitItem, KitPanel, KitSection } from '../Kit';
 import { MartStories, MartStoryViewer } from '@/components/MartStories';
 import { MartBanner } from '@/components/MartBanner';
-import { BANNERS, STORIES } from '@/lib/mock';
+import { BANNERS, KIT_PRODUCTS, STORIES } from '@/lib/mock';
+import type { Story } from '@/lib/types';
 
 // Превью: desktop — история «Скидки» на паузе; mobile — «Промокод» в состоянии «Код скопирован».
 const PROMO_INDEX = Math.max(0, STORIES.findIndex(x => x.slides.some(sl => sl.cta?.copy)));
+// Сторис с товаром (привязка в панели): только для витрины — первая история про гортензии с букетом f4.
+const WITH_PRODUCT: Story[] = [{ ...(STORIES.find(x => x.id === 's-hydrangeas') ?? STORIES[0]), product: KIT_PRODUCTS.find(p => p.id === 'f4') }];
 
 export default function StoriesSection() {
   const banner = BANNERS[0];
@@ -30,6 +33,11 @@ export default function StoriesSection() {
           <KitItem label="Просмотр mobile · 390×844, «Код скопирован»">
             <div style={{ position: 'relative', width: 390, maxWidth: '100%', height: 844, borderRadius: 'var(--r-24)', overflow: 'hidden', border: '1px solid var(--border)' }}>
               <MartStoryViewer stories={STORIES} mode="mobile" start={PROMO_INDEX} preview={{ progress: 0.3, paused: true, copied: true }} />
+            </div>
+          </KitItem>
+          <KitItem label="Сторис с товаром · блок товара вместо CTA (MartProductStrip)">
+            <div style={{ position: 'relative', width: 390, maxWidth: '100%', height: 844, borderRadius: 'var(--r-24)', overflow: 'hidden', border: '1px solid var(--border)' }}>
+              <MartStoryViewer stories={WITH_PRODUCT} mode="mobile" preview={{ progress: 0.5, paused: true }} />
             </div>
           </KitItem>
         </KitPanel>

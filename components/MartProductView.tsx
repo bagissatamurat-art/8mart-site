@@ -4,7 +4,7 @@
 // Desktop — модалка 1040 (галерея слева sticky, миниатюры, стрелки, ←→); mobile — sheet 94% (свайп-галерея с точками,
 // CTA закреплён снизу). page=true — та же разметка без оверлея и крестика (/product/[id]).
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 import Link from 'next/link';
 import { bonusText, cartKey, deliveryConditions, discountPct, money } from '@/lib/domain';
 import type { Category, Method, Product, ProductDetail } from '@/lib/types';
@@ -14,6 +14,8 @@ import { Cross, Chevron } from './ui/Cross';
 import { HeartIcon } from './ui/HeartIcon';
 import { Gallery, type Slide } from './product/Gallery';
 import { Colors, compositionOf, Cta, Description, Packs, Sizes, Specs, Ways } from './product/Sections';
+import { MartVideoPlayer } from './MartVideoPlayer';
+import { hideVideo, useVideoHidden } from '@/lib/store/videoHidden';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { modalAbove, useModal } from '@/lib/hooks/useModal';
 import { useMounted } from '@/lib/hooks/useMounted';
@@ -70,6 +72,8 @@ function View({
   const [colorSel, setColorSel] = useState<string | null>(null);
   const [idx, setIdx] = useState(0);
   const [shared, setShared] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const videoHidden = useVideoHidden(pr.id);
   const dialogRef = useRef<HTMLDivElement>(null);
   const shareT = useRef<ReturnType<typeof setTimeout>>(undefined);
   const fav = useIsFavorite(pr.id);
@@ -100,6 +104,8 @@ function View({
   const hasUnit = !!pr.weight && !vs && pr.weight !== '1 шт';
 
   const toggleFav = () => setFavorite(pr.id, !fav);
+  // Плеер монтируется синхронно в том же нажатии: play() со звуком браузер разрешает только внутри жеста.
+  const openVideo = () => flushSync(() => setPlaying(true));
   const setQ = (q: number) => onQty?.(key, q);
   const step = (d: number) => setIdx(i => (Math.min(i, imgs.length - 1) + d + imgs.length) % imgs.length);
 
@@ -209,7 +215,8 @@ function View({
           </button>
         )}
         <div className={s.body}>
-          <Gallery slides={imgs} idx={cur} name={pr.name} mobile={mobile} fav={fav} onFav={toggleFav} onIdx={setIdx} resetKey={v?.id} page={page} />
+          <Gallery slides={imgs} idx={cur} name={pr.name} mobile={mobile} fav={fav} onFav={toggleFav} onIdx={setIdx} resetKey={v?.id} page={page}
+            video={videoHidden ? null : pr.video} onVideo={openVideo} onHideVideo={() => hideVideo(pr.id)} />
           {info}
           {after && <div className={s.after}>{after}</div>}
         </div>
@@ -218,6 +225,11 @@ function View({
     </div>
   );
 
-  if (trap) return mounted ? createPortal(tree, document.body) : null;
-  return tree;
+  const player = playing && pr.video ? (
+    <MartVideoPlayer product={pr} video={pr.video} variantId={v?.id} color={color} mode={mobile ? 'mobile' : 'desktop'}
+      qtyFor={qtyFor} onQty={onQty} cartHref={cartHref} onClose={() => setPlaying(false)} />
+  ) : null;
+
+  if (trap) return mounted ? <>{createPortal(tree, document.body)}{player}</> : null;
+  return <>{tree}{player}</>;
 }
