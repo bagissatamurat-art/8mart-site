@@ -103,11 +103,15 @@ export interface Order {
   payState?: 'unpaid' | 'paid' | 'refunded';
   payUntil?: string | null;
   invoiceIssued?: boolean;
+  /** Счёт ещё не выставлен — к какому времени выставим (ночью — после открытия филиала). */
+  invoiceBy?: string | null;
 }
 
 /** POST /orders — тело запроса. */
 export interface OrderDraft {
   cart: Record<string, number>; method: Method; city: string; address: string; pickupPointId: string | null;
+  /** Точка адреса доставки: по ней сервер выбирает зону, филиал и тариф. */
+  lat?: number; lng?: number;
   entrance?: string; floor?: string; flat?: string; comment?: string;
   /** Получатель: телефон — из профиля (можно поменять), имя — из профиля, может быть пустым. */
   recipient: { name: string; phone: string };

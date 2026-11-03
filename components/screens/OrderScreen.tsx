@@ -35,7 +35,9 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   const kaspi = order.payment === 'kaspi', cancelled = order.status === 'cancelled', pk = order.method === 'pickup';
   const done = !cancelled && order.shipments.every(sh => sh.status === 'done');
   const canCancel = !cancelled && !order.shipments.some(sh => CANCEL_BEFORE.includes(sh.status));
-  const refund = ORDER_PAGE.refund(money(order.total), kaspi, REFUND_DAYS);
+  // Не оплачен (мок не знает об оплате — считаем оплаченным): возвращать нечего.
+  const unpaid = order.payState === 'unpaid';
+  const refund = unpaid ? (cancelled ? ORDER_PAGE.notCharged : ORDER_PAGE.cancelUnpaid) : ORDER_PAGE.refund(money(order.total), kaspi, REFUND_DAYS);
   const count = order.items.reduce((sum, it) => sum + it.qty, 0);
   const title = itemsTitle(count);
   const lines = order.items.map(it => { const p = orderItemInfo(it); return { key: it.id, img: p.img, name: p.name, qty: it.qty, price: p.price }; });
@@ -71,7 +73,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
       <div className={l.divider} />
       <TotalsRows compact totals={totals} promo={promo} />
       <div className={l.divider} />
-      <TotalLine small total={order.total} paid={cancelled ? ORDER_PAGE.refundShort : order.payState === 'unpaid' ? ORDER_PAGE.toPay : ORDER_PAGE.paid(kaspi)} />
+      <TotalLine small total={order.total} paid={cancelled ? (unpaid ? ORDER_PAGE.notPaid : ORDER_PAGE.refundShort) : unpaid ? ORDER_PAGE.toPay : ORDER_PAGE.paid(kaspi)} />
       {earnText && <EarnNote>{earnText}</EarnNote>}
     </>
   );

@@ -64,6 +64,8 @@ export const GEO = {
   needHouse: 'Укажите номер дома — найдите адрес или сдвиньте пин к дому',
   /** Строка о доставке под адресом: по зоне 8mart.kz (стоимость и время) или общие условия. TODO: согласовать с бизнесом */
   fee: (fee: string, freeFrom: string, eta: string) => `Доставка ${fee}, бесплатно от ${freeFrom} · ${eta}`,
+  /** Филиал сейчас закрыт — вместо времени в пути. */
+  afterOpen: (when: string) => `привезём ${when}`,
   quoteLoading: 'Считаем стоимость доставки…',
   outsideZone: 'Сюда пока не доставляем — выберите другой адрес или самовывоз',
 };
@@ -92,6 +94,7 @@ export const CART = {
 
 /** Оформление (03). */
 export const CHECKOUT = {
+  placeFailed: 'Не получилось оформить заказ — нет связи с сервером. Попробуйте ещё раз',
   /** Блок «Доставка / Самовывоз»: контакты и пожелания. TODO: согласовать с бизнесом */
   recipientPhone: 'Телефон получателя',
   recipientHint: (pickup: boolean) => pickup ? 'Пришлём уведомление, когда заказ будет готов' : 'Курьер позвонит на этот номер',
@@ -131,11 +134,14 @@ export const ORDER_PAGE = {
   earned: (bonus: string) => `Начислено ${bonus}`,
   paid: (kaspi: boolean) => kaspi ? 'Оплачено Kaspi' : 'Оплачено картой',
   toPay: 'К оплате',
+  notPaid: 'Не оплачен',
+  cancelUnpaid: 'Заказ ещё не оплачен — деньги не спишутся',
+  notCharged: 'Заказ не был оплачен — деньги не списывались',
   awaitingStage: 'Ждём оплату',
-  awaitingPay: (kaspi: boolean, invoice: boolean, phone: string, until: string) => !kaspi
+  awaitingPay: (kaspi: boolean, invoice: boolean, phone: string, until: string, by: string | null) => !kaspi
     ? `Оплатите картой до ${until}, иначе заказ отменится`
     : invoice ? `Счёт выставлен в Kaspi на ${phone}. Оплатите его в приложении Kaspi до ${until}`
-      : `Выставим счёт в Kaspi на ${phone} в течение 5 минут. Оплатите до ${until}, иначе заказ отменится`,
+      : `Выставим счёт в Kaspi на ${phone} ${by ? `до ${by}` : 'в течение нескольких минут'}. Оплатите его до ${until}, иначе заказ отменится`,
   refundShort: 'Возврат',
   supportText: (id: string) => `Здравствуйте! Вопрос по заказу №${id}`,
   cancelTitle: (id: string) => `Отменить заказ №${id}?`,

@@ -21,6 +21,13 @@ let tokenOf: () => string | null = () => null;
 /** Откуда брать accessToken (клиент): () => useAuth.getState().accessToken. */
 export function setAuthTokenProvider(fn: () => string | null) { tokenOf = fn; }
 
+// accessToken живёт 15 минут. Ответ 401 на запрос с токеном — один раз обновляем токен (refresh в httpOnly-cookie)
+// и повторяем запрос. Одновременные 401 ждут одно обновление. null — войти заново (refresher сам выходит).
+let refresher: (() => Promise<string | null>) | null = null;
+export function setAuthRefresher(fn: () => Promise<string | null>) { refresher = fn; }
+let refreshing: Promise<string | null> | null = null;
+const refreshOnce = () => (refreshing ??= (refresher ? refresher() : Promise.resolve(null)).finally(() => { refreshing = null; }));
+
 type Query = Record<string, string | number | boolean | (string | number)[] | null | undefined>;
 export interface ApiInit {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -44,6 +51,10 @@ export function toQuery(q: Query = {}): string {
 
 /** Запрос к API: JSON туда и обратно, Bearer-токен, ошибки — ApiError(status, message из {error:{message}} | {message}). 204 — undefined. */
 export async function apiFetch<T>(path: string, init: ApiInit = {}): Promise<T> {
+  return request<T>(path, init, false);
+}
+
+async function request<T>(path: string, init: ApiInit, retried: boolean): Promise<T> {
   const { method = 'GET', query, body, signal, revalidate } = init;
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -59,6 +70,10 @@ export async function apiFetch<T>(path: string, init: ApiInit = {}): Promise<T> 
   } catch (e) {
     if (signal?.aborted) throw e;
     throw new ApiError(0, 'Нет связи с сервером');
+  }
+  if (r.status === 401 && token && !retried && !path.startsWith('/auth/')) {
+    const fresh = await refreshOnce();
+    if (fresh) return request<T>(path, init, true);
   }
   if (r.status === 204) return undefined as T;
   const data = await r.json().catch(() => null) as unknown;

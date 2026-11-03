@@ -1,6 +1,7 @@
 // Разделы кабинета и общие расчёты по заказам — одно место для сайдбара, мобильного меню и MartAccount.
 // Логика — из site/06 Личный кабинет.dc.html и site/MartAccount.dc.html.
 import { ORDER_STATUS } from '@/lib/config';
+import { ORDER_PAGE } from '@/lib/copy';
 import { groupDigits, plural } from '@/lib/domain';
 import type { Bonus, Order, OrderStatus, UserPromo } from '@/lib/types';
 
@@ -20,7 +21,8 @@ const ACTIVE: OrderStatus[] = ['accepted', 'assembling', 'onway', 'ready'];
 export const isActiveOrder = (o: Pick<Order, 'status'>) => ACTIVE.includes(o.status);
 
 /** Подпись статуса: у самовывоза «Выдан» вместо «Доставлен». */
-export function statusLabel(o: Pick<Order, 'status' | 'method'>): string {
+export function statusLabel(o: Pick<Order, 'status' | 'method' | 'payState'>): string {
+  if (o.status === 'accepted' && o.payState === 'unpaid') return ORDER_PAGE.awaitingStage;
   const s = ORDER_STATUS[o.status];
   return o.method === 'pickup' && s.labelPickup ? s.labelPickup : s.label;
 }

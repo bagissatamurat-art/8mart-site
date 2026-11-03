@@ -17,7 +17,8 @@ import { loadQuickView, loadQuickViewComponent, peekQuickView, peekQuickViewComp
 import { useCart } from '@/lib/store/cart';
 import { useCartItems } from '@/lib/store/cartItems';
 import { useAuth } from '@/lib/store/auth';
-import { setAuthTokenProvider } from '@/lib/http';
+import { ApiError, setAuthRefresher, setAuthTokenProvider } from '@/lib/http';
+import { authRefresh } from '@/lib/api';
 import { methodValue, useMethod } from '@/lib/store/method';
 import { closeOverlays, flushPending, setCartQty, useUi } from '@/lib/store/ui';
 import type { Category, City } from '@/lib/types';
@@ -32,6 +33,23 @@ export function methodLabel(v: MethodValue, cities: City[]): string {
 
 // Токен входа для запросов lib/api.ts к бэкенду (Authorization: Bearer).
 setAuthTokenProvider(() => useAuth.getState().accessToken);
+// Токен истёк — новый по refresh-cookie. Другая вкладка только что обновила (409) — повторяем с её новой cookie.
+// Сессия закончилась (401) — выходим, экран попросит войти заново.
+setAuthRefresher(async () => {
+  for (let i = 0; i < 2; i++) {
+    if (!useAuth.getState().user) return null;
+    try {
+      const r = await authRefresh();
+      useAuth.setState({ accessToken: r.accessToken });
+      return r.accessToken;
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 409) { await new Promise(res => setTimeout(res, 400)); continue; }
+      if (e instanceof ApiError && e.status === 401) useAuth.getState().logout();
+      return null;
+    }
+  }
+  return null;
+});
 
 function StoreHydrator() {
   useEffect(() => {

@@ -19,7 +19,8 @@ export const useAuth = create<AuthState>()(persist(
     user: null, accessToken: null,
     login: (user, token = null) => set({ user, accessToken: token }),
     setName: name => { const u = get().user; if (u) set({ user: { ...u, name } }); },
-    logout: () => set({ user: null, accessToken: null }),
+    // Сервер отзывает сессию (refresh-cookie) — после выхода токен не обновится. Импорт ленивый: api зависит от сторов.
+    logout: () => { if (get().user) void import('@/lib/api').then(m => m.authLogout()); set({ user: null, accessToken: null }); },
   }),
   { name: '8mart.auth', storage: createJSONStorage(browserStorage), skipHydration: true, version: 1,
     partialize: s => ({ user: s.user, accessToken: s.accessToken }) },

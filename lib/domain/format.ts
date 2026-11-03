@@ -61,3 +61,14 @@ export function formatPhone(raw: string | null | undefined, prev?: string): stri
 export function phoneComplete(v: string): boolean {
   return /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(v);
 }
+
+/** «сегодня с 09:00» / «завтра с 09:00» / «6 ноября с 09:00» по времени Казахстана — когда филиал откроется. */
+export function opensText(iso: string, now = new Date()): string {
+  const zone = { timeZone: 'Asia/Almaty' } as const;
+  const at = new Date(iso);
+  const ymd = (d: Date) => new Intl.DateTimeFormat('en-CA', zone).format(d);
+  const days = Math.round((Date.parse(ymd(at)) - Date.parse(ymd(now))) / 864e5);
+  const time = new Intl.DateTimeFormat('ru-RU', { ...zone, hour: '2-digit', minute: '2-digit' }).format(at);
+  const day = days === 0 ? 'сегодня' : days === 1 ? 'завтра' : new Intl.DateTimeFormat('ru-RU', { ...zone, day: 'numeric', month: 'long' }).format(at);
+  return `${day} с ${time}`;
+}

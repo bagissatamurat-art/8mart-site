@@ -19,7 +19,7 @@ import { EarnNote, SummaryLines, TotalLine, TotalsRows } from '@/components/chec
 import { MobileTopBar } from '@/components/checkout/MobileTopBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { Skeleton } from '@/components/ui/Spinner';
-import { createOrder, getBonus, getCards, getDeliverySlots } from '@/lib/api';
+import { ApiError, createOrder, getBonus, getCards, getDeliverySlots } from '@/lib/api';
 import { DELIVERY, SHIPPING } from '@/lib/config';
 import { CART, CHECKOUT, CTA_BLOCKED } from '@/lib/copy';
 import { bonusText, groupDigits, itemsTitle, money, orderTotals, phoneComplete, slotTitle, splitOptions, tg, type SlotDay } from '@/lib/domain';
@@ -55,6 +55,8 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const [phone, setPhone] = useState('');
   const [kaspiPhone, setKaspiPhone] = useState('');
   const [touched, setTouched] = useState(false);
+  /** Отказ сервера (интервал заполнен, филиал закрылся, вне зоны) — текст под кнопкой. */
+  const [placeError, setPlaceError] = useState<string | null>(null);
   const [leaveAtDoor, setLeaveAtDoor] = useState(false);
   const [entrance, setEntrance] = useState(''), [floor, setFloor] = useState(''), [flat, setFlat] = useState('');
   const [comment, setComment] = useState('');
@@ -116,16 +118,21 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   const place = async () => {
     if (reason || !user) { setTouched(true); return; }
     setPlacing(true);
+    setPlaceError(null);
     try {
       const { id } = await createOrder({
-        cart, method, city: m.city, address: m.address, pickupPointId: m.pickupPointId, entrance, floor, flat, comment,
+        cart, method, city: m.city, address: m.address, pickupPointId: m.pickupPointId,
+        ...(!pk && m.lat != null && m.lng != null ? { lat: m.lat, lng: m.lng } : {}), entrance, floor, flat, comment,
         recipient: { name: user.name, phone }, leaveAtDoor: !pk && leaveAtDoor, kaspiPhone: kaspiInvoice ? kaspiPhone : undefined, ...quotePlan(m), together, courierSlot: slot, cargoSlot, lift,
         promo: promo?.code, useBonus, payment: kaspi ? 'kaspi' : 'card', cardId: kaspi || pay === 'card' ? null : pay,
       });
       placed.current = true;
       router.push(`/order/${id}`);
       clear();
-    } catch { setPlacing(false); }
+    } catch (e) {
+      setPlaceError(e instanceof ApiError && e.status !== 0 ? e.message : CHECKOUT.placeFailed);
+      setPlacing(false);
+    }
   };
 
   const summary = lines.filter(l => !l.soldOut).map(l => ({ key: l.p.id, img: l.p.img, name: l.p.name, qty: l.qty, price: l.p.price }));
@@ -138,7 +145,8 @@ export function CheckoutScreen({ categories }: { categories: Category[] }) {
   );
   const cta = <MartButton label={kaspi ? undefined : 'Оплатить'} amount={money(t.total)} variant={kaspi ? 'kaspi' : 'primary'} size={56} full
     disabled={!!reason} reason={reason} loading={placing} onClick={place} />;
-  const reasonText = reason && <span className={mobile ? c.reasonM : c.reason}>{reason}</span>;
+  const shown = reason || placeError;
+  const reasonText = shown && <span className={mobile ? c.reasonM : c.reason} role={placeError && !reason ? 'alert' : undefined}>{shown}</span>;
 
   const auth = (
     <div className={mobile ? c.authM : c.authCard}>

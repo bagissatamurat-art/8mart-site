@@ -52,7 +52,7 @@ export function OrderTrack({ order, mobile, refundText }: { order: Order; mobile
       <div className={s.track}>
         <div className={`${s.trackHead} ${mobile ? s.trackHeadM : ''}`}><div className={s.trackTitleCol}>
           <span className={`${s.trackTitle} ${s.trackBad}`}>{ORDER_PAGE.cancelled}</span>
-          {refundText && <span className={s.trackSub}>{refundText.replace('Вернём', 'Вернём деньги —')}</span>}
+          {refundText && <span className={s.trackSub}>{refundText.startsWith('Вернём') ? refundText.replace('Вернём', 'Вернём деньги —') : refundText}</span>}
         </div></div>
         <Stages mobile={mobile} stages={[
           { title: ORDER_PAGE.acceptedStage, sub: '', time: times[0] ?? '', state: 'done' },
@@ -63,7 +63,7 @@ export function OrderTrack({ order, mobile, refundText }: { order: Order; mobile
   }
   const multi = order.shipments.length > 1;
   const unpaid = order.payState === 'unpaid'
-    ? ORDER_PAGE.awaitingPay(order.payment === 'kaspi', !!order.invoiceIssued, formatPhone(order.kaspiPhone ?? order.recipient?.phone), payTime(order.payUntil))
+    ? ORDER_PAGE.awaitingPay(order.payment === 'kaspi', !!order.invoiceIssued, formatPhone(order.kaspiPhone ?? order.recipient?.phone), payTime(order.payUntil), order.invoiceBy ? payTime(order.invoiceBy) : null)
     : '';
   return (
     <>
@@ -102,8 +102,12 @@ export function OrderTrack({ order, mobile, refundText }: { order: Order; mobile
   );
 }
 
-/** «01:54» по времени Казахстана (UTC+5) — срок оплаты. */
+/** «01:54» или «5 ноября, 09:05» по времени Казахстана (UTC+5) — сроки счёта и оплаты. */
 function payTime(iso: string | null | undefined) {
   if (!iso) return 'конца дня';
-  return new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Almaty' }).format(new Date(iso));
+  const zone = { timeZone: 'Asia/Almaty' } as const;
+  const d = new Date(iso);
+  const time = new Intl.DateTimeFormat('ru-RU', { ...zone, hour: '2-digit', minute: '2-digit' }).format(d);
+  const day = (x: Date) => new Intl.DateTimeFormat('ru-RU', { ...zone, day: 'numeric', month: 'long' }).format(x);
+  return day(d) === day(new Date()) ? time : `${day(d)}, ${time}`;
 }

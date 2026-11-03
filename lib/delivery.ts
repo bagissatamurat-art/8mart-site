@@ -13,6 +13,9 @@ export interface DeliveryQuote {
   zone: string;
   /** Филиал принимает Kaspi Pay автоматически — счёт на номер не нужен. */
   kaspiIntegrated: boolean;
+  /** Бэкенд: филиал сейчас принимает заказы; нет — привезём после opensAt (ISO). */
+  acceptingOrders?: boolean;
+  opensAt?: string | null;
 }
 
 export interface RawZone {

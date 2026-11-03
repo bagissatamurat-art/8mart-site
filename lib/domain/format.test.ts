@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bonusText, formatPhone, itemsTitle, money, phoneComplete, plural, tg } from './format';
+import { bonusText, formatPhone, itemsTitle, money, opensText, phoneComplete, plural, tg } from './format';
 
 describe('tg', () => {
   it('сумма внутри фразы — без точки', () => {
@@ -90,5 +90,14 @@ describe('formatPhone', () => {
     expect(phoneComplete('+7 (700) 133-90-71')).toBe(true);
     expect(phoneComplete('+7 (700) 133-90-7')).toBe(false);
     expect(phoneComplete('+998 90 1234567')).toBe(false);
+  });
+});
+
+describe('opensText', () => {
+  const now = new Date('2026-11-04T01:20:00+05:00');
+  it('сегодня, завтра или дата — по времени Казахстана', () => {
+    expect(opensText('2026-11-04T09:00:00+05:00', now)).toBe('сегодня с 09:00');
+    expect(opensText('2026-11-05T09:00:00+05:00', now)).toBe('завтра с 09:00');
+    expect(opensText('2026-11-07T10:30:00+05:00', now)).toBe('7 ноября с 10:30');
   });
 });

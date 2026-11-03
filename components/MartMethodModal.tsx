@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import { geoSuggest, getCities, getPickupPoints, quoteDelivery } from '@/lib/api';
 import type { QuoteResult } from '@/lib/delivery';
 import { DELIVERY } from '@/lib/config';
-import { tg } from '@/lib/domain/format';
+import { opensText, tg } from '@/lib/domain/format';
 import { GEO } from '@/lib/copy';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { useNow } from '@/lib/hooks/useNow';
@@ -214,7 +214,7 @@ function MethodDialog({
               : quote?.status === 'loading'
                 ? <div className={s.fee} role="status">{GEO.quoteLoading}</div>
                 : <div className={s.fee}>{zone
-                    ? GEO.fee(tg(zone.fee), tg(DELIVERY.freeFrom), `~${zone.eta} мин`)
+                    ? GEO.fee(tg(zone.fee), tg(DELIVERY.freeFrom), zone.acceptingOrders === false && zone.opensAt ? GEO.afterOpen(opensText(zone.opensAt)) : `~${zone.eta} мин`)
                     : GEO.fee('от ' + tg(DELIVERY.fee), tg(DELIVERY.freeFrom), `${DELIVERY.etaMin}–${DELIVERY.etaMax} мин`)}</div>}
           </div>
         ) : (

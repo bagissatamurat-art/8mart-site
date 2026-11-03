@@ -261,6 +261,12 @@ export function authVerify(phone: string, code: string): Promise<{ accessToken: 
     return reply({ accessToken: 'mock-token', user: phone === M.USER.phone ? { name: M.USER.name } : {} });
   });
 }
+/** POST /auth/refresh — новый accessToken по refresh-cookie (вращается). В моке токен вечный. */
+export const authRefresh = (): Promise<{ accessToken: string; user: { name?: string } }> =>
+  endpoint('authRefresh', () => apiFetch('/auth/refresh', { method: 'POST' }), () => reply({ accessToken: 'mock-token', user: {} }, 0));
+/** POST /auth/logout — отозвать сессию (refresh-cookie) на сервере. */
+export const authLogout = (): Promise<void> =>
+  endpoint('authLogout', () => apiFetch<void>('/auth/logout', { method: 'POST' }).catch(() => undefined), () => reply(undefined, 0));
 /** POST /auth/tg → {token} */
 export const authTg = (): Promise<{ token: string }> =>
   endpoint('authTg', () => apiFetch('/auth/tg', { method: 'POST' }), () => reply({ token: Math.random().toString(36).slice(2, 10) }));
