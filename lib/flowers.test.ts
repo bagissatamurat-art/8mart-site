@@ -15,7 +15,7 @@ describe('цветы из каталога 8mart.kz', () => {
       for (const v of f.variants!) {
         expect(['S', 'M', 'L']).toContain(v.size);
         expect(v.price).toBeGreaterThan(0);
-        expect(v.img).toMatch(/^https:\/\/dukenfy-api\.8mart\.kz\/api\/v1\/catalog\/files\//);
+        expect(v.img).toMatch(/^\/assets\/flowers\/[\w-]+\.webp$/);
       }
       expect(f.price).toBe(Math.min(...f.variants!.map(v => v.price))); // «от» — самый маленький размер
     }

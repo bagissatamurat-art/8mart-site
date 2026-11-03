@@ -125,9 +125,8 @@
 |---|---|---|
 | `app/api/branches/route.ts` (+ `lib/branches.ts`, `lib/branches.snapshot.json`) | Филиалы из `dukenfy-api.8mart.kz/api/v1/public/branches`, кэш 60 с; если API недоступен, отдаёт снимок | `GET /pickup-points?city` |
 | `app/api/delivery/quote/route.ts` (+ `lib/delivery.ts`) | Зоны из `…/public/branches/resolve-delivery?lat&lng`, кэш 5 мин | `GET /delivery/quote?lat&lng` |
-| `lib/stories.ts` | Сторис из `…/public/stories`, кэш 5 мин | `GET /stories` |
 | `app/api/geo/*` (+ `geo.server.ts`) | DaData suggest и geolocate; ключ только на сервере | `GET /geo/suggest`, `GET /geo/reverse` |
-| `scripts/import-flowers.mjs` → `lib/flowers.ts`, `scripts/import-branches.mjs` | Выгружают каталог цветов и филиалы в мок | не нужны, когда будет `/products` |
+| `scripts/import-flowers.mjs` → `lib/flowers.ts`, `scripts/import-branches.mjs` | Выгружали каталог цветов и филиалы в мок. Старый API выключен 02.11.2026: `lib/flowers.ts` — снимок, фото в `public/assets/flowers` | не нужны, когда будет `/products` |
 
 В приложении:
 - `lib/data/delivery_repository.dart`, `story_repository.dart`, `geo_repository.dart` — те же адаптеры;

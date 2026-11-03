@@ -7,7 +7,6 @@ import * as M from './mock';
 import { CANCEL_BEFORE, CAT_FILTERS, DELIVERY, PAGE_SIZE, PROMO } from './config';
 import { cargoSlots, cartItem, courierSlots, orderTotals, planShipments, slotEta, type PlanOptions, type ShipmentPlan, type SlotDay } from './domain';
 import { FLOWER_COMPOSITION } from './flowers';
-import { fetchLiveStories } from './stories';
 import type { QuoteResult } from './delivery';
 import type {
   Address, Banner, Bonus, Card, CartProduct, Category, City, Order, OrderDraft, PickupPoint, Product, ProductDetail,
@@ -129,9 +128,8 @@ function mockSuggest(q: string) {
   return reply({ categories, products: hits.slice(0, 6), total: hits.length }, 150);
 }
 
-/** GET /stories. Мок — настоящие сторис 8mart.kz (видео, TEMP-ADAPTER lib/stories.ts, только на сервере) первыми, затем сторис сайта. */
-export const getStories = (): Promise<Story[]> => endpoint('getStories', () => apiFetch('/stories', { revalidate: 300 }),
-  () => (typeof window === 'undefined' ? fetchLiveStories().then(live => [...live, ...M.STORIES]) : reply(M.STORIES)));
+/** GET /stories */
+export const getStories = (): Promise<Story[]> => endpoint('getStories', () => apiFetch('/stories', { revalidate: 300 }), () => reply(M.STORIES));
 /** GET /banners */
 export const getBanners = (): Promise<Banner[]> => endpoint('getBanners', () => apiFetch('/banners', { revalidate: PUBLIC }), () => reply(M.BANNERS));
 

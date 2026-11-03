@@ -1,12 +1,13 @@
 // Размытые превью фото (blurDataURL) → lib/blur.ts: пока грузится фото, next/image показывает размытое пятно этого фото, а не серый фон.
-// Фото букетов из каталога (lib/flowers.ts) + картинки главной и сторис из public/assets. Превью — WebP 16 px, ~200 байт.
+// Фото букетов (public/assets/flowers, удалённые — из lib/flowers.ts) + картинки главной и сторис из public/assets. Превью — WebP 16 px, ~200 байт.
 // Запуск: node scripts/make-blur.mjs (входит в npm run import:catalog).
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import sharp from 'sharp';
 
 const root = new URL('..', import.meta.url);
-const remote = [...new Set(readFileSync(new URL('lib/flowers.ts', root), 'utf8').match(/https:\/\/dukenfy-api\.8mart\.kz\/[^"']+\.(?:png|jpe?g|webp)/g) ?? [])];
-const local = ['banner-flowers.jpg', 'st-flowers.jpg', 'st-delivery.jpg', 'st-gifts.jpg', 'st-sale.jpg', 'cat-flowers.png', 'cat-build.png', 'cat-tools.png', 'cat-home.png', 'cat-goods.png'].map(f => `/assets/${f}`);
+const remote = [...new Set(readFileSync(new URL('lib/flowers.ts', root), 'utf8').match(/https:\/\/[^"']+\.(?:png|jpe?g|webp)/g) ?? [])];
+const flowers = readdirSync(new URL('public/assets/flowers', root)).filter(f => f.endsWith('.webp')).map(f => `flowers/${f}`);
+const local = [...flowers, 'banner-flowers.jpg', 'st-flowers.jpg', 'st-delivery.jpg', 'st-gifts.jpg', 'st-sale.jpg', 'cat-flowers.png', 'cat-build.png', 'cat-tools.png', 'cat-home.png', 'cat-goods.png'].map(f => `/assets/${f}`);
 
 const tiny = async (buf) => 'data:image/webp;base64,' + (await sharp(buf).resize(16, 16, { fit: 'inside' }).webp({ quality: 40 }).toBuffer()).toString('base64');
 const out = {};

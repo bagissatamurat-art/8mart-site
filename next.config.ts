@@ -13,11 +13,9 @@ const nextConfig: NextConfig = {
     qualities: [60, 75],
     // Фото товаров и обложки сторис не меняются по тому же адресу — держим оптимизированные копии 31 день.
     minimumCacheTTL: 2678400,
-    // Фото товаров из API 8mart
+    // Фото товаров, баннеров и сторис из бэкенда 8mart (MEDIA_PUBLIC_URL)
     remotePatterns: [
-      { protocol: 'https', hostname: 'dukenfy-api.8mart.kz', pathname: '/api/v1/catalog/files/**' },
-      // Обложки сторис 8mart.kz (PNG ~2,7 МБ → оптимизатор отдаёт WebP/AVIF нужного размера)
-      { protocol: 'https', hostname: 'dukenfy-api.8mart.kz', pathname: '/api/v1/stories/files/**' },
+      { protocol: 'https', hostname: 'api.8mart.kz', pathname: '/media/**' },
     ],
   },
   // Шрифты и картинки из public — с долгим кэшем браузера (по умолчанию Next отдаёт их с max-age=0).
