@@ -187,7 +187,9 @@ export const getCities = (): Promise<City[]> => endpoint('getCities', () => apiF
  *  (кэш 60 с), на сервере и при сбое — снимок (lib/branches.snapshot.json). */
 let live: { at: number; points: Promise<PickupPoint[]> } | null = null;
 export function getPickupPoints(city: string): Promise<PickupPoint[]> {
-  return endpoint('getPickupPoints', () => apiFetch('/pickup-points', { query: { city } }), () => mockPickupPoints(city));
+  // На сервере (страницы городов, сборка) — с кэшем на минуту: без него Next не может пререндерить страницу.
+  // В браузере — без кэша: живой статус «открыто / закрыто».
+  return endpoint('getPickupPoints', () => apiFetch('/pickup-points', { query: { city }, ...(typeof window === 'undefined' ? { revalidate: PUBLIC } : {}) }), () => mockPickupPoints(city));
 }
 function mockPickupPoints(city: string): Promise<PickupPoint[]> {
   const inCity = (ps: PickupPoint[]) => ps.filter(p => p.city === city);
