@@ -22,4 +22,9 @@ describe('productLd: отзывы', () => {
       { '@type': 'Review', author: { '@type': 'Person', name: 'Ержан' }, datePublished: '2026-11-03T09:20:00.000Z', reviewRating: { '@type': 'Rating', ratingValue: 5, bestRating: 5, worstRating: 1 } },
     ]);
   });
+  it('среди отзывов есть тестовые — поисковикам ни оценки, ни отзывов', () => {
+    const ld = productLd({ ...p, rating: { avg: 4.5, count: 2, test: true } }, undefined, [review({}), review({ id: '2', author: 'Тестовый отзыв', test: true })]);
+    expect(ld).not.toHaveProperty('aggregateRating');
+    expect(ld).not.toHaveProperty('review');
+  });
 });

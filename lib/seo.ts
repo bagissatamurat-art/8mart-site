@@ -85,10 +85,11 @@ const shippingLd = () => ({
 const ANONYMOUS_AUTHOR = 'Покупатель';
 
 /** Отзывы в разметке — только опубликованные и только когда они есть (правило Google: отсутствующие отзывы не размечать).
- *  aggregateRating — средняя по всем опубликованным (p.rating); review — отзывы первой страницы, у которых есть имя автора. */
+ *  aggregateRating — средняя по всем опубликованным (p.rating); review — отзывы первой страницы, у которых есть имя автора.
+ *  Тестовые отзывы (проверка сайта, rating.test) поисковикам не отдаём совсем. */
 function reviewsLd(p: Pick<Product, 'rating'>, reviews: Review[]) {
-  if (!p.rating || p.rating.count < 1) return {};
-  const named = reviews.filter(r => r.author && r.author !== ANONYMOUS_AUTHOR);
+  if (!p.rating || p.rating.count < 1 || p.rating.test) return {};
+  const named = reviews.filter(r => r.author && r.author !== ANONYMOUS_AUTHOR && !r.test);
   return {
     aggregateRating: { '@type': 'AggregateRating', ratingValue: p.rating.avg, ratingCount: p.rating.count, bestRating: 5, worstRating: 1 },
     ...(named.length ? {

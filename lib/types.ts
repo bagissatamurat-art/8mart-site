@@ -43,7 +43,8 @@ export interface Product {
 
 // ── Отзывы о товарах (04.11): оставляет только покупатель, получивший товар; на сайте — только опубликованные ──
 
-export interface ReviewSummary { avg: number; count: number }
+/** test — среди отзывов есть тестовые (проверка сайта): в разметку поисковиков не отдаём. */
+export interface ReviewSummary { avg: number; count: number; test?: true }
 /** Фото отзыва: src — большое (просмотр), thumb — миниатюра 320, blur — размытое превью, пока грузится. */
 export interface ReviewPhoto { src: string; thumb: string; blur?: string; width: number; height: number }
 /** Ответ магазина под отзывом; date — «3 ноября» (с годом, если не этот). */
@@ -55,6 +56,8 @@ export interface Review {
   /** Какой размер купили: «M», «S, L». */
   variant?: string;
   reply?: ReviewReply;
+  /** Тестовый отзыв (проверка сайта): автор «Тестовый отзыв», в разметку поисковиков не идёт. */
+  test?: true;
 }
 /** GET /products/{id}/reviews?page — страница отзывов (с текстом и фото выше); ещё есть, пока загружено меньше rating.count. */
 export interface ProductReviews { rating: ReviewSummary | null; items: Review[] }
