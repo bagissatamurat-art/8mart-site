@@ -4,7 +4,7 @@
 .contained { position: absolute; z-index: 20; }
 
 .panel {
-  position: relative; width: 100%; box-sizing: border-box; overflow: auto; overscroll-behavior: contain;
+  position: relative; width: 100%; box-sizing: border-box; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
   background: var(--surface-card); border-radius: var(--r-24) var(--r-24) 0 0;
   padding: 20px 16px 24px; display: flex; flex-direction: column;
   font-family: var(--font); color: var(--ink-1); outline: none;

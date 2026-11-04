@@ -27,7 +27,7 @@
 .page.mobile .dialog { height: 100%; max-height: 100%; border-radius: 0; overflow: hidden; }
 
 /* ── Тело: галерея · инфо ── */
-.body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-items: start; }
+.body { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; display: grid; align-items: start; } /* без горизонтальной прокрутки: в Safari overflow-y: auto включает и её от долей пикселя */
 .desktop .body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-8); padding: var(--s-6); }
 .page.desktop .body { padding: 28px; /* из референса, нет в tokens.css */ overflow: visible; }
 .mobile .body { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); padding: 0 var(--s-4) var(--s-5); }
