@@ -1,6 +1,6 @@
 // Техническое SEO: адрес сайта, канонические ссылки, микроразметка schema.org.
 import { BRAND, DELIVERY } from './config';
-import type { Category, City, PickupPoint, Product } from './types';
+import type { Category, City, PickupPoint, Product, Review } from './types';
 
 /** Боевой адрес сайта (основное зеркало — www). NEXT_PUBLIC_SITE_URL переопределяет его для стендов. */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.8mart.kz').replace(/\/$/, '');
@@ -81,8 +81,29 @@ const shippingLd = () => ({
     transitTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' } },
 });
 
-/** Product + Offer (цена в тенге; у цветов — AggregateOffer по размерам). Бренд — только у букетов 8mart (свои). */
-export function productLd(p: Product & { description?: string; images?: string[]; soldOut?: boolean }, category?: Category) {
+/** Подпись бэкенда, когда имени покупателя нет или аккаунт удалён (services/reviews.ts): для разметки это не имя автора. */
+const ANONYMOUS_AUTHOR = 'Покупатель';
+
+/** Отзывы в разметке — только опубликованные и только когда они есть (правило Google: отсутствующие отзывы не размечать).
+ *  aggregateRating — средняя по всем опубликованным (p.rating); review — отзывы первой страницы, у которых есть имя автора. */
+function reviewsLd(p: Pick<Product, 'rating'>, reviews: Review[]) {
+  if (!p.rating || p.rating.count < 1) return {};
+  const named = reviews.filter(r => r.author && r.author !== ANONYMOUS_AUTHOR);
+  return {
+    aggregateRating: { '@type': 'AggregateRating', ratingValue: p.rating.avg, ratingCount: p.rating.count, bestRating: 5, worstRating: 1 },
+    ...(named.length ? {
+      review: named.map(r => ({
+        '@type': 'Review', author: { '@type': 'Person', name: r.author }, datePublished: r.createdAt,
+        reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+        ...(r.text ? { reviewBody: r.text } : {}),
+      })),
+    } : {}),
+  };
+}
+
+/** Product + Offer (цена в тенге; у цветов — AggregateOffer по размерам). Бренд — только у букетов 8mart (свои).
+ *  reviews — опубликованные отзывы, которые есть в HTML страницы (первая страница). */
+export function productLd(p: Product & { description?: string; images?: string[]; soldOut?: boolean }, category?: Category, reviews: Review[] = []) {
   const prices = p.variants?.map(v => v.price) ?? (p.price != null ? [p.price] : []);
   const url = abs(`/product/${p.id}`);
   const availability = p.soldOut ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock';
@@ -99,5 +120,6 @@ export function productLd(p: Product & { description?: string; images?: string[]
     ...(category ? { category: category.name } : {}),
     ...(p.delivery === 'flowers' ? { brand: { '@type': 'Brand', name: SITE_NAME } } : {}),
     ...(offer ? { offers: offer } : {}),
+    ...reviewsLd(p, reviews),
   };
 }

@@ -3,11 +3,14 @@
 // DESIGN_RULES.md → «Карточка товара (быстрый просмотр)»; референс site/MartProductView.dc.html и «08 Товар.dc.html».
 // Desktop — модалка 1040 (галерея слева sticky, миниатюры, стрелки, ←→); mobile — sheet 94% (свайп-галерея с точками,
 // CTA закреплён снизу). page=true — та же разметка без оверлея и крестика (/product/[id]).
+// Отзывы (FEATURES.reviews): у товара с опубликованными отзывами — средняя у названия и блок под характеристиками.
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal, flushSync } from 'react-dom';
 import Link from 'next/link';
 import { bonusText, cartKey, deliveryConditions, discountPct, money } from '@/lib/domain';
-import type { Category, Method, Product, ProductDetail } from '@/lib/types';
+import type { Category, Method, Product, ProductDetail, ProductReviews } from '@/lib/types';
+import { FEATURES } from '@/lib/config';
+import { MartReviews, RatingLink } from './MartReviews';
 import { setFavorite, useIsFavorite } from '@/lib/store/favorites';
 import { Badge } from './ui/Badge';
 import { Cross, Chevron } from './ui/Cross';
@@ -50,6 +53,8 @@ export interface MartProductViewProps {
   after?: React.ReactNode;
   /** Высота окна, которое модалка подменяет (скелетон): высота плавно перейдёт к своей, без скачка. */
   fromHeight?: number;
+  /** Первая страница отзывов с сервера (страница товара — отзывы в HTML); без неё блок загрузит их сам. */
+  reviews?: ProductReviews;
 }
 
 export function MartProductView(props: MartProductViewProps) {
@@ -66,7 +71,7 @@ const productUrl = (id: string) => `/product/${encodeURIComponent(id)}`;
 
 function View({
   product: pr, group, categories, method = null, qtyFor, onQty, onClose, onPickGroup, page = false, contained = false, appear = 'enter',
-  cartHref = '/cart', mobile, fromHeight, onHeight, after,
+  cartHref = '/cart', mobile, fromHeight, onHeight, after, reviews,
 }: MartProductViewProps & { mobile: boolean; onHeight?: (h: number) => void }) {
   const [vid, setVid] = useState<string | null>(null);
   const [colorSel, setColorSel] = useState<string | null>(null);
@@ -75,6 +80,9 @@ function View({
   const [playing, setPlaying] = useState(false);
   const videoHidden = useVideoHidden(pr.id);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const reviewsRef = useRef<HTMLHeadingElement>(null);
+  // Отзывы — только когда есть опубликованные (без них ни звёзд, ни блока)
+  const rating = FEATURES.reviews && pr.rating && pr.rating.count > 0 ? pr.rating : null;
   const shareT = useRef<ReturnType<typeof setTimeout>>(undefined);
   const fav = useIsFavorite(pr.id);
   // Портал — только после гидрации (на сервере document нет).
@@ -104,6 +112,13 @@ function View({
   const hasUnit = !!pr.weight && !vs && pr.weight !== '1 шт';
 
   const toggleFav = () => setFavorite(pr.id, !fav);
+  /** Средняя у названия → к блоку отзывов: прокрутка (в окне — внутри него) и фокус на заголовок для скринридера. */
+  const toReviews = () => {
+    const h = reviewsRef.current;
+    if (!h) return;
+    h.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    h.focus({ preventScroll: true });
+  };
   // Плеер монтируется синхронно в том же нажатии: play() со звуком браузер разрешает только внутри жеста.
   const openVideo = () => flushSync(() => setPlaying(true));
   const setQ = (q: number) => onQty?.(key, q);
@@ -170,6 +185,7 @@ function View({
             </button>
           )}
         </div>
+        {rating && <RatingLink rating={rating} onClick={toReviews} />}
         <div className={s.priceRow}>
           <b className={`${s.price} ${price == null ? s.priceNone : ''}`}>{money(price)}</b>
           {!v && pr.oldPrice != null && <>
@@ -201,6 +217,7 @@ function View({
       <Ways type={type} method={method} />
       <Description text={pr.description || ''} />
       <Specs specs={pr.specs || []} />
+      {rating && <MartReviews productId={pr.id} rating={reviews?.rating ?? rating} initial={reviews?.items} id={page ? 'reviews' : undefined} headingRef={reviewsRef} />}
     </div>
   );
 

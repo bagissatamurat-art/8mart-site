@@ -23,3 +23,7 @@
 .videoDesktop { position: relative; width: 552px; max-width: 100%; height: 860px; border-radius: var(--r-20); overflow: hidden; }
 .videoPhone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: var(--r-24); overflow: hidden; border: 1px solid var(--border); }
 .stripBox { padding: 12px; border-radius: var(--r-20); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--border); }
+/* Отзывы: пометка демо-данных и рамки образцов */
+.kitDemo { margin: 0; padding: 8px 12px; border-radius: var(--r-12); background: var(--warning-bg); color: var(--warning-ink); font-size: var(--fs-13); font-weight: 600; align-self: flex-start; }
+.reviewsBox { padding: 20px; border-radius: var(--r-20); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--border); }
+.reviewsDesktop { position: relative; width: 600px; max-width: 100%; height: 820px; border-radius: var(--r-20); overflow: hidden; background: var(--surface-page); }

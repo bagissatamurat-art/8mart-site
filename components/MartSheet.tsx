@@ -3,6 +3,7 @@
 // (затемнение --overlay, панель белая r24 сверху, отступы 20/16/24, max-height 88%).
 // Закрытие: Esc, клик по фону, свайп вниз > 80 (с ручки или с панели, когда она прокручена к началу).
 // contained — лист внутри ближайшего position:relative родителя (артборд 390 в витрине /kit), без портала и блокировки скролла.
+// inside — тоже внутри родителя, но настоящий слой: Esc, фокус, свайп (отзывы поверх видео в рамке плеера).
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useModal } from '@/lib/hooks/useModal';
@@ -25,6 +26,8 @@ export interface MartSheetProps {
   handle?: boolean;
   /** Внутри родителя (витрина), а не поверх страницы. */
   contained?: boolean;
+  /** Внутри родителя, но модальный слой (Esc, фокус): лист поверх видео в рамке плеера. */
+  inside?: boolean;
   /** Переводить фокус в лист при открытии (выключается для статичного образца в витрине). */
   autoFocus?: boolean;
   className?: string;
@@ -33,7 +36,8 @@ export interface MartSheetProps {
 /** Порог свайпа вниз для закрытия — как у сторис (COMPONENTS.md → MartStories). */
 const SWIPE_CLOSE = 80;
 
-export function MartSheet({ open, onClose, children, label, labelledBy, gap = 16, maxHeight = '88%', handle, contained, autoFocus = true, className }: MartSheetProps) {
+export function MartSheet({ open, onClose, children, label, labelledBy, gap = 16, maxHeight = '88%', handle, contained, inside, autoFocus = true, className }: MartSheetProps) {
+  const inPlace = contained || inside;
   const mounted = useMounted();
   const [dy, setDy] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
@@ -59,10 +63,10 @@ export function MartSheet({ open, onClose, children, label, labelledBy, gap = 16
     if (dy > SWIPE_CLOSE) onClose(); else setDy(0);
   };
 
-  if (!open || (!contained && !mounted)) return null;
+  if (!open || (!inPlace && !mounted)) return null;
 
   const sheet = (
-    <div className={`${s.overlay} ${contained ? s.contained : s.fixed}`} onClick={onClose}>
+    <div className={`${s.overlay} ${inPlace ? s.contained : s.fixed}`} onClick={onClose}>
       <div
         ref={panel}
         role="dialog"
@@ -92,5 +96,5 @@ export function MartSheet({ open, onClose, children, label, labelledBy, gap = 16
       </div>
     </div>
   );
-  return contained ? sheet : createPortal(sheet, document.body);
+  return inPlace ? sheet : createPortal(sheet, document.body);
 }

@@ -67,7 +67,7 @@
 .m .track { align-self: stretch; }
 .m .track > * { flex: 1; }
 
-.past { flex-direction: row; align-items: center; gap: var(--s-4); }
+.past { display: flex; flex-direction: row; align-items: center; gap: var(--s-4); min-width: 0; }
 .m .past { flex-direction: column; align-items: stretch; }
 .pastMain { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 0; }
 .pastHead { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }

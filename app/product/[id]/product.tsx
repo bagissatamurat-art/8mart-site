@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductScreen } from '@/components/screens/ProductScreen';
-import { ApiError, getAllProductIds, getCategories, getGroup, getProduct } from '@/lib/api';
+import { ApiError, getAllProductIds, getCategories, getGroup, getProduct, getProductReviews } from '@/lib/api';
+import { FEATURES } from '@/lib/config';
 import { JsonLd } from '@/components/ui/JsonLd';
 import { money } from '@/lib/domain';
 import { breadcrumbsLd, catalogPath, OG_BASE, productLd, CITIES_IN } from '@/lib/seo';
@@ -32,10 +33,16 @@ export async function productMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
-/** Страница товара; mobile — вёрстка с сервера для телефона (app/product/[id]/m через proxy.ts). */
+/** Страница товара; mobile — вёрстка с сервера для телефона (app/product/[id]/m через proxy.ts).
+ *  Отзывы: первая страница — в серверном HTML и в разметке Product (только опубликованные и только если они есть).
+ *  Не загрузились — страница всё равно отдаётся, блок догрузит их в браузере. */
 export async function renderProduct(id: string, mobile: boolean) {
   const product = await load(id);
-  const [group, categories] = await Promise.all([product.group ? getGroup(product.group) : Promise.resolve([]), getCategories()]);
+  const rated = FEATURES.reviews && !!product.rating?.count;
+  const [group, categories, reviews] = await Promise.all([
+    product.group ? getGroup(product.group) : Promise.resolve([]), getCategories(),
+    rated ? getProductReviews(product.id).catch(() => undefined) : Promise.resolve(undefined),
+  ]);
   const cat = categories.find(c => c.sub.some(s => s.slug === product.cat));
   const sub = cat?.sub.find(s => s.slug === product.cat);
   const crumbs = [{ name: 'Главная', path: '/' }, { name: 'Каталог', path: '/catalog' },
@@ -43,8 +50,8 @@ export async function renderProduct(id: string, mobile: boolean) {
     { name: product.name, path: `/product/${product.id}` }];
   return (
     <>
-      <JsonLd data={[productLd(product, cat), breadcrumbsLd(crumbs)]} />
-      <ProductScreen product={product} group={group} categories={categories} initialMobile={mobile} />
+      <JsonLd data={[productLd(product, cat, reviews?.items), breadcrumbsLd(crumbs)]} />
+      <ProductScreen product={product} group={group} categories={categories} reviews={reviews} initialMobile={mobile} />
     </>
   );
 }

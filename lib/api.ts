@@ -5,13 +5,13 @@ import { cache } from 'react';
 import { ApiError, apiFetch, endpoint, isMocked } from './http';
 import { useCartItems } from './store/cartItems';
 import * as M from './mock';
-import { CANCEL_BEFORE, CAT_FILTERS, DELIVERY, PAGE_SIZE, PROMO } from './config';
+import { CANCEL_BEFORE, CAT_FILTERS, DELIVERY, PAGE_SIZE, PROMO, REVIEW_RULES } from './config';
 import { cargoSlots, cartItem, courierSlots, orderTotals, planShipments, slotEta, type PlanOptions, type ShipmentPlan, type SlotDay } from './domain';
 import { FLOWER_COMPOSITION } from './flowers';
 import type { QuoteResult } from './delivery';
 import type {
-  Address, Banner, Bonus, Card, CartProduct, Category, City, Order, OrderDraft, OrderItem, PickupPoint, Product, ProductDetail,
-  ProductQuery, PromoCheck, Story, User, UserPromo,
+  Address, Banner, Bonus, Card, CartProduct, Category, City, MyReview, Order, OrderDraft, OrderItem, OrderReviewItem, PickupPoint, Product, ProductDetail,
+  ProductQuery, ProductReviews, PromoCheck, ReviewDraft, Story, User, UserPromo,
 } from './types';
 
 /** Задержка мока, чтобы экраны проходили через состояние загрузки. */
@@ -101,6 +101,15 @@ function mockProduct(id: string): Promise<ProductDetail> {
   // Букет: состав по размерам — из каталога 8mart.kz (lib/flowers.ts).
   const specs = det?.specs ?? (FLOWER_COMPOSITION[p.id]?.length ? FLOWER_COMPOSITION[p.id].map(([size, c]) => [`Размер ${size}`, c] as [string, string]) : ([['Фасовка', p.pack || p.weight], ['Производитель', 'Уточняется']] as [string, string][]).filter(r => r[1]));
   return reply({ ...p, images, description, specs });
+}
+
+/** GET /products/{id}/reviews?page — опубликованные отзывы: с текстом и фото выше, по REVIEW_RULES.page на страницу.
+ *  Страница товара берёт первую на сервере (отзывы — в HTML), «Показать ещё» — следующие. Мок — пусто: отзывы о настоящих
+ *  букетах не выдумываем (пример с отзывами — витрина /kit#reviews). */
+export function getProductReviews(id: string, page = 1): Promise<ProductReviews> {
+  return endpoint('getProductReviews',
+    () => apiFetch(`/products/${encodeURIComponent(id)}/reviews`, { query: { page: page > 1 ? page : undefined }, revalidate: PUBLIC }),
+    () => reply({ rating: null, items: [] }, 0));
 }
 
 /** Все id товаров — для статической сборки страниц /product/[id] (в проде — sitemap бэкенда). */
@@ -301,8 +310,37 @@ const writeMock = (m: MockOrders) => { if (typeof window === 'undefined' && !('v
 const allOrders = (): Order[] => {
   const m = readMock();
   return [...m.placed, ...M.ORDERS].map(o => (m.cancelled[o.id]
-    ? { ...o, status: 'cancelled' as const, shipments: o.shipments.map(sh => ({ ...sh, status: 'cancelled' as const, times: [sh.times?.[0] ?? '', m.cancelled[o.id]] })) } : o));
+    ? { ...o, status: 'cancelled' as const, shipments: o.shipments.map(sh => ({ ...sh, status: 'cancelled' as const, times: [sh.times?.[0] ?? '', m.cancelled[o.id]] })) } : o))
+    .map(o => { const reviews = mockOrderReviews(o); return reviews ? { ...o, reviews } : o; });
 };
+
+// ── Отзывы (мок) ── Свои отзывы на демо-заказы живут в localStorage '8mart.mockReviews' — форму можно пройти без бэкенда.
+// Публичных отзывов мок не выдумывает: отзыв из формы — «на проверке» и в список товара не попадает.
+const MOCK_REVIEWS_KEY = '8mart.mockReviews';
+const readReviews = (): Record<string, MyReview> => {
+  const ls = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  if (typeof window === 'undefined' && !(ls && 'value' in ls)) return {};
+  try { const v = JSON.parse(globalThis.localStorage?.getItem(MOCK_REVIEWS_KEY) || 'null'); if (v && typeof v === 'object') return v; } catch { /* нет хранилища */ }
+  return {};
+};
+const writeReviews = (r: Record<string, MyReview>) => { try { globalThis.localStorage?.setItem(MOCK_REVIEWS_KEY, JSON.stringify(r)); } catch { /* нет хранилища */ } };
+/** Товар по ключу позиции («f7-m|Белый» → букет f7) — по полному демо-набору: в заказах мока есть и стройматериалы. */
+const productOfKey = (key: string) => {
+  const id = key.split('|')[0];
+  return M.KIT_PRODUCTS.find(p => p.id === id && !p.variants) ?? M.KIT_PRODUCTS.find(p => p.variants?.some(v => v.id === id));
+};
+/** Полученные товары демо-заказа (в моке — когда заказ выполнен целиком) и свои отзывы о них. */
+function mockOrderReviews(o: Order): OrderReviewItem[] | undefined {
+  if (o.status !== 'done') return undefined;
+  const mine = readReviews(), seen = new Set<string>(), out: OrderReviewItem[] = [];
+  for (const it of o.items) {
+    const p = productOfKey(it.id);
+    if (!p || seen.has(p.id)) continue;
+    seen.add(p.id);
+    out.push({ product: p.id, name: p.name, img: p.img, delivery: p.delivery, review: mine[`${o.id}:${p.id}`] ?? null });
+  }
+  return out.length ? out : undefined;
+}
 
 const plusMin = (d: Date, m: number) => { const x = new Date(d.getTime() + m * 60000); x.setMinutes(Math.ceil(x.getMinutes() / 5) * 5); return x; };
 
@@ -355,6 +393,37 @@ function mockCancel(id: string): Promise<{ refund: { amount: number; to: string 
   if (o.shipments.some(sh => CANCEL_BEFORE.includes(sh.status))) return Promise.reject(new ApiError(409, 'Заказ уже передан в доставку'));
   const m = readMock(); writeMock({ ...m, cancelled: { ...m.cancelled, [id]: hhmm(new Date()) } });
   return reply({ refund: { amount: o.total, to: o.payment === 'kaspi' ? 'Kaspi' : 'карту' }, bonusReturned: o.spend ?? 0 }, 700);
+}
+
+/** POST /orders/{id}/reviews (multipart: product, rating, text, photos) — отзыв о полученном товаре, уходит на проверку.
+ *  Ошибки — ApiError с текстом сервера: 409 — ещё не получен или уже оценён, 422 — форма или фото, 429 — слишком часто. */
+export function createReview(orderId: string, d: ReviewDraft): Promise<MyReview> {
+  return endpoint('createReview', () => {
+    const f = new FormData();
+    f.append('product', d.product);
+    f.append('rating', String(d.rating));
+    if (d.text.trim()) f.append('text', d.text);
+    d.photos.forEach((p, i) => f.append('photos', p, `photo-${i + 1}.${p.type === 'image/png' ? 'png' : 'jpg'}`));
+    return apiFetch(`/orders/${encodeURIComponent(orderId)}/reviews`, { method: 'POST', body: f });
+  }, () => mockCreateReview(orderId, d));
+}
+function mockCreateReview(orderId: string, d: ReviewDraft): Promise<MyReview> {
+  const o = allOrders().find(x => x.id === orderId);
+  if (!o) return Promise.reject(new ApiError(404, 'Заказ не найден'));
+  const item = o.reviews?.find(r => r.product === d.product);
+  if (!item) return Promise.reject(new ApiError(409, 'Оценить товар можно, когда вы его получите'));
+  if (item.review) return Promise.reject(new ApiError(409, 'Вы уже оценили этот товар'));
+  if (!Number.isInteger(d.rating) || d.rating < 1 || d.rating > 5) return Promise.reject(new ApiError(422, 'Поставьте оценку от 1 до 5'));
+  const text = d.text.trim();
+  if (text.length > REVIEW_RULES.textMax) return Promise.reject(new ApiError(422, `Отзыв — не длиннее ${REVIEW_RULES.textMax} символов`));
+  if (d.photos.length > REVIEW_RULES.photosMax) return Promise.reject(new ApiError(422, `Не больше ${REVIEW_RULES.photosMax} фото`));
+  const now = new Date();
+  const review: MyReview = { id: 'r' + now.getTime(), rating: d.rating, text, photos: [], status: 'pending', date: `${now.getDate()} ${MONTHS[now.getMonth()]}` };
+  writeReviews({ ...readReviews(), [`${orderId}:${d.product}`]: review });
+  // Фото мок не хранит (не место в localStorage): в ответе — только предпросмотр на эту сессию.
+  const photos = typeof URL.createObjectURL === 'function' && typeof window !== 'undefined'
+    ? d.photos.map(b => { const u = URL.createObjectURL(b); return { src: u, thumb: u, width: 0, height: 0 }; }) : [];
+  return reply({ ...review, photos }, 700);
 }
 
 // ── Профиль ── (запросы с Bearer-токеном, см. setAuthTokenProvider)

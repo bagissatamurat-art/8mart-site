@@ -26,8 +26,13 @@ export const FAVORITES_KEY = '8mart.favorites';
 /** Товары, у которых покупатель закрыл миниатюру видео, — до конца сессии (sessionStorage, string[]). */
 export const VIDEO_HIDDEN_KEY = '8mart.videoHidden';
 
-/** Функции в работе: выключенные не показываются. reviews — отзывы о товаре (кнопка в плеере видео), следующая задача. */
-export const FEATURES = { reviews: false };
+/** Функции в работе: выключенные не показываются. reviews — отзывы о товаре: звёзды у названия, блок в карточке, кнопка
+ *  в плеере видео (каждое — только когда у товара есть опубликованные отзывы), оценка полученного заказа. */
+export const FEATURES = { reviews: true };
+
+/** Отзывы: те же пределы проверяет сервер (services/reviews.ts). page — сколько отзывов в странице ответа API.
+ *  photoSide и photoQuality — фото уменьшаем на телефоне перед отправкой (быстрее по мобильной сети, без координат съёмки). */
+export const REVIEW_RULES = { page: 5, textMax: 1000, photosMax: 3, photoMaxMb: 15, photoSide: 2048, photoQuality: 0.85 };
 
 export const PAGE_SIZE = 8;
 export const SORTS: [SortId, string][] = [['popular', 'Сначала популярные'], ['cheap', 'Сначала дешевле'], ['expensive', 'Сначала дороже'], ['sale', 'Со скидкой'], ['bonus', 'С бонусами']];

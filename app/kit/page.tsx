@@ -9,6 +9,7 @@ import Cart from './sections/Cart';
 import Header from './sections/Header';
 import ProductView from './sections/ProductView';
 import Video from './sections/Video';
+import Reviews from './sections/Reviews';
 import MethodModal from './sections/MethodModal';
 import Auth from './sections/Auth';
 import Account from './sections/Account';
@@ -23,7 +24,7 @@ const TOC: [string, string][] = [
   ['colors', 'Цвета'], ['type', 'Типографика'], ['radii', 'Радиусы'], ['button', 'Кнопка'], ['input', 'Инпут'], ['select', 'Список'], ['promo', 'Промокод'],
   ['shipments', 'Отправления'], ['stepper', 'Счётчик'], ['chips', 'Чипы'], ['filters', 'Фильтры'], ['stories', 'Сторис'], ['banner', 'Баннер'],
   ['card', 'Карточка товара'], ['badges', 'Бейджи и алерты'], ['cart', 'Корзина'], ['tabbar', 'Таб-бар'], ['header', 'Шапка'], ['search', 'Поиск'],
-  ['product', 'Быстрый просмотр'], ['video', 'Видео товара'], ['method', 'Способ получения'], ['auth', 'Вход'], ['account', 'Кабинет'],
+  ['product', 'Быстрый просмотр'], ['video', 'Видео товара'], ['reviews', 'Отзывы'], ['method', 'Способ получения'], ['auth', 'Вход'], ['account', 'Кабинет'],
   ['sidebar', 'Сайдбар'], ['shelf', 'Полка'], ['toast', 'Тост'], ['crumbs', 'Крошки'], ['card-skeleton', 'Скелетон карточки'], ['loading', 'Состояния загрузки'], ['marks', 'Радио · чекбокс · свитч'],
   ['checkout-controls', 'Оформление'], ['checkout-summary', 'Итоги'], ['order-track', 'Статус заказа'], ['topbar', 'Шапка экрана'],
 ];
@@ -46,6 +47,7 @@ export default function KitPage() {
       <Header />
       <ProductView />
       <Video />
+      <Reviews />
       <MethodModal />
       <Auth />
       <Account />

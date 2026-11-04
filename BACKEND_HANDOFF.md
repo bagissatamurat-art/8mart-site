@@ -47,6 +47,8 @@
 
 **Видео товара** (бэкенд готов, 04.11): у `Product` в любом ответе каталога — `video: {src, preview, poster, width, height, duration} | null` (`ProductVideo` в `lib/types.ts`), только уже обработанный ролик. `src` — со звуком (H.264 + AAC, до 720×1280), `preview` — беззвучные первые 6 с 360×640 для миниатюры, `poster` — первый кадр, `duration` — секунды. Сайт: миниатюра поверх галереи (`components/product/VideoThumb.tsx`) и плеер на весь экран (`MartVideoPlayer`). В моке роликов нет (поля нет — то же, что `null`), пример с роликом — витрина `/kit#video`. Файлы — с того же хоста `/media/…`, что и фото.
 
+**Отзывы о товарах** (бэкенд готов, 04.11): у `Product` в любом ответе каталога — `rating?: {avg, count}` (средняя и число опубликованных; нет отзывов — поля нет: сайт не показывает ни звёзд, ни блока, ни кнопки в видео). `getProductReviews(id, page)` → `GET /products/{id}/reviews?page` → `{rating, items: Review[]}`, по 5 на страницу, сначала с текстом и фото; первая страница — в серверном HTML страницы товара и в разметке `Product`. `Review`: `author` («Айгерим К.» или «Покупатель»), `rating`, `text` (пусто — только оценка), `photos[] {src, thumb, blur, width, height}`, `date` («3 ноября»), `createdAt`, `variant?` («M»), `reply? {text, date}` — ответ магазина. Мок отзывов не выдумывает: список пуст.
+
 **Сторис с товаром:** `Story.product?: Product` — товар в форме каталога, если сторис к нему привязана в панели и он опубликован. В просмотре снизу вместо CTA — блок товара (`MartProductStrip`: размер, «В корзину», избранное, «Поделиться»).
 
 ### Корзина и доставка
@@ -89,6 +91,9 @@
 | `getOrders` | `GET /orders` | `Order[]` |
 | `getOrder` | `GET /orders/{id}` | `Order` — своя шкала статусов у каждого отправления |
 | `cancelOrder` | `POST /orders/{id}/cancel` | `{refund: {amount, to}, bonusReturned}` — пока ни одно отправление не передано в доставку |
+| `createReview` | `POST /orders/{id}/reviews` (multipart: `product`, `rating` 1–5, `text` до 1000, `photos` до 3) | `MyReview` — уходит на проверку; 409 — ещё не получен или уже оценён, 422 — форма или фото, 429 — больше 10 в час |
+
+**Отзывы в заказе:** `Order.reviews?: OrderReviewItem[]` — полученные товары (их отправление выполнено): `{product, name, img?, delivery, review: MyReview | null}`; `MyReview.status` — `pending` (на проверке) / `published` / `rejected` (+ `rejectReason`), `reply?` — ответ магазина. Блок «Оцените букет» — на странице заказа (`/order/{id}?review=1` сразу прокручивает к нему — ссылка для будущего WhatsApp) и в «Моих заказах». Фото сайт уменьшает до 2048 px перед отправкой (`lib/photo.ts`); `apiFetch` отправляет `FormData` как есть.
 
 **Поля `OrderDraft`, о которых легко забыть:**
 - `recipient.phone` — телефон получателя;
@@ -148,6 +153,7 @@
 | `8mart.favorites` | id избранного у гостя | при входе объединить с `GET /favorites` |
 | `8mart.storiesSeen`, `8mart.recentSearches`, `8mart.methodAutoShown` | интерфейс | нет |
 | `8mart.videoHidden` (sessionStorage) | товары, у которых закрыли миниатюру видео, — до конца сессии | нет |
+| `8mart.mockReviews` | только мок: свои отзывы на демо-заказы (форму можно пройти без бэкенда) | нет — с API отзывы на сервере |
 
 ---
 

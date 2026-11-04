@@ -1,0 +1,183 @@
+/* Отзывы о товарах (04.11): звёзды, оценка, отзыв, блок в карточке товара, фото на весь экран, форма, «Оцените букет».
+   Только токены; литералы без токена помечены «нет в tokens.css». */
+
+/* ── Звёзды ── */
+.stars { display: inline-flex; flex: none; line-height: 0; }
+
+/* ── Ввод оценки: звёзды-кнопки 44 ── */
+.rate { display: flex; flex-direction: column; gap: var(--s-1); }
+/* Кнопка 44, звезда меньше: край ряда выровнен по тексту выше */
+.rateRow { display: flex; margin: 0 calc(-1 * var(--s-1)); }
+.rateBtn {
+  width: var(--h-44); height: var(--h-44); flex: none; padding: 0; border: 0; border-radius: var(--r-12); background: transparent;
+  display: flex; align-items: center; justify-content: center; color: var(--star-off); cursor: pointer;
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.rateBtn:hover:not(:disabled) { transform: scale(1.08); }
+.rateBtn:disabled { cursor: default; }
+.rateOn { color: var(--star); }
+.rateCaption { min-height: 18px; font-size: var(--fs-13); font-weight: 600; color: var(--ink-2); }
+
+/* ── Блок в карточке товара ── */
+.block { display: flex; flex-direction: column; gap: var(--s-3); scroll-margin-top: var(--s-6); min-width: 0; }
+.title { margin: 0; font-size: 17px; /* как «Описание» в MartProductView, из референса */ font-weight: 700; }
+.title:focus-visible { box-shadow: none; }
+.summary { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+.avg { font-size: var(--fs-h2); font-weight: 800; letter-spacing: var(--tracking-tight); line-height: 1; }
+.countNote { font-size: var(--fs-13); color: var(--ink-2); }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.foot { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; }
+.error { font-size: var(--fs-small); color: var(--ink-2); }
+.retry {
+  position: relative; height: var(--h-36); padding: 0; border: 0; background: transparent; font-family: inherit; font-size: var(--fs-small); font-weight: 600;
+  color: var(--primary); cursor: pointer;
+}
+.retry::before { content: ''; position: absolute; inset: -4px 0; } /* зона касания 44 */
+
+/* Средняя у названия товара — ссылка к отзывам (36, зона касания 44) */
+.ratingLink {
+  position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: var(--h-36); margin: -4px 0;
+  padding: 0; border: 0; background: transparent; font-family: inherit; font-size: var(--fs-small); color: var(--ink-2); cursor: pointer;
+}
+.ratingLink::before { content: ''; position: absolute; inset: -4px 0; }
+.ratingAvg { font-weight: 700; color: var(--ink-1); }
+.ratingLink:hover .ratingCount { color: var(--primary); }
+
+/* ── Отзыв ── */
+.item { display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-4) 0; border-top: 1px solid var(--divider); min-width: 0; }
+.itemHead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); }
+.author { font-size: var(--fs-15); font-weight: 600; overflow-wrap: anywhere; }
+.date { font-size: var(--fs-13); color: var(--ink-3); white-space: nowrap; }
+.itemMeta { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+.variant { font-size: var(--fs-13); color: var(--ink-2); }
+/* Текст покупателя — как написал: переносы строк сохраняются, ссылок не делаем (React экранирует) */
+.text { margin: 0; font-size: var(--fs-15); line-height: 1.55; color: var(--ink-1); white-space: pre-line; overflow-wrap: anywhere; text-wrap: pretty; }
+.textClamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; line-clamp: 6; overflow: hidden; }
+.photos { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+.photoBtn {
+  position: relative; width: 72px; height: 72px; flex: none; padding: 0; border: 0; border-radius: var(--r-12); overflow: hidden; cursor: pointer;
+  background: var(--surface-subtle); box-shadow: inset 0 0 0 1px var(--divider);
+}
+.photoBtn:focus-visible { box-shadow: var(--focus-ring); }
+.photoImg { width: 100%; height: 100%; object-fit: cover; }
+.reply { display: flex; flex-direction: column; gap: var(--s-1); padding: var(--s-3); border-radius: var(--r-12); background: var(--surface-subtle); }
+.replyHead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-2); }
+.replyTitle { font-size: var(--fs-13); font-weight: 600; }
+.replyText { margin: 0; font-size: var(--fs-small); line-height: var(--lh-small); white-space: pre-line; overflow-wrap: anywhere; }
+
+/* ── Скелетон отзыва ── */
+.skel { display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-4) 0; border-top: 1px solid var(--divider); }
+
+/* ── Белые круглые кнопки поверх тёмного (просмотр фото) — как в плеере видео ── */
+.round {
+  position: absolute; width: var(--h-44); height: var(--h-44); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; background: var(--badge-on-photo); color: var(--ink-1);
+}
+/* На тёмном фоне --focus-ring не виден — светлым розовым из палитры, как в плеере */
+.round:focus-visible { box-shadow: 0 0 0 3px var(--primary-200); }
+
+/* ── Фото на весь экран ── */
+.viewer {
+  position: fixed; inset: 0; z-index: var(--z-modal-top); display: flex; align-items: center; justify-content: center;
+  background: var(--overlay-strong); font-family: var(--font); touch-action: pan-y;
+}
+.viewer:focus-visible { box-shadow: none; }
+.viewerStage { position: relative; width: min(100% - 32px, 960px); height: min(100% - 160px, 960px); }
+.viewerImg { object-fit: contain; }
+.viewerClose { top: var(--s-4); right: var(--s-4); }
+.viewerPrev { left: var(--s-4); top: 50%; margin-top: calc(var(--h-44) / -2); }
+.viewerNext { right: var(--s-4); top: 50%; margin-top: calc(var(--h-44) / -2); }
+.viewerCount {
+  position: absolute; left: 50%; bottom: max(var(--s-5), env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 4px 10px;
+  border-radius: var(--r-pill); background: rgba(23, 21, 26, .6); /* как счётчик фото в MartProductView, нет в tokens.css */
+  color: #fff; font-size: var(--fs-small); font-weight: 600;
+}
+
+/* ── Форма отзыва: окно (desktop) ── */
+.formOverlay {
+  position: fixed; inset: 0; z-index: var(--z-modal-top); display: flex; align-items: center; justify-content: center; padding: var(--s-6);
+  background: var(--overlay); font-family: var(--font); color: var(--ink-1);
+}
+.formOverlay.inline { position: absolute; z-index: auto; }
+.formBox {
+  position: relative; width: 100%; max-width: 520px; max-height: 100%; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: var(--s-5); padding: 28px; border-radius: var(--r-24); background: var(--surface-card);
+}
+.formBox:focus-visible { box-shadow: none; }
+.formClose {
+  position: absolute; right: var(--s-4); top: var(--s-4); width: var(--h-40); height: var(--h-40); border-radius: 50%; border: 0; padding: 0;
+  background: var(--surface-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.formClose::before { content: ''; position: absolute; inset: -2px; } /* 40 как в макете, зона касания 44 */
+.formCloseM { right: var(--s-3); top: var(--s-3); width: var(--h-44); height: var(--h-44); }
+.form { display: flex; flex-direction: column; gap: var(--s-5); }
+.formHead { display: flex; align-items: center; gap: var(--s-3); padding-right: var(--s-10); }
+.formSheet .formHead { padding-right: var(--s-12); }
+.formThumb { width: 56px; height: 56px; flex: none; border-radius: var(--r-12); object-fit: cover; background: var(--surface-subtle); }
+.formHeadText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.formTitle { margin: 0; font-size: 22px; /* как заголовок окна подтверждения (06), нет в tokens.css */ font-weight: 800; letter-spacing: var(--tracking-tight); }
+.formSheet .formTitle { font-size: 20px; }
+.formName { font-size: var(--fs-small); color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.formSection { display: flex; flex-direction: column; gap: var(--s-2); }
+.formLabel { font-size: var(--fs-15); font-weight: 600; }
+.hint { margin: 0; font-size: var(--fs-13); line-height: var(--lh-small); color: var(--ink-2); }
+.reason { margin: 0; font-size: var(--fs-13); color: var(--ink-3); text-align: center; }
+.formFoot { display: flex; flex-direction: column; gap: var(--s-2); }
+
+/* Фото в форме: выбранные 72 с «убрать» и плитка «+ Фото» */
+.pick { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+.pickItem { position: relative; width: 72px; height: 72px; flex: none; border-radius: var(--r-12); overflow: hidden; background: var(--surface-subtle); }
+.pickImg { width: 100%; height: 100%; object-fit: cover; }
+.pickRemove {
+  position: absolute; top: var(--s-1); right: var(--s-1); width: 24px; height: 24px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; background: var(--badge-on-photo); box-shadow: var(--shadow-1);
+}
+.pickRemove::before { content: ''; position: absolute; inset: -10px; } /* крестик 24, зона касания 44 */
+.pickAdd {
+  position: relative; width: 72px; height: 72px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border: 1.5px dashed var(--border); border-radius: var(--r-12); background: var(--surface-subtle); color: var(--ink-2);
+  font-size: var(--fs-caption); font-weight: 600; cursor: pointer; transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.pickAdd:hover { border-color: var(--primary); color: var(--primary); }
+.pickAdd:focus-within { border-color: var(--primary); box-shadow: var(--focus-ring); }
+.pickBusy { cursor: progress; }
+.plus { position: relative; width: 14px; height: 14px; }
+.plus::before, .plus::after { content: ''; position: absolute; left: 0; top: 6px; width: 14px; height: 2px; border-radius: 1px; background: currentColor; }
+.plus::after { transform: rotate(90deg); }
+
+/* ── «Оцените букет» (заказ, «Мои заказы») ── */
+.prompts { display: flex; flex-direction: column; gap: var(--s-4); }
+.prompts.compact { gap: var(--s-3); padding-top: var(--s-3); border-top: 1px solid var(--divider); }
+.prompt { display: flex; align-items: flex-start; gap: var(--s-3); min-width: 0; }
+.promptThumb { width: 56px; height: 56px; flex: none; border-radius: var(--r-12); object-fit: cover; background: var(--surface-subtle); }
+.compact .promptThumb { width: var(--h-44); height: var(--h-44); }
+.promptBody { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.promptTop { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+.promptTitle { font-size: var(--fs-15); font-weight: 600; }
+.promptName { font-size: var(--fs-13); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.promptStars { margin-top: 2px; }
+.promptText { margin: var(--s-1) 0 0; font-size: var(--fs-small); line-height: var(--lh-small); color: var(--ink-2); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; white-space: pre-line; overflow-wrap: anywhere; }
+.promptNote { margin: var(--s-1) 0 0; font-size: var(--fs-13); line-height: var(--lh-small); }
+.thanks { color: var(--success-ink); }
+.rejected { color: var(--danger); }
+.prompt .reply { margin-top: var(--s-2); }
+/* Статус проверки — чипом, как статус заказа в кабинете */
+.status { padding: 3px 8px; border-radius: var(--r-pill); font-size: var(--fs-caption); font-weight: 600; white-space: nowrap; }
+.status_pending { background: var(--primary-50); color: var(--primary); }
+.status_published { background: var(--success-bg); color: var(--success-ink); }
+.status_rejected { background: var(--danger-bg); color: var(--danger); }
+
+/* ── Лист отзывов поверх видео ── */
+.sheetPanel.sheetPanel { padding-bottom: max(var(--s-6), env(safe-area-inset-bottom)); }
+.sheetHead { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+.sheetTitle { margin: 0; font-size: 20px; /* как заголовок листа (06), нет в tokens.css */ font-weight: 800; letter-spacing: var(--tracking-tight); }
+.sheetClose {
+  position: relative; width: var(--h-44); height: var(--h-44); flex: none; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; background: var(--surface-subtle);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .viewer, .formOverlay:not(.inline) { animation: var(--anim-fade); }
+  .formOverlay:not(.inline) .formBox { animation: var(--anim-rise); }
+}
+@media (prefers-reduced-motion: reduce) { .rateBtn, .pickAdd { transition: none; } .rateBtn:hover:not(:disabled) { transform: none; } }

@@ -10,7 +10,7 @@ import { useCart, useCartCount } from '@/lib/store/cart';
 import { useMethod } from '@/lib/store/method';
 import { setCartQty } from '@/lib/store/ui';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import type { Category, Product, ProductDetail } from '@/lib/types';
+import type { Category, Product, ProductDetail, ProductReviews } from '@/lib/types';
 import s from '@/components/site/site.module.css';
 import p from './ProductScreen.module.css';
 import { Breadcrumbs } from '@/components/site/Breadcrumbs';
@@ -18,9 +18,14 @@ import { SiteFaq } from '@/components/site/SiteFaq';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { catalogPathOf } from '@/components/catalog/catalogUrl';
 
-export interface ProductData { product: ProductDetail; group: Product[]; categories: Category[]; /** Телефон по User-Agent — вёрстка с сервера (proxy.ts). */ initialMobile?: boolean }
+export interface ProductData {
+  product: ProductDetail; group: Product[]; categories: Category[];
+  /** Первая страница отзывов — в серверном HTML (нет отзывов или не загрузились — блок решит сам). */
+  reviews?: ProductReviews;
+  /** Телефон по User-Agent — вёрстка с сервера (proxy.ts). */ initialMobile?: boolean;
+}
 
-export function ProductScreen({ product, group, categories, initialMobile }: ProductData) {
+export function ProductScreen({ product, group, categories, reviews, initialMobile }: ProductData) {
   const router = useRouter();
   const mobile = useIsMobile(initialMobile);
   const lines = useCart(st => st.lines);
@@ -29,7 +34,7 @@ export function ProductScreen({ product, group, categories, initialMobile }: Pro
   const cat = categories.find(c => c.sub.some(x => x.slug === product.cat));
   const sub = cat?.sub.find(x => x.slug === product.cat);
   const view = (
-    <MartProductView page product={product} group={group} categories={categories} method={method} mode={mobile ? 'mobile' : 'desktop'}
+    <MartProductView page product={product} group={group} categories={categories} method={method} mode={mobile ? 'mobile' : 'desktop'} reviews={reviews}
       qtyFor={k => lines[k] || 0} onQty={setCartQty} onPickGroup={id => router.push(`/product/${id}`)}
       after={mobile ? <><SiteFaq /><SiteFooter categories={categories} /></> : undefined} />
   );

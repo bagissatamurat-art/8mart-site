@@ -49,7 +49,7 @@ export function toQuery(q: Query = {}): string {
   return s ? `?${s}` : '';
 }
 
-/** Запрос к API: JSON туда и обратно, Bearer-токен, ошибки — ApiError(status, message из {error:{message}} | {message}). 204 — undefined. */
+/** Запрос к API: JSON (или FormData) туда, JSON обратно, Bearer-токен, ошибки — ApiError(status, message из {error:{message}} | {message}). 204 — undefined. */
 export async function apiFetch<T>(path: string, init: ApiInit = {}): Promise<T> {
   return request<T>(path, init, false);
 }
@@ -57,14 +57,16 @@ export async function apiFetch<T>(path: string, init: ApiInit = {}): Promise<T> 
 async function request<T>(path: string, init: ApiInit, retried: boolean): Promise<T> {
   const { method = 'GET', query, body, signal, revalidate } = init;
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  // Форма с файлами (отзыв с фото) уходит как есть: границу multipart браузер ставит в Content-Type сам.
+  const form = typeof FormData !== 'undefined' && body instanceof FormData;
+  if (body !== undefined && !form) headers['Content-Type'] = 'application/json';
   const token = tokenOf();
   if (token) headers.Authorization = `Bearer ${token}`;
   let r: Response;
   try {
     r = await fetch(API_URL + path + toQuery(query), {
       method, headers, signal, credentials: 'include',
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : form ? body : JSON.stringify(body),
       ...(revalidate != null ? { next: { revalidate } } : { cache: 'no-store' as const }),
     });
   } catch (e) {

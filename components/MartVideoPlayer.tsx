@@ -1,17 +1,19 @@
 'use client';
 // MartVideoPlayer — видео товара на весь экран, как в TikTok: тёмный фон, ролик со звуком (запуск — тем же нажатием,
 // что открыло плеер; не дал браузер — без звука, динамик перечёркнут), пауза по тапу, полоса прогресса. Справа —
-// «В избранное», «Отзывы» (FEATURES.reviews) и «Поделиться», снизу — блок товара с размером и «В корзину».
+// «В избранное», «Отзывы» (FEATURES.reviews, только у товара с опубликованными отзывами: лист со списком поверх видео,
+// ролик на это время на паузе) и «Поделиться», снизу — блок товара с размером и «В корзину».
 // Desktop — вертикальная рамка 400 по центру поверх затемнения; mobile — весь экран.
 // Закрыть: «Назад» слева сверху, крестик (desktop), Esc, свайп вниз, «назад» в браузере (useModal). Пробел — пауза.
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import type { Product, ProductVideo } from '@/lib/types';
+import type { Product, ProductVideo, Review } from '@/lib/types';
 import { FEATURES } from '@/lib/config';
-import { STATUS, VIDEO } from '@/lib/copy';
+import { REVIEWS, STATUS, VIDEO } from '@/lib/copy';
 import { modalAbove, useModal } from '@/lib/hooks/useModal';
 import { setFavorite, useIsFavorite } from '@/lib/store/favorites';
 import { MartProductStrip } from './MartProductStrip';
+import { ReviewsSheet } from './reviews/ReviewsSheet';
 import { shareProduct, ShareIcon } from './product/share';
 import { Chevron, Cross } from './ui/Cross';
 import { HeartIcon } from './ui/HeartIcon';
@@ -35,8 +37,9 @@ export interface MartVideoPlayerProps {
   qtyFor?: (key: string) => number;
   onQty?: (key: string, qty: number) => void;
   cartHref?: string;
-  /** Витрина /kit: статичный кадр внутри родителя (position: relative) — без портала, модального слоя и звука. */
-  preview?: { progress?: number; paused?: boolean };
+  /** Витрина /kit: статичный кадр внутри родителя (position: relative) — без портала, модального слоя и звука.
+   *  reviews — открытый лист отзывов поверх кадра с этими (демо) отзывами. */
+  preview?: { progress?: number; paused?: boolean; reviews?: Review[] };
 }
 
 export function MartVideoPlayer({ product: p, video, variantId, color, mode = 'mobile', onClose, qtyFor, onQty, cartHref, preview }: MartVideoPlayerProps) {
@@ -51,7 +54,10 @@ export function MartVideoPlayer({ product: p, video, variantId, color, mode = 'm
   const [waiting, setWaiting] = useState(false);
   const [failed, setFailed] = useState(false);
   const [shared, setShared] = useState(false);
+  const [reviews, setReviews] = useState(!!preview?.reviews);
+  const resume = useRef(false);
   const fav = useIsFavorite(p.id);
+  const rated = FEATURES.reviews && !!p.rating?.count;
   const drag = useRef<{ x: number; y: number; dy: number; moved: boolean } | null>(null);
   const shareT = useRef<ReturnType<typeof setTimeout>>(undefined);
   const onCloseRef = useRef(onClose);
@@ -77,6 +83,18 @@ export function MartVideoPlayer({ product: p, video, variantId, color, mode = 'm
     const v = videoRef.current;
     if (!v || isPreview || failed) return;
     if (v.paused) v.play().catch(() => {}); else v.pause();
+  };
+  // Отзывы поверх видео: ролик на паузе, после закрытия — продолжаем, если он шёл.
+  const openReviews = () => {
+    const v = videoRef.current;
+    resume.current = !!v && !v.paused;
+    v?.pause();
+    setReviews(true);
+  };
+  const closeReviews = () => {
+    setReviews(false);
+    if (resume.current) videoRef.current?.play().catch(() => {});
+    resume.current = false;
   };
   const toggleSound = () => {
     const v = videoRef.current;
@@ -180,8 +198,8 @@ export function MartVideoPlayer({ product: p, video, variantId, color, mode = 'm
               <span className={s.railIcon}><HeartIcon on={fav} size={24} /></span>
               <span className={s.railLabel} aria-hidden>{fav ? VIDEO.favOn : VIDEO.fav}</span>
             </button>
-            {FEATURES.reviews && (
-              <button type="button" className={s.railBtn} aria-label={VIDEO.reviews}>
+            {rated && (
+              <button type="button" className={s.railBtn} onClick={openReviews} aria-haspopup="dialog" aria-label={`${VIDEO.reviews}: ${REVIEWS.count(p.rating!.count)}`}>
                 <span className={s.railIcon}><ReviewsIcon /></span>
                 <span className={s.railLabel} aria-hidden>{VIDEO.reviews}</span>
               </button>
@@ -198,6 +216,7 @@ export function MartVideoPlayer({ product: p, video, variantId, color, mode = 'm
         <div className={s.sheet}>
           <MartProductStrip product={p} variantId={variantId} color={color} mobile={!desktop} qtyFor={qtyFor} onQty={onQty} cartHref={cartHref} />
         </div>
+        {rated && <ReviewsSheet open={reviews} product={p} onClose={closeReviews} contained={isPreview} initial={preview?.reviews} />}
       </div>
       {desktop && (
         <button type="button" className={`${s.round} ${s.closeD}`} onClick={close} aria-label={VIDEO.close}>

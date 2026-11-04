@@ -37,7 +37,37 @@ export interface Product {
   conditions?: ProductConditions;
   /** Видео товара (GET /products, /products/{id}); нет — null (в моке поля нет). Миниатюра поверх галереи и плеер на весь экран. */
   video?: ProductVideo | null;
+  /** Средняя оценка и число опубликованных отзывов (любой ответ каталога). Нет отзывов — поля нет: ни звёзд, ни кнопки «Отзывы». */
+  rating?: ReviewSummary;
 }
+
+// ── Отзывы о товарах (04.11): оставляет только покупатель, получивший товар; на сайте — только опубликованные ──
+
+export interface ReviewSummary { avg: number; count: number }
+/** Фото отзыва: src — большое (просмотр), thumb — миниатюра 320, blur — размытое превью, пока грузится. */
+export interface ReviewPhoto { src: string; thumb: string; blur?: string; width: number; height: number }
+/** Ответ магазина под отзывом; date — «3 ноября» (с годом, если не этот). */
+export interface ReviewReply { text: string; date: string }
+/** Опубликованный отзыв. author — «Айгерим К.» или «Покупатель» (телефона нет никогда); text пустой — только оценка. */
+export interface Review {
+  id: string; author: string; rating: number; text: string; photos: ReviewPhoto[];
+  date: string; createdAt: string;
+  /** Какой размер купили: «M», «S, L». */
+  variant?: string;
+  reply?: ReviewReply;
+}
+/** GET /products/{id}/reviews?page — страница отзывов (с текстом и фото выше); ещё есть, пока загружено меньше rating.count. */
+export interface ProductReviews { rating: ReviewSummary | null; items: Review[] }
+export type ReviewStatus = 'pending' | 'published' | 'rejected';
+/** Свой отзыв покупателя: на проверке, опубликован или нет (с причиной). */
+export interface MyReview {
+  id: string; rating: number; text: string; photos: ReviewPhoto[]; status: ReviewStatus; date: string;
+  rejectReason?: string; reply?: ReviewReply;
+}
+/** Полученный товар заказа (Order.reviews): review = null — ещё не оценён. */
+export interface OrderReviewItem { product: string; name: string; img?: string; delivery?: DeliveryKind; review: MyReview | null }
+/** POST /orders/{id}/reviews — форма отзыва (multipart). photos — уже уменьшенные на телефоне. */
+export interface ReviewDraft { product: string; rating: number; text: string; photos: Blob[] }
 
 /** GET /products/{id} */
 export interface ProductDetail extends Product {
@@ -115,6 +145,8 @@ export interface Order {
   invoiceIssued?: boolean;
   /** Счёт ещё не выставлен — к какому времени выставим (ночью — после открытия филиала). */
   invoiceBy?: string | null;
+  /** Полученные товары (их отправление выполнено) и свои отзывы о них — блок «Оцените букет». Нет поля — оценивать нечего. */
+  reviews?: OrderReviewItem[];
 }
 
 /** POST /orders — тело запроса. */

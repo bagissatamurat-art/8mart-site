@@ -1,11 +1,13 @@
 'use client';
 // Мои заказы: активные сверху (шкала этапов + «Следить за заказом»), ниже история (статус, бонусы, «Подробнее», «Повторить»).
+// Под полученным заказом — «Оцените букет» для каждого товара без отзыва (свои отзывы целиком — на странице заказа).
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { ORDER_STATUS } from '@/lib/config';
+import { FEATURES, ORDER_STATUS } from '@/lib/config';
 import { bonusText, money, plural } from '@/lib/domain';
 import { orderItemInfo } from '@/lib/api';
 import type { Order } from '@/lib/types';
+import { ReviewPrompts } from '../reviews/ReviewPrompts';
 import { MartButton } from '../MartButton';
 import { BonusCoin } from '../ui/BonusCoin';
 import { isActiveOrder, orderSteps, statusLabel } from './sections';
@@ -37,7 +39,7 @@ export function AccountOrders({ orders, mobile, orderHref, onOpenOrder, onRepeat
     <>
       {active.map(o => <ActiveOrder key={o.id} o={o} mobile={mobile} href={orderHref(o.id)} onOpen={onOpenOrder} />)}
       {mobile && past.length > 0 && <h2 className={s.groupTitle}>История</h2>}
-      {past.map(o => <PastOrder key={o.id} o={o} href={orderHref(o.id)} onOpen={onOpenOrder} onRepeat={onRepeat} />)}
+      {past.map(o => <PastOrder key={o.id} o={o} mobile={mobile} href={orderHref(o.id)} onOpen={onOpenOrder} onRepeat={onRepeat} />)}
     </>
   );
 }
@@ -75,7 +77,7 @@ function ActiveOrder({ o, mobile, href, onOpen }: { o: Order; mobile: boolean; h
 
 type RepeatState = 'loading' | 'done' | null;
 
-function PastOrder({ o, href, onOpen, onRepeat }: { o: Order; href: string; onOpen?: (id: string) => void; onRepeat?: AccountOrdersProps['onRepeat'] }) {
+function PastOrder({ o, mobile, href, onOpen, onRepeat }: { o: Order; mobile: boolean; href: string; onOpen?: (id: string) => void; onRepeat?: AccountOrdersProps['onRepeat'] }) {
   const [re, setRe] = useState<RepeatState>(null);
   const alive = useRef(true);
   useEffect(() => () => { alive.current = false; }, []);
@@ -92,33 +94,39 @@ function PastOrder({ o, href, onOpen, onRepeat }: { o: Order; href: string; onOp
     catch { if (alive.current) setRe(null); }
   };
 
+  // «Оцените букет» — для товаров без отзыва; оценённые здесь остаются со «Спасибо…» (состояние — у ReviewPrompts).
+  const toRate = FEATURES.reviews && o.reviews?.some(r => !r.review) ? o.reviews : null;
+
   return (
-    <article className={`${s.card} ${s.past}`}>
-      <div className={s.pastMain}>
-        <div className={s.pastHead}>
-          <b className={s.pastNo}>№{o.id}</b>
-          <span className={s.date}>{o.date}</span>
-          <span className={`${s.chip} ${s[`tone_${tone}`]}`}>{statusLabel(o)}</span>
-          {earned > 0 && <span className={s.bonusChip}><BonusCoin />{bonusText(earned)}</span>}
+    <article className={s.card}>
+      <div className={s.past}>
+        <div className={s.pastMain}>
+          <div className={s.pastHead}>
+            <b className={s.pastNo}>№{o.id}</b>
+            <span className={s.date}>{o.date}</span>
+            <span className={`${s.chip} ${s[`tone_${tone}`]}`}>{statusLabel(o)}</span>
+            {earned > 0 && <span className={s.bonusChip}><BonusCoin />{bonusText(earned)}</span>}
+          </div>
+          <div className={s.thumbs}>
+            {thumbs.map((p, i) => p?.img
+              ? <Img key={i} src={p.img} w={44} h={44} className={`${s.thumb} ${cancelled ? s.dim : ''}`} />
+              : <span key={i} className={`${s.thumb} ${cancelled ? s.dim : ''}`} aria-hidden />)}
+            {n > 4 && <span className={s.more}>+{n - 4}</span>}
+          </div>
+          <span className={s.meta13}>{n} {plural(n, 'позиция', 'позиции', 'позиций')} · {o.method === 'pickup' ? 'Самовывоз' : 'Доставка'}, {o.address}</span>
         </div>
-        <div className={s.thumbs}>
-          {thumbs.map((p, i) => p?.img
-            ? <Img key={i} src={p.img} w={44} h={44} className={`${s.thumb} ${cancelled ? s.dim : ''}`} />
-            : <span key={i} className={`${s.thumb} ${cancelled ? s.dim : ''}`} aria-hidden />)}
-          {n > 4 && <span className={s.more}>+{n - 4}</span>}
+        <div className={s.pastActs}>
+          <b className={`${s.sum} ${cancelled ? s.sumCancelled : ''}`}>
+            {cancelled && <span className="visually-hidden">Отменён, сумма </span>}{money(o.total)}
+          </b>
+          <div className={s.btns}>
+            <Link href={href} className={s.moreLink} onClick={() => onOpen?.(o.id)} aria-label={`Подробнее о заказе №${o.id}`}>Подробнее</Link>
+            <MartButton label={re === 'done' ? 'В корзине' : 'Повторить'} variant="secondary" size={40} loading={re === 'loading'} onClick={repeat}
+              aria-label={re === 'done' ? `Товары заказа №${o.id} в корзине` : `Повторить заказ №${o.id}`} />
+          </div>
         </div>
-        <span className={s.meta13}>{n} {plural(n, 'позиция', 'позиции', 'позиций')} · {o.method === 'pickup' ? 'Самовывоз' : 'Доставка'}, {o.address}</span>
       </div>
-      <div className={s.pastActs}>
-        <b className={`${s.sum} ${cancelled ? s.sumCancelled : ''}`}>
-          {cancelled && <span className="visually-hidden">Отменён, сумма </span>}{money(o.total)}
-        </b>
-        <div className={s.btns}>
-          <Link href={href} className={s.moreLink} onClick={() => onOpen?.(o.id)} aria-label={`Подробнее о заказе №${o.id}`}>Подробнее</Link>
-          <MartButton label={re === 'done' ? 'В корзине' : 'Повторить'} variant="secondary" size={40} loading={re === 'loading'} onClick={repeat}
-            aria-label={re === 'done' ? `Товары заказа №${o.id} в корзине` : `Повторить заказ №${o.id}`} />
-        </div>
-      </div>
+      {toRate && <ReviewPrompts orderId={o.id} items={toRate} mobile={mobile} compact />}
     </article>
   );
 }

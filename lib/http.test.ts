@@ -49,6 +49,18 @@ describe('apiFetch', () => {
     expect(init.credentials).toBe('include');
   });
 
+  it('FormData (отзыв с фото) уходит как есть: без JSON и без своего Content-Type — границу ставит браузер', async () => {
+    const h = await load({ url: 'https://api.test' });
+    const fetchMock = vi.fn(async () => json(200, { id: '1' }));
+    vi.stubGlobal('fetch', fetchMock);
+    const form = new FormData();
+    form.append('rating', '5');
+    await h.apiFetch('/orders/8M-1/reviews', { method: 'POST', body: form });
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit & { headers: Record<string, string> }];
+    expect(init.body).toBe(form);
+    expect(init.headers['Content-Type']).toBeUndefined();
+  });
+
   it('ошибка — ApiError со статусом и сообщением сервера', async () => {
     const h = await load({ url: 'https://api.test' });
     vi.stubGlobal('fetch', vi.fn(async () => json(409, { error: { message: 'Корзина изменилась' } })));

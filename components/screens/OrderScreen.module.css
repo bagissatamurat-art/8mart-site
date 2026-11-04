@@ -11,6 +11,8 @@
 .supportText { display: flex; flex-direction: column; gap: 1px; }
 .supportSub { font-size: var(--fs-13); font-weight: 400; color: var(--ink-2); }
 .infoCard { background: var(--surface-card); border-radius: var(--r-24); padding: 24px; }
+/* «Оцените букет» — карточкой между шкалой и адресом, как блок адреса */
+.reviewsCard { background: var(--surface-card); border-radius: var(--r-24); padding: 24px; scroll-margin-top: var(--s-6); }
 .info { display: flex; flex-direction: column; gap: 12px; font-size: var(--fs-15); }
 .infoRow { display: flex; flex-direction: column; gap: 2px; line-height: 1.4; }
 .infoLabel { font-size: var(--fs-13); color: var(--ink-3); }

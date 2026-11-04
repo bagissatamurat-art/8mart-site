@@ -1,7 +1,10 @@
 'use client';
 // Статус заказа — 03 Оформление.dc.html, шаг success (3a / 3b): шкала по отправлениям, поддержка, отмена до передачи в доставку.
+// Получили товар — «Оцените букет» под шкалой (Order.reviews); ссылка /order/<номер>?review=1 сразу прокручивает к нему.
 import { PageSkeleton } from '@/components/site/PageSkeleton';
 import { useEffect, useState } from 'react';
+import { ReviewPrompts } from '@/components/reviews/ReviewPrompts';
+import { FEATURES } from '@/lib/config';
 import { MartButton } from '@/components/MartButton';
 import { ConfirmDialog } from '@/components/account/ConfirmDialog';
 import { OrderTrack } from '@/components/checkout/OrderTrack';
@@ -10,7 +13,7 @@ import { MobileTopBar } from '@/components/checkout/MobileTopBar';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { cancelOrder, getOrder, orderItemInfo } from '@/lib/api';
 import { CANCEL_BEFORE, REFUND_DAYS, SUPPORT_WA } from '@/lib/config';
-import { CART, ORDER_PAGE, CHECKOUT } from '@/lib/copy';
+import { CART, ORDER_PAGE, CHECKOUT, REVIEWS } from '@/lib/copy';
 import { bonusText, formatPhone, itemsTitle, money } from '@/lib/domain';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { Category, Order } from '@/lib/types';
@@ -25,6 +28,11 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
   const [confirm, setConfirm] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   useEffect(() => { getOrder(id).then(setOrder).catch(() => setOrder(null)); }, [id]);
+  // Ссылка «оцените заказ» (WhatsApp, когда подключим уведомления): /order/<номер>?review=1 — сразу к оценке.
+  const hasReviews = !!order?.reviews?.length;
+  useEffect(() => {
+    if (hasReviews && new URLSearchParams(location.search).get('review') === '1') document.getElementById('reviews')?.scrollIntoView({ block: 'start' });
+  }, [hasReviews]);
 
   // Загрузка — скелетон всей страницы (шапка + колонка + панель), как итоговая раскладка: без скачка.
   if (order === undefined) return <PageSkeleton variant="split" />;
@@ -78,6 +86,13 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
     </>
   );
   const cancelBtn = canCancel && <button type="button" className={c.cancel} onClick={() => setConfirm(true)}>Отменить заказ</button>;
+  // Оценить полученное: отзыв уходит на проверку, в заказе сразу «Ваш отзыв · На проверке».
+  const reviews = FEATURES.reviews && order.reviews?.length ? (
+    <section id="reviews" className={mobile ? c.cardM : c.reviewsCard} aria-label={REVIEWS.orderBlock}>
+      <ReviewPrompts orderId={order.id} items={order.reviews} mobile={mobile}
+        onReviewed={(product, review) => setOrder(o => (o ? { ...o, reviews: o.reviews?.map(r => (r.product === product ? { ...r, review } : r)) } : o))} />
+    </section>
+  ) : null;
   const dialog = (
     <ConfirmDialog open={confirm} mode={mobile ? 'mobile' : 'desktop'} title={ORDER_PAGE.cancelTitle(order.id)} text={refund}
       confirmLabel="Отменить заказ" cancelLabel="Не отменять" loading={cancelling} onConfirm={doCancel} onClose={() => setConfirm(false)} />
@@ -93,6 +108,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
             <OrderTrack order={order} mobile refundText={refund} />
             <div className={c.supportRowM}>{supportLink}</div>
           </section>
+          {reviews}
           <section className={c.cardM}>{info}</section>
           <section className={`${c.cardM} ${c.stack}`}><b className={c.h16}>{title}</b>{summaryBody}</section>
           <MartButton label="Продолжить покупки" variant="ghost" size={56} full href="/" />
@@ -115,6 +131,7 @@ export function OrderScreen({ id, categories }: { id: string; categories: Catego
               <OrderTrack order={order} refundText={refund} />
               <div className={c.supportRow}>{supportLink}</div>
             </section>
+            {reviews}
             <section className={c.infoCard}>{info}</section>
             {cancelBtn}
           </main>

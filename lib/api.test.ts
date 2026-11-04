@@ -89,3 +89,22 @@ describe('заказ: оформление → статус → отмена', (
     expect(r.lines.find(l => l.id === 'b3')?.soldOut).toBe(true);
   });
 });
+
+describe('отзывы (мок)', () => {
+  it('публичных отзывов мок не выдумывает: список пуст, в форме ответа API', async () => {
+    expect(await api.getProductReviews('f7')).toEqual({ rating: null, items: [] });
+    expect((await api.getProduct('f7')).rating).toBeUndefined();
+  });
+  it('полученный заказ — «Оцените»: товары без отзыва; отзыв уходит на проверку, повтор — 409', async () => {
+    const done = await api.getOrder('8M-10311');
+    expect(done.reviews?.map(r => [r.product, r.review])).toEqual([['b3', null], ['b11', null]]);
+    expect((await api.getOrder('8M-10482')).reviews).toBeUndefined(); // ещё в пути
+    await expect(api.createReview('8M-10311', { product: 'b3', rating: 0, text: '', photos: [] })).rejects.toMatchObject({ status: 422 });
+    const r = await api.createReview('8M-10311', { product: 'b3', rating: 4, text: '  Хороший цемент  ', photos: [] });
+    expect(r).toMatchObject({ rating: 4, text: 'Хороший цемент', status: 'pending' });
+    expect((await api.getOrder('8M-10311')).reviews?.[0].review).toMatchObject({ rating: 4, status: 'pending' });
+    await expect(api.createReview('8M-10311', { product: 'b3', rating: 5, text: '', photos: [] })).rejects.toMatchObject({ status: 409 });
+    await expect(api.createReview('8M-10482', { product: 'b1', rating: 5, text: '', photos: [] })).rejects.toMatchObject({ status: 409 });
+    expect(await api.getProductReviews('b3')).toEqual({ rating: null, items: [] }); // на проверке — не на сайте
+  });
+});
