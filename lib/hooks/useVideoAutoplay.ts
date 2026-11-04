@@ -1,13 +1,12 @@
 'use client';
-// Можно ли крутить беззвучное превью видео (миниатюра товара): не при «уменьшить движение», не в режиме экономии трафика
-// и не на медленной сети (Network Information API; в Safari его нет — сеть считаем обычной). На сервере и до гидрации —
-// нельзя: миниатюра показывает обложку, видео подключается уже в браузере.
+// Можно ли крутить беззвучное превью видео (плавающая миниатюра товара): да, кроме «уменьшить движение» и явной экономии
+// трафика (Save-Data). Медленную сеть больше не учитываем (решение владельца 04.11): Chrome на телефоне часто считает
+// мобильную сеть «3g» по задержке, и покупатель видел статичную обложку вместо ролика; превью — несколько сотен килобайт.
+// На сервере и до гидрации — нельзя: миниатюра показывает обложку, видео подключается уже в браузере.
 import { useSyncExternalStore } from 'react';
 
-type Connection = EventTarget & { saveData?: boolean; effectiveType?: string };
+type Connection = EventTarget & { saveData?: boolean };
 const REDUCED = '(prefers-reduced-motion: reduce)';
-/** Медленнее 4G превью (несколько сотен килобайт) грузилось бы дольше, чем его смотрят. */
-const SLOW = new Set(['slow-2g', '2g', '3g']);
 const connection = () => (navigator as Navigator & { connection?: Connection }).connection;
 
 function subscribe(cb: () => void) {
@@ -19,9 +18,7 @@ function subscribe(cb: () => void) {
 }
 
 export function canAutoplay(): boolean {
-  if (window.matchMedia(REDUCED).matches) return false;
-  const c = connection();
-  return !c?.saveData && !SLOW.has(c?.effectiveType ?? '');
+  return !window.matchMedia(REDUCED).matches && !connection()?.saveData;
 }
 
 export function useVideoAutoplay(): boolean {

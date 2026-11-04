@@ -18,7 +18,10 @@ import { HeartIcon } from './ui/HeartIcon';
 import { Gallery, type Slide } from './product/Gallery';
 import { Colors, compositionOf, Cta, Description, Packs, Sizes, Specs, Ways } from './product/Sections';
 import { MartVideoPlayer } from './MartVideoPlayer';
+import { VideoFloat } from './product/VideoFloat';
 import { hideVideo, useVideoHidden } from '@/lib/store/videoHidden';
+import { VIDEO_FLOAT } from '@/lib/config';
+import type { FloatBounds } from '@/lib/videoFloat';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { modalAbove, useModal } from '@/lib/hooks/useModal';
 import { useMounted } from '@/lib/hooks/useMounted';
@@ -80,6 +83,9 @@ function View({
   const [playing, setPlaying] = useState(false);
   const videoHidden = useVideoHidden(pr.id);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const reviewsRef = useRef<HTMLHeadingElement>(null);
   // Отзывы — только когда есть опубликованные (без них ни звёзд, ни блока)
   const rating = FEATURES.reviews && pr.rating && pr.rating.count > 0 ? pr.rating : null;
@@ -121,6 +127,27 @@ function View({
   };
   // Плеер монтируется синхронно в том же нажатии: play() со звуком браузер разрешает только внутри жеста.
   const openVideo = () => flushSync(() => setPlaying(true));
+  // Окно въезжает (transform): fixed-миниатюра внутри него встала бы не туда — показываем её, когда окно на месте.
+  const [settled, setSettled] = useState(!trap || appear === 'swap');
+  useEffect(() => {
+    if (settled) return;
+    const t = setTimeout(() => setSettled(true), VIDEO_FLOAT.enterDelay);
+    return () => clearTimeout(t);
+  }, [settled]);
+  /** Где плавающей миниатюре видео можно стоять. Телефон — вся карточка (страница — под верхней панелью, лист — ниже
+   *  крестика окна), над нижней «В корзину». Компьютер — колонка галереи по высоте окна, но в пределах видимой карточки. */
+  const floatBounds = (): FloatBounds | null => {
+    const d = dialogRef.current?.getBoundingClientRect();
+    if (!d) return null;
+    const vh = window.innerHeight;
+    if (mobile) {
+      const foot = footerRef.current?.getBoundingClientRect();
+      const close = closeRef.current?.getBoundingClientRect();
+      return { zone: { left: d.left, right: d.right, top: Math.max(0, close ? close.bottom : d.top), bottom: Math.min(vh, foot ? foot.top : d.bottom) } };
+    }
+    const g = galleryRef.current?.getBoundingClientRect() ?? d;
+    return { zone: { left: g.left, right: g.right, top: 0, bottom: vh }, clip: { left: g.left, right: g.right, top: d.top, bottom: d.bottom } };
+  };
   const setQ = (q: number) => onQty?.(key, q);
   const step = (d: number) => setIdx(i => (Math.min(i, imgs.length - 1) + d + imgs.length) % imgs.length);
 
@@ -227,17 +254,21 @@ function View({
       <div ref={dialogRef} className={s.dialog} onClick={e => e.stopPropagation()}
         role={modal ? 'dialog' : undefined} aria-modal={modal || undefined} aria-label={modal ? pr.name : undefined} tabIndex={modal ? -1 : undefined}>
         {modal && (
-          <button type="button" className={`${s.onPhoto} ${s.close}`} onClick={() => onClose?.()} aria-label="Закрыть">
+          <button ref={closeRef} type="button" className={`${s.onPhoto} ${s.close}`} onClick={() => onClose?.()} aria-label="Закрыть">
             <Cross size={14} color="var(--ink-1)" />
           </button>
         )}
         <div className={s.body}>
           <Gallery slides={imgs} idx={cur} name={pr.name} mobile={mobile} fav={fav} onFav={toggleFav} onIdx={setIdx} resetKey={v?.id} page={page}
-            video={videoHidden ? null : pr.video} onVideo={openVideo} onHideVideo={() => hideVideo(pr.id)} />
+            rootRef={galleryRef} />
           {info}
           {after && <div className={s.after}>{after}</div>}
         </div>
-        {mobile && <div className={s.footer}>{cta}</div>}
+        {mobile && <div ref={footerRef} className={s.footer}>{cta}</div>}
+        {pr.video && !videoHidden && mounted && settled && (
+          <VideoFloat video={pr.video} onOpen={openVideo} onHide={() => hideVideo(pr.id)} bounds={floatBounds} paused={playing}
+            width={mobile ? VIDEO_FLOAT.width : VIDEO_FLOAT.widthDesktop} contained={contained} />
+        )}
       </div>
     </div>
   );

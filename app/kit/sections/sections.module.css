@@ -15,14 +15,22 @@
 @media (max-width: 900px) { .cartGrid { grid-template-columns: 1fr; } }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 /* Видео товара */
-.videoGallery { position: relative; width: 320px; max-width: 100%; aspect-ratio: 1 / 1; border-radius: var(--r-18); overflow: hidden; background: var(--surface-subtle); }
+/* Экран телефона для плавающей миниатюры: панель 56 сверху, фото 1:1, «В корзину» снизу */
+.floatPhone {
+  position: relative; display: flex; flex-direction: column; width: 390px; max-width: 100%; height: 640px; border-radius: var(--r-24);
+  overflow: hidden; background: var(--surface-card); border: 1px solid var(--border);
+}
+.floatBar { flex: none; height: 56px; display: flex; align-items: center; justify-content: center; font-size: var(--fs-small); color: var(--ink-2); }
+.floatPhoto { position: relative; flex: none; aspect-ratio: 1 / 1; background: var(--surface-subtle); }
+.floatInfo { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 16px; font-size: var(--fs-15); }
+.floatFoot { flex: none; padding: 10px var(--s-4) var(--s-5); box-shadow: 0 -1px 0 var(--divider); }
 .videoReset {
   position: absolute; right: 12px; top: 12px; height: var(--h-36); padding: 0 12px; border: 0; border-radius: var(--r-pill);
   background: var(--surface-card); font-family: var(--font); font-size: var(--fs-small); font-weight: 600; cursor: pointer;
 }
 .videoDesktop { position: relative; width: 552px; max-width: 100%; height: 860px; border-radius: var(--r-20); overflow: hidden; }
 .videoPhone { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: var(--r-24); overflow: hidden; border: 1px solid var(--border); }
-.stripBox { padding: 12px; border-radius: var(--r-20); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--border); }
+.stripBox { padding: 12px; border-radius: var(--r-20); background: var(--ink-1); } /* карточка товара — поверх тёмного кадра, как в видео */
 /* Отзывы: пометка демо-данных и рамки образцов */
 .kitDemo { margin: 0; padding: 8px 12px; border-radius: var(--r-12); background: var(--warning-bg); color: var(--warning-ink); font-size: var(--fs-13); font-weight: 600; align-self: flex-start; }
 .reviewsBox { padding: 20px; border-radius: var(--r-20); background: var(--surface-card); box-shadow: inset 0 0 0 1px var(--border); }

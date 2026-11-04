@@ -25,6 +25,13 @@ export const STORIES_SEEN_KEY = '8mart.storiesSeen';
 export const FAVORITES_KEY = '8mart.favorites';
 /** Товары, у которых покупатель закрыл миниатюру видео, — до конца сессии (sessionStorage, string[]). */
 export const VIDEO_HIDDEN_KEY = '8mart.videoHidden';
+/** Где покупатель оставил плавающую миниатюру видео — до конца сессии, одно место на все товары (sessionStorage, {side, t}). */
+export const VIDEO_FLOAT_KEY = '8mart.videoFloat';
+/** Плавающая миниатюра видео (решение владельца 04.11): ширина (высота — 9:16), отступ от краёв, сдвиг, после которого
+ *  касание — уже перетаскивание, время «магнита» к краю; enterDelay — окно товара въезжает, миниатюра появляется после. */
+export const VIDEO_FLOAT = { width: 96, widthDesktop: 112, gap: 12, dragStart: 8, snapMs: 260, enterDelay: 260 };
+/** Пузыри отзывов над товаром в видео и сторис: сколько висит один, пауза до следующего, сколько слов из текста. */
+export const REVIEW_BUBBLES = { showMs: 3200, gapMs: 700, words: 6, maxChars: 44 };
 
 /** Функции в работе: выключенные не показываются. reviews — отзывы о товаре: звёзды у названия, блок в карточке, кнопка
  *  в плеере видео (каждое — только когда у товара есть опубликованные отзывы), оценка полученного заказа. */

@@ -108,9 +108,14 @@ export default function ReviewsSection() {
         <KitItem label="Форма · mobile, лист снизу">
           <div className={s.videoPhone}><ReviewPrompts orderId="demo" items={PROMPTS.slice(0, 1)} mobile demoForm={{ product: flowers.id, rating: 0 }} /></div>
         </KitItem>
+        <KitItem label="В видео · пузыри отзывов над карточкой, плашка «N отзывов», «Отзывы» с числом">
+          <div className={s.videoPhone}>
+            <MartVideoPlayer product={rated} video={DEMO_VIDEO} mode="mobile" preview={{ progress: 0.45, reviews: DEMO_REVIEWS }} {...common} />
+          </div>
+        </KitItem>
         <KitItem label="Отзывы поверх видео · лист в рамке плеера">
           <div className={s.videoPhone}>
-            <MartVideoPlayer product={rated} video={DEMO_VIDEO} mode="mobile" preview={{ progress: 0.3, paused: true, reviews: DEMO_REVIEWS }} {...common} />
+            <MartVideoPlayer product={rated} video={DEMO_VIDEO} mode="mobile" preview={{ progress: 0.3, paused: true, reviews: DEMO_REVIEWS, sheet: true }} {...common} />
           </div>
         </KitItem>
       </KitPanel>

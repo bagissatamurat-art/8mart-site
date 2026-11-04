@@ -1,11 +1,9 @@
 'use client';
 // Галерея быстрого просмотра. Desktop — большое фото + стрелки + счётчик + миниатюры 64×64;
 // mobile — свайп-лента со scroll-snap и точками. Нет фото → полосатый плейсхолдер (как в референсе).
-// Есть видео — его миниатюра справа сверху поверх фото (VideoThumb).
-import { useEffect, useRef } from 'react';
-import type { ProductVideo } from '@/lib/types';
+// Видео товара — плавающая миниатюра поверх страницы (VideoFloat в MartProductView), на компьютере — в колонке галереи (rootRef).
+import { useEffect, useRef, type Ref } from 'react';
 import { HeartIcon } from '../ui/HeartIcon';
-import { VideoThumb } from './VideoThumb';
 import s from '../MartProductView.module.css';
 import { Img } from '@/components/ui/Img';
 
@@ -32,18 +30,13 @@ export interface GalleryProps {
   resetKey?: string;
   /** Страница товара: первое фото — LCP (предзагрузка). В быстром просмотре — нет. */
   page?: boolean;
-  /** Видео товара: миниатюра поверх фото; нажатие — плеер, крестик — скрыть до конца сессии. */
-  video?: ProductVideo | null;
-  onVideo?: () => void;
-  onHideVideo?: () => void;
+  /** Корень галереи: по нему на компьютере ходит плавающая миниатюра видео. */
+  rootRef?: Ref<HTMLDivElement>;
 }
 
-export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey, page, video, onVideo, onHideVideo }: GalleryProps) {
+export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey, page, rootRef }: GalleryProps) {
   const n = slides.length, multi = n > 1;
   const stripRef = useRef<HTMLDivElement>(null);
-  // В листе (mobile, не страница) справа сверху — крестик окна: миниатюра ниже него.
-  const thumb = (cls: string | undefined) => video && onVideo
-    ? <VideoThumb video={video} onOpen={onVideo} onHide={() => onHideVideo?.()} className={cls} /> : null;
 
   useEffect(() => { if (stripRef.current) stripRef.current.scrollLeft = 0; }, [resetKey]);
 
@@ -53,7 +46,7 @@ export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey
       if (i !== idx) onIdx(i);
     };
     return (
-      <div className={s.galleryM}>
+      <div ref={rootRef} className={s.galleryM}>
         <div ref={stripRef} className={s.strip} onScroll={onScroll} aria-label={`Фото товара, ${idx + 1} из ${n}`}>
           {slides.map((src, i) => (
             <div key={i} className={s.slide} aria-hidden={i !== idx || undefined}><Photo src={src} alt={name} lcp={page && i === 0} near={Math.abs(i - idx) <= 1} /></div>
@@ -64,14 +57,13 @@ export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey
             {slides.map((_, i) => <span key={i} className={`${s.dot} ${i === idx ? s.dotOn : ''}`} />)}
           </div>
         )}
-        {thumb(page ? s.videoThumbM : s.videoThumbSheet)}
       </div>
     );
   }
 
   const step = (d: number) => onIdx((idx + d + n) % n);
   return (
-    <div className={s.gallery}>
+    <div ref={rootRef} className={s.gallery}>
       <div className={s.main}>
         <Photo src={slides[idx] ?? null} alt={name} lcp={page && idx === 0} near />
         <button type="button" className={`${s.onPhoto} ${s.favOnPhoto}`} onClick={onFav}
@@ -87,7 +79,6 @@ export function Gallery({ slides, idx, name, mobile, fav, onFav, onIdx, resetKey
           </button>
           <span className={s.counter} aria-live="polite">{idx + 1} / {n}</span>
         </>}
-        {thumb(s.videoThumbD)}
       </div>
       {multi && (
         <div className={s.thumbs}>

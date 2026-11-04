@@ -1,5 +1,5 @@
-/* MartVideoPlayer и миниатюра видео (VideoThumb). Тёмный фон — --ink-1, затемнение desktop — --overlay-strong (как у сторис).
-   Литералы без токена помечены «нет в tokens.css». */
+/* MartVideoPlayer и плавающая миниатюра видео (VideoFloat). Тёмный фон — --ink-1, затемнение desktop — --overlay-strong
+   (как у сторис). Товар поверх ролика — ProductOverlay.module.css. Литералы без токена помечены «нет в tokens.css». */
 
 /* ── Плеер ── */
 .overlay { position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; font-family: var(--font); }
@@ -8,14 +8,19 @@
 .desktop { background: var(--overlay-strong); }
 .mobile { background: var(--ink-1); }
 
-.frame { position: relative; display: flex; flex-direction: column; overflow: hidden; background: var(--ink-1); }
-.desktop .frame { width: 400px; height: min(900px, calc(100% - 48px)); border-radius: var(--r-20); } /* 400 — как карточка сторис desktop */
+.frame { position: relative; overflow: hidden; background: var(--ink-1); }
+/* Компьютер — рамка 9:16, как карточка сторис (400×711), не выше окна */
+.desktop .frame { height: min(711px, calc(100% - 48px)); aspect-ratio: 9 / 16; border-radius: var(--r-20); }
 .mobile .frame { width: 100%; height: 100%; max-width: var(--mobile-max); }
 
-/* Ролик — целиком (contain): товар в кадре не обрезается; блок товара — под ним, а не поверх. */
-.stage { position: relative; flex: 1; min-height: 0; }
-.media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; background: var(--ink-1); }
+/* Ролик — на весь кадр без чёрных полос (cover, решение владельца 04.11): вертикальный ролик на вертикальном экране
+   обрезается по краям совсем немного; товар — поверх ролика снизу (ProductOverlay). */
+.stage { position: absolute; inset: 0; }
+.media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: var(--ink-1); }
 .tap { position: absolute; inset: 0; cursor: pointer; touch-action: none; }
+/* Товар поверх ролика: карточка с отступами от краёв, над ней прогресс, пузыри отзывов и колонка иконок */
+.bottom { position: absolute; left: var(--s-3); right: var(--s-3); bottom: var(--s-3); }
+.mobile .bottom { bottom: max(var(--s-3), env(safe-area-inset-bottom)); }
 
 .top {
   position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--s-2);
@@ -32,7 +37,7 @@
   transition: box-shadow var(--dur) var(--ease);
 }
 /* На тёмном фоне --focus-ring (18 %) не виден — кольцо светлым розовым из палитры */
-.round:focus-visible, .railBtn:focus-visible .railIcon { outline: none; box-shadow: 0 0 0 3px var(--primary-200); }
+.round:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--primary-200); }
 .closeD { position: absolute; top: var(--s-6); right: var(--s-6); }
 .closeD:focus-visible { box-shadow: 0 0 0 3px var(--primary-200); }
 
@@ -50,31 +55,17 @@
   background: var(--overlay); color: #fff; font-size: var(--fs-small); white-space: nowrap; pointer-events: none;
 }
 
-/* Колонка справа: «В избранное», «Отзывы», «Поделиться» */
-.rail { position: absolute; right: var(--s-3); bottom: var(--s-6); display: flex; flex-direction: column; align-items: center; gap: var(--s-4); }
-.railBtn {
-  display: flex; flex-direction: column; align-items: center; gap: var(--s-1); min-width: var(--h-44); padding: 0; border: 0; background: transparent;
-  font-family: inherit; color: #fff; cursor: pointer;
-}
-.railBtn:focus-visible { outline: none; }
-.railIcon {
-  width: var(--h-44); height: var(--h-44); border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  background: var(--badge-on-photo); color: var(--ink-1); transition: box-shadow var(--dur) var(--ease), color var(--dur) var(--ease);
-}
-.railDone { color: var(--success); }
-.railLabel {
-  max-width: 72px; font-size: var(--fs-caption); font-weight: 600; line-height: 1.2; text-align: center;
-  text-shadow: 0 1px 2px rgba(23, 21, 26, .8), 0 0 8px rgba(23, 21, 26, .5); /* подпись читается и на светлом кадре, нет в tokens.css */
-}
 
-.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .3); /* нет в tokens.css */ }
-.progressFill { display: block; height: 100%; background: #fff; transition: width .25s linear; }
-
-.sheet { flex: none; position: relative; padding: var(--s-4); background: var(--surface-card); border-radius: var(--r-24) var(--r-24) 0 0; }
-.mobile .sheet { padding-bottom: max(var(--s-4), env(safe-area-inset-bottom)); }
-
-/* ── Миниатюра поверх галереи (VideoThumb): 9:16, ~1/4 ширины; место задаёт галерея ── */
-.thumb { position: absolute; z-index: 3; aspect-ratio: 9 / 16; border-radius: var(--r-14); box-shadow: 0 2px 8px rgba(23, 21, 26, .12); /* как кнопки на фото */ }
+/* ── Плавающая миниатюра (VideoFloat): 9:16, поверх страницы; место и размер задаёт компонент (transform, width) ── */
+.float {
+  position: fixed; left: 0; top: 0; z-index: var(--z-sticky); border-radius: var(--r-14); box-shadow: var(--shadow-menu);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: grab;
+  transition: box-shadow var(--dur) var(--ease);
+}
+.floatIn { position: absolute; } /* витрина: внутри родителя */
+.floatDrag { cursor: grabbing; box-shadow: var(--shadow-toast); }
+.floatDrag .thumbOpen { cursor: grabbing; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .thumbOpen {
   position: absolute; inset: 0; padding: 0; border: 0; border-radius: inherit; overflow: hidden; cursor: pointer; background: var(--ink-1);
   transition: box-shadow var(--dur) var(--ease);
@@ -98,4 +89,4 @@
   .overlay:not(.inline) { animation: var(--anim-fade); }
   .overlay:not(.inline) .frame { animation: var(--anim-rise); }
 }
-@media (prefers-reduced-motion: reduce) { .round, .railIcon, .thumbOpen, .progressFill { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .round, .thumbOpen, .float { transition: none; } }

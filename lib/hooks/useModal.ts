@@ -12,12 +12,15 @@ const stack: Layer[] = [];
 let locks = 0;
 let savedOverflow = '';
 
+/** Esc: «Esc» — у старых браузеров и некоторых клавиатур, код 27 — если key не заполнен (ввод от вспомогательных программ). */
+export const isEscape = (e: KeyboardEvent) => e.key === 'Escape' || e.key === 'Esc' || (!e.key && e.keyCode === 27);
+
 // Слушатель на window (всплытие) срабатывает после React-обработчиков: список внутри модалки
 // (подсказки адреса, города, сортировка) гасит свой Esc через preventDefault — модалка тогда остаётся.
 function onKey(e: KeyboardEvent) {
   const top = stack[stack.length - 1];
   if (!top) return;
-  if (e.key === 'Escape') {
+  if (isEscape(e)) {
     if (!e.defaultPrevented) { e.preventDefault(); top.close(); }
     return;
   }

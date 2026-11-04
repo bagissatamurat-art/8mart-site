@@ -35,7 +35,7 @@ export default function StoriesSection() {
               <MartStoryViewer stories={STORIES} mode="mobile" start={PROMO_INDEX} preview={{ progress: 0.3, paused: true, copied: true }} />
             </div>
           </KitItem>
-          <KitItem label="Сторис с товаром · блок товара вместо CTA (MartProductStrip)">
+          <KitItem label="Сторис с товаром · вместо CTA — карточка товара, пузыри отзывов и колонка иконок (ProductOverlay)">
             <div style={{ position: 'relative', width: 390, maxWidth: '100%', height: 844, borderRadius: 'var(--r-24)', overflow: 'hidden', border: '1px solid var(--border)' }}>
               <MartStoryViewer stories={WITH_PRODUCT} mode="mobile" preview={{ progress: 0.5, paused: true }} />
             </div>

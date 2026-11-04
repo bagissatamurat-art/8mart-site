@@ -1,15 +1,17 @@
 'use client';
 // MartStories — COMPONENTS.md → MartStories; референс site/MartStories.dc.html.
 // Ряд миниатюр + просмотрщик (desktop — карточка 400×711 на затемнении со стрелками, mobile — на весь экран).
-// Сторис с товаром (story.product): снизу вместо CTA — блок товара (MartProductStrip); покупатель взялся за него — пауза,
-// касание картинки — продолжить.
+// Сторис с товаром (story.product): снизу вместо CTA — товар по референсу владельца (ProductOverlay): компактная карточка,
+// над ней пузыри настоящих отзывов и колонка «В избранное», «Отзывы», «Поделиться». Покупатель взялся за товар — пауза,
+// касание картинки — продолжить. «Отзывы» — лист со списком поверх сторис (Esc закрывает сначала его).
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal, flushSync } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { MartButton } from './MartButton';
-import { MartProductStrip } from './MartProductStrip';
+import { ProductOverlay } from './product/ProductOverlay';
+import { ReviewsSheet } from './reviews/ReviewsSheet';
 import { Chevron, Cross } from './ui/Cross';
-import { STORY_DURATION } from '@/lib/config';
+import { FEATURES, STORY_DURATION } from '@/lib/config';
 import { markStorySeen, useStoriesSeen } from '@/lib/store/storiesSeen';
 import type { Story } from '@/lib/types';
 import s from './MartStories.module.css';
@@ -143,6 +145,8 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   /** Блок товара: пока покупатель выбирает размер и кладёт в корзину, история стоит (shopping). */
   const stripRef = useRef<HTMLDivElement>(null);
   const shopping = useRef(false);
+  /** Лист отзывов о товаре сторис открыт (история на паузе, как при выборе размера). */
+  const [reviewsOpen, setReviewsOpen] = useState(false);
   const onCloseRef = useRef(onClose); onCloseRef.current = onClose;
 
   const close = useCallback(() => { if (!isPreview) onCloseRef.current?.(); }, [isPreview]);
@@ -157,6 +161,7 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
     setCopied(false);
     if (copyTimer.current) { clearTimeout(copyTimer.current); copyTimer.current = undefined; setPaused(false); }
     if (shopping.current) { shopping.current = false; setPaused(false); }
+    setReviewsOpen(false);
     setPos({ si, sl });
   }, [stories]);
 
@@ -387,6 +392,8 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
   const hasText = !!(slide.title || slide.text);
   const product = story.product;
   const shop = () => { if (!isPreview && !shopping.current) { shopping.current = true; setPaused(true); } };
+  const rated = FEATURES.reviews && !!product?.rating?.count;
+  const openReviews = () => { shop(); setReviewsOpen(true); };
 
   const view = (
     <div
@@ -448,13 +455,14 @@ export function MartStoryViewer({ stories, mode = 'mobile', start = 0, onClose, 
         </div>
         {product ? (
           <div ref={stripRef} className={s.product} onPointerDownCapture={shop} onFocusCapture={shop}>
-            <MartProductStrip product={product} actions link mobile={!desktop} />
+            <ProductOverlay product={product} link mobile={!desktop} onReviews={rated ? openReviews : undefined} reviewsOpen={reviewsOpen} />
           </div>
         ) : cta && (
           <div className={s.cta}>
             <MartButton label={ctaLabel} variant="primary" size={56} full onClick={onCta} />
           </div>
         )}
+        {product && rated && <ReviewsSheet open={reviewsOpen} product={product} onClose={() => setReviewsOpen(false)} contained={isPreview} />}
       </div>
       </div>
       </div>
@@ -489,7 +497,7 @@ function Ghost({ story, sl, side, mobile }: { story: Story; sl: number; side: 'p
           <p className={s.body}>{slide.text}</p>
         </div>
       </div>
-      {story.product ? <div className={s.product}><MartProductStrip product={story.product} actions link mobile={mobile} /></div>
+      {story.product ? <div className={s.product}><ProductOverlay product={story.product} link mobile={mobile} bubbles={false} /></div>
         : slide.cta && <div className={s.cta}><MartButton label={slide.cta.label} variant="primary" size={56} full /></div>}
     </div>
   );

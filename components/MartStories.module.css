@@ -88,8 +88,8 @@
 
 .cta { position: absolute; left: 16px; right: 16px; bottom: 16px; }
 .cardMobile .cta { bottom: 34px; } /* из референса: над home-индикатором */
-/* Товар сторис — белая карточка снизу вместо CTA (MartProductStrip), отступы — как у CTA */
-.product { position: absolute; left: 12px; right: 12px; bottom: 16px; padding: 12px; border-radius: var(--r-20); background: var(--surface-card); box-shadow: var(--shadow-2); }
+/* Товар сторис — снизу вместо CTA (ProductOverlay): компактная карточка, над ней пузыри отзывов и колонка иконок; отступы — как у CTA */
+.product { position: absolute; left: 12px; right: 12px; bottom: 16px; }
 .cardMobile .product { bottom: 34px; }
 
 .arrow {
